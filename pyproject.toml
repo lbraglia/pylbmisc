@@ -32,7 +32,7 @@ Issues = "https://github.com/lbraglia/pylb/issues"
 Source = "https://github.com/lbraglia/pylb"
 
 [project.scripts]
-pylbtestapp = "pylb.scripts.testapp:main"
+pylbtestapp = "pylb.scripts:main"
 
 [tool.hatch.version]
 path = "src/pylb/__about__.py"

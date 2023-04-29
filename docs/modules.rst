@@ -1,7 +1,7 @@
-pylb
-====
+pylbmisc
+========
 
 .. toctree::
    :maxdepth: 4
 
-   pylb
+   pylbmisc

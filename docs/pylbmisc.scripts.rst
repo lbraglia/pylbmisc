@@ -1,13 +1,13 @@
-pylb.experiments package
+pylbmisc.scripts package
 ========================
 
 Submodules
 ----------
 
-pylb.experiments.sphinx module
-------------------------------
+pylbmisc.scripts.pylbtestapp module
+-----------------------------------
 
-.. automodule:: pylb.experiments.sphinx
+.. automodule:: pylbmisc.scripts.pylbtestapp
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ pylb.experiments.sphinx module
 Module contents
 ---------------
 
-.. automodule:: pylb.experiments
+.. automodule:: pylbmisc.scripts
    :members:
    :undoc-members:
    :show-inheritance:

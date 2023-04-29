@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pylb"
+name = "pylbmisc"
 dynamic = ["version"]
 description = 'Personal functions'
 readme = "README.md"
@@ -27,15 +27,15 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Documentation = "https://github.com/lbraglia/pylb#readme"
-Issues = "https://github.com/lbraglia/pylb/issues"
-Source = "https://github.com/lbraglia/pylb"
+Documentation = "https://github.com/lbraglia/pylbmisc#readme"
+Issues = "https://github.com/lbraglia/pylbmisc/issues"
+Source = "https://github.com/lbraglia/pylbmisc"
 
 [project.scripts]
-pylbtestapp = "pylb.scripts.pylbtestapp:main"
+pylbmisctestapp = "pylbmisc.scripts.pylbmisctestapp:main"
 
 [tool.hatch.version]
-path = "src/pylb/__about__.py"
+path = "src/pylbmisc/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -65,7 +65,7 @@ dependencies = [
   "ruff>=0.0.243",
 ]
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/pylb tests}"
+typing = "mypy --install-types --non-interactive {args:src/pylbmisc tests}"
 style = [
   "ruff {args:.}",
   "black --check --diff {args:.}",
@@ -131,7 +131,7 @@ unfixable = [
 ]
 
 [tool.ruff.isort]
-known-first-party = ["pylb"]
+known-first-party = ["pylbmisc"]
 
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "all"
@@ -141,16 +141,16 @@ ban-relative-imports = "all"
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
 
 [tool.coverage.run]
-source_pkgs = ["pylb", "tests"]
+source_pkgs = ["pylbmisc", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/pylb/__about__.py",
+  "src/pylbmisc/__about__.py",
 ]
 
 [tool.coverage.paths]
-pylb = ["src/pylb", "*/pylb/src/pylb"]
-tests = ["tests", "*/pylb/tests"]
+pylbmisc = ["src/pylbmisc", "*/pylbmisc/src/pylbmisc"]
+tests = ["tests", "*/pylbmisc/tests"]
 
 [tool.coverage.report]
 exclude_lines = [

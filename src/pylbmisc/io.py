@@ -42,6 +42,16 @@ def data_importer(fpaths):
     else:
         raise ValueError("No data to be imported.")
         
+def export_data(dfs, outfile): 
+    '''
+    export a dict of DataFrame as a single excel file
+
+    dfs: dict of pandas.DataFrame
+    outfile: outfile path
+    '''
+    with pd.ExcelWriter(outfile) as writer:
+        for k,v in dfs.items():
+            v.to_excel(writer, sheet_name = k)
 
 # res = data_importer(['/tmp/asd.csv', '/tmp/bar.csv', '/tmp/ajeje.zip', '/tmp/test.xlsx'])
 

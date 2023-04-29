@@ -1,7 +1,7 @@
-# pylb
+# pylbmisc
 
 Package of personal function.
 
 ## License
 
-`pylb` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+`pylbmisc` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.

@@ -32,7 +32,7 @@ Issues = "https://github.com/lbraglia/pylbmisc/issues"
 Source = "https://github.com/lbraglia/pylbmisc"
 
 [project.scripts]
-pylbmisctestapp = "pylbmisc.scripts.pylbmisctestapp:main"
+pylbmisctestapp = "pylbmisc.scripts.testapp:main"
 
 [tool.hatch.version]
 path = "src/pylbmisc/__about__.py"

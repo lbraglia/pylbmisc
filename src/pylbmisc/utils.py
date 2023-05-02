@@ -5,7 +5,9 @@ import readline
 readline.parse_and_bind('set editing-mode emacs')
 
 def argparser(opts):
-    'Helper function for argument parsing.'
+    '''
+    Helper function for argument parsing.
+    '''
     parser = argparse.ArgumentParser()
     defaults = {}
     for i in opts:
@@ -45,30 +47,10 @@ def argparser(opts):
     return(args)
 
 
-
-def import_logical(x):
-    """
-    Function to import logical values saved in csv
-    """
-    if ((x == "TRUE") or (x == "True") or (x == True)):
-        return True
-    elif (x == "NA") or (x == None) or (x == ""):
-        return None
-    else:
-        return False
-
-    
-def import_character(x):
-    """
-    Function to import characters values saved in csv
-    """
-    if (x == "" or x == "NA"):
-        return None
-    else:
-        return str(x)
-
-
 def match_arg(arg, choices):
+    '''
+    An R's match.arg equivalent.
+    '''
     res = [expanded for expanded in choices \
            if expanded.startswith(arg)]
     l = len(res)
@@ -80,26 +62,21 @@ def match_arg(arg, choices):
         return res[0]
 
 
-def unique(items):
-    seen = set()
-    for item in items:
-        if item in seen:
-            pass
-        else:
-            seen.add(item)
-            yield item
-
-
 def ascii_header(x):
+    '''
+    Create an ascii header given a string as title.
+    '''
     l = len(x)
     header = ("=" * l)
     print(header)
-    print(x.upper())
+    print(x)
     print(header, '\n')
     
  
 def line_to_numbers(x):
-    """ transform a string of positive numbers "1 2-3, 4, 6-10" to a list [1,2,3,4,6,7,8,9,10] """
+    '''
+    transform a string of positive numbers "1 2-3, 4, 6-10" to a list [1,2,3,4,6,7,8,9,10] 
+    '''
     # replace comma with white chars
     x = x.replace(",", " ")
     # keep only digits, - and white spaces
@@ -147,8 +124,14 @@ def menu(choices  = None,
          repeated = False,
          strict   = True):
     """ 
-    Return a single choice, a list of selected choiches or None if nothing
-    was choosed
+    CLI menu for user single/multiple choices
+
+    Returns either:
+    - a single choice
+    - a list of selected choiches 
+    - None if nothing was choosed
+
+    TODO: add a default options
     """
     available_ind = [i + 1 for i in range(len(choices))]
     avail_with_0  = [0] + available_ind

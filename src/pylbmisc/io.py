@@ -60,3 +60,25 @@ def export_data(dfs, outfile):
 # df = pd.read_excel("/tmp/test.xlsx", None)
 # for k, v in df.items():
 #     print(type(v))
+
+
+def import_logical(x):
+    """
+    Function to import logical values saved in csv
+    """
+    if ((x == "TRUE") or (x == "True") or (x == True)):
+        return True
+    elif (x == "NA") or (x == None) or (x == ""):
+        return None
+    else:
+        return False
+
+    
+def import_character(x):
+    """
+    Function to import characters values saved in csv
+    """
+    if (x == "" or x == "NA"):
+        return None
+    else:
+        return str(x)

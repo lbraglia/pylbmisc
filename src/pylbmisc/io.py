@@ -3,7 +3,7 @@ import pandas as pd
 from zipfile import ZipFile
 from tempfile import TemporaryDirectory
 
-def data_importer(fpaths):
+def data_import(fpaths):
     '''
     import data from several filepaths (supported formats: .csv .xls .xlsx .zip) and return a dict of DataFrame
     '''
@@ -42,7 +42,7 @@ def data_importer(fpaths):
     else:
         raise ValueError("No data to be imported.")
         
-def export_data(dfs, outfile): 
+def data_export(dfs, outfile): 
     '''
     export a dict of DataFrame as a single excel file
 

@@ -1,5 +1,5 @@
-import os
-import tempfile
+import os as _os
+import tempfile as _tempfile
 
 def save(fig,
          label = "",
@@ -18,7 +18,7 @@ def save(fig,
     scale: LaTeX includegraphics scale
     """
     # fdir not existing, using /tmp
-    if not os.path.isdir(fdir):
+    if not _os.path.isdir(fdir):
         fdir = '/tmp'
 
     # default filename to be set as label, if available or a temporary one
@@ -26,11 +26,11 @@ def save(fig,
         if label != "":
             fname = label
         else:
-            tempfile = tempfile.mkstemp(dir = fdir)
-            fname = os.path.basename(tempfile[1])
+            tempfile = _tempfile.mkstemp(dir = fdir)
+            fname = _os.path.basename(tempfile[1])
     
     # produce the file paths
-    base_path = os.path.join(fdir, fname)
+    base_path = _os.path.join(fdir, fname)
     eps_path =  base_path + ".eps"
     png_path =  base_path + ".png"
     pdf_path =  base_path + ".pdf"

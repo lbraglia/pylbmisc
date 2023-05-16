@@ -4,8 +4,9 @@
 
 from . import fig
 from . import io
-from . import utils
 from . import iter
+from . import r
+from . import utils
 
 
 

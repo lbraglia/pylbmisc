@@ -1,15 +1,17 @@
+def ascii_header(x):
+    '''
+    Create an ascii header given a string as title.
+    '''
+    l = len(x)
+    header = ("=" * l)
+    print(header)
+    print(x)
+    print(header, '\n')
 import argparse
 import math
 import re
 import readline
 readline.parse_and_bind('set editing-mode emacs')
-
-# rpy2 per rdataset
-import rpy2.robjects as ro                 # tutto il resto ..
-from rpy2.robjects import pandas2ri        # traduzione data.frame
-from rpy2.robjects.packages import importr # importazione pacchetti
-from rpy2.robjects.packages import data    # importazione dati
-
 
 def argparser(opts):
     '''
@@ -53,41 +55,6 @@ def argparser(opts):
         args[optname] = opttype(args[optname])
     return(args)
 
-
-def rdataset(dataset, pkg = 'datasets'):
-    pkgobj = importr(pkg)
-    rdf = data(pkgobj).fetch(dataset)[dataset]
-    with (ro.default_converter + pandas2ri.converter).context():
-        df = ro.conversion.get_conversion().rpy2py(rdf)
-    return df
-
-
-
-def match_arg(arg, choices):
-    '''
-    An R's match.arg equivalent.
-    '''
-    res = [expanded for expanded in choices \
-           if expanded.startswith(arg)]
-    l = len(res)
-    if l == 0:
-        raise ValueError("Parameter ", arg, "must be one of ", choices)
-    elif l > 1:
-        raise ValueError(arg, "matches multiple choices from ", choices)
-    else:
-        return res[0]
-
-
-def ascii_header(x):
-    '''
-    Create an ascii header given a string as title.
-    '''
-    l = len(x)
-    header = ("=" * l)
-    print(header)
-    print(x)
-    print(header, '\n')
-    
  
 def line_to_numbers(x):
     '''

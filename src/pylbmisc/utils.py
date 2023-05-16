@@ -4,6 +4,13 @@ import re
 import readline
 readline.parse_and_bind('set editing-mode emacs')
 
+# rpy2 per rdataset
+import rpy2.robjects as ro                 # tutto il resto ..
+from rpy2.robjects import pandas2ri        # traduzione data.frame
+from rpy2.robjects.packages import importr # importazione pacchetti
+from rpy2.robjects.packages import data    # importazione dati
+
+
 def argparser(opts):
     '''
     Helper function for argument parsing.
@@ -45,6 +52,15 @@ def argparser(opts):
         # converti il tipo a quello specificato
         args[optname] = opttype(args[optname])
     return(args)
+
+
+def rdataset(dataset, pkg = 'datasets'):
+    pkgobj = importr(pkg)
+    rdf = data(pkgobj).fetch(dataset)[dataset]
+    with (ro.default_converter + pandas2ri.converter).context():
+        df = ro.conversion.get_conversion().rpy2py(rdf)
+    return df
+
 
 
 def match_arg(arg, choices):

@@ -1,47 +1,47 @@
-import pandas as pd
+import pandas as _pd
 
-# rpy2 per rdataset
-import rpy2.robjects as ro                 # tutto il resto ..
-import rpy2.rinterface as ri
+import rpy2.robjects as _ro
+import rpy2.rinterface as _ri
 
-from rpy2.robjects import pandas2ri        # traduzione data.frame
-from rpy2.robjects.packages import importr # importazione pacchetti
-from rpy2.robjects.packages import data    # importazione dati
+from rpy2.robjects import pandas2ri as _pandas2ri      # traduzione data.frame
+from rpy2.robjects.packages import importr as _importr # importazione pacchetti
+from rpy2.robjects.packages import data    as _data    # importazione dati
 
-from rpy2.rinterface_lib import na_values
-from rpy2.robjects.conversion import localconverter
-from rpy2.robjects.conversion import get_conversion
+from rpy2.rinterface_lib import na_values as _RNA
+
 
 # -------------------------------------------------------------------------
 # custom converter for dataframe per gestire gli NA
 # https://stackoverflow.com/questions/72657405
-custom_converter = ro.default_converter
+_custom_converter = _ro.default_converter
 
-@custom_converter.rpy2py.register(ri.IntSexpVector)
-def to_int(obj):
-    return [int(v) if v != na_values.NA_Integer else pd.NA for v in obj]
+@_custom_converter.rpy2py.register(_ri.IntSexpVector)
+def _to_int(obj):
+    return [int(v) if v != _RNA.NA_Integer else _pd.NA for v in obj]
 
-@custom_converter.rpy2py.register(ri.FloatSexpVector)
-def to_float(obj):
-    return [float(v) if v != na_values.NA_Real else pd.NA for v in obj]
+@_custom_converter.rpy2py.register(_ri.FloatSexpVector)
+def _to_float(obj):
+    return [float(v) if v != _RNA.NA_Real else _pd.NA for v in obj]
 
-@custom_converter.rpy2py.register(ri.StrSexpVector)
-def to_str(obj):
-    return [str(v) if v != na_values.NA_Character else pd.NA for v in obj]
+@_custom_converter.rpy2py.register(_ri.StrSexpVector)
+def _to_str(obj):
+    return [str(v) if v != _RNA.NA_Character else _pd.NA for v in obj]
 
-@custom_converter.rpy2py.register(ri.BoolSexpVector)
-def to_bool(obj):
-    return [bool(v) if v != na_values.NA_Logical else pd.NA for v in obj]
+@_custom_converter.rpy2py.register(_ri.BoolSexpVector)
+def _to_bool(obj):
+    return [bool(v) if v != _RNA.NA_Logical else _pd.NA for v in obj]
 
 # define the top-level converter
-def toDataFrame(obj):
-    cv = get_conversion() # get the converter from current context
-    return pd.DataFrame(
+def _toDataFrame(obj):
+    cv = _ro.conversion.get_conversion() # get the converter from current context
+    return _pd.DataFrame(
         {str(k): cv.rpy2py(obj[i]) for i, k in enumerate(obj.names)}
     )
 
 # associate the converter with R data.frame class
-custom_converter.rpy2py_nc_map[ri.ListSexpVector].update({"data.frame": toDataFrame})
+_custom_converter.rpy2py_nc_map[_ri.ListSexpVector].update(
+    {"data.frame": _toDataFrame}
+)
 # -------------------------------------------------------------------------
 
 
@@ -49,11 +49,10 @@ def dataset(dataset, pkg = 'datasets'):
     '''
     Import an R dataset and convert it to a pandas DataFrame
     '''
-    pkgobj = importr(pkg)
-    rdf = data(pkgobj).fetch(dataset)[dataset]
-    # with (ro.default_converter + pandas2ri.converter).context():
-    with (custom_converter + pandas2ri.converter).context():
-        df = ro.conversion.get_conversion().rpy2py(rdf)
+    pkgobj = _importr(pkg)
+    rdf = _data(pkgobj).fetch(dataset)[dataset]
+    with (_custom_converter + _pandas2ri.converter).context():
+        df = _ro.conversion.get_conversion().rpy2py(rdf)
     return df
 
 

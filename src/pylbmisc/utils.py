@@ -1,23 +1,13 @@
-def ascii_header(x):
-    '''
-    Create an ascii header given a string as title.
-    '''
-    l = len(x)
-    header = ("=" * l)
-    print(header)
-    print(x)
-    print(header, '\n')
-import argparse
-import math
-import re
-import readline
-readline.parse_and_bind('set editing-mode emacs')
+import argparse as _argparse
+import re  as _re
+import readline as _readline
+_readline.parse_and_bind('set editing-mode emacs')
 
 def argparser(opts):
     '''
     Helper function for argument parsing.
     '''
-    parser = argparse.ArgumentParser()
+    parser = _argparse.ArgumentParser()
     defaults = {}
     for i in opts:
         optname = i[0]
@@ -63,13 +53,13 @@ def line_to_numbers(x):
     # replace comma with white chars
     x = x.replace(",", " ")
     # keep only digits, - and white spaces
-    x = re.sub(r'[^\d\- ]', '', x)
+    x = _re.sub(r'[^\d\- ]', '', x)
     # split by whitespaces
     spl = x.split(" ")
     # change ranges to proper
     expanded = []
-    single_page_re = re.compile("^\d+$")
-    pages_range_re = re.compile("^(\d+)-(\d+)$")
+    single_page_re = _re.compile("^\d+$")
+    pages_range_re = _re.compile("^(\d+)-(\d+)$")
     for i in range(len(spl)):
         # Check if the single element match one of the regular expression
         single_page = single_page_re.match(spl[i])
@@ -156,21 +146,12 @@ def menu(choices  = None,
     return rval
 
 
-
-if __name__ == '__main__':
-    # # test argparse
-    # opts = (
-    #     ('download', 'a True default', True, bool),
-    #     ('another_option', 'a false default', False, bool),
-    #     ('years', 'integer: years to be downloaded (PagesList)', 1998, int),
-    #     ('eds', 'str: edition/s to be downloaded (comma separated)',
-    #      'SE,SSE', str), 
-    # )
-    # args = argparser(opts)
-    # print(args)
-
-    # test menu
-    print(menu(choices  = ["a", "b", "c"],
-               title    = "Test menu multiple/repeated",
-               multiple = True,
-               repeated = False))
+def ascii_header(x):
+    '''
+    Create an ascii header given a string as title.
+    '''
+    l = len(x)
+    header = ("=" * l)
+    print(header)
+    print(x)
+    print(header, '\n')

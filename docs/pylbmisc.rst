@@ -13,10 +13,34 @@ Subpackages
 Submodules
 ----------
 
+pylbmisc.fig module
+-------------------
+
+.. automodule:: pylbmisc.fig
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.io module
 ------------------
 
 .. automodule:: pylbmisc.io
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pylbmisc.iter module
+--------------------
+
+.. automodule:: pylbmisc.iter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pylbmisc.r module
+-----------------
+
+.. automodule:: pylbmisc.r
    :members:
    :undoc-members:
    :show-inheritance:

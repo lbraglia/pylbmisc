@@ -3,6 +3,8 @@ import re  as _re
 import readline as _readline
 _readline.parse_and_bind('set editing-mode emacs')
 
+from .iter import unique as _unique
+
 def argparser(opts):
     '''
     Helper function for argument parsing.
@@ -139,7 +141,7 @@ def menu(choices  = None,
             ind = allowed
     # make unique if not allowed repetitions
     if not repeated:
-        ind = list(unique(ind))
+        ind = list(_unique(ind))
     # obtain the selection
     rval = [choices[i - 1] for i in ind if i != 0]
     # return always a list should simplify the code

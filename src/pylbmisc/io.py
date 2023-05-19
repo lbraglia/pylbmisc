@@ -31,12 +31,12 @@ def data_import(fpaths):
                 with _zipfile.ZipFile(fpath) as myzip:
                     myzip.extractall(tempdir)
                     zipped_fpaths = [_os.path.join(tempdir, f) for f in _os.listdir(tempdir)]
-                    zipped_data = data_importer(zipped_fpaths)
+                    zipped_data = data_import(zipped_fpaths)
             # prepend zip name to fname (as keys) and update results
             zipped_data = { "{0}_{1}".format(fname, k) : v for k, v in zipped_data.items()}
             rval.update(zipped_data)
         else:
-            raise Warning("Format not supported for {0}. It must be a .csv, .xls, .xlsx, .zip. Ignoring it.".format(f))
+            raise Warning("Format not supported for {0}. It must be a .csv, .xls, .xlsx, .zip. Ignoring it.".format(fext))
     if len(rval):
         return(rval)
     else:

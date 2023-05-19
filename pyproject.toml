@@ -24,7 +24,10 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dependencies = [
+  "pandas",
+  "rpy2"
+]
 
 [project.urls]
 Documentation = "https://github.com/lbraglia/pylbmisc#readme"

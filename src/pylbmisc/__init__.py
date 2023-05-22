@@ -5,7 +5,7 @@
 from . import fig
 from . import io
 from . import iter
-from . import r
+# from . import r
 from . import utils
 
 

@@ -6,3 +6,6 @@ lint:
 
 doc-refresh:
 	sphinx-apidoc -f src/pylbmisc -o docs
+
+mypy:
+	mypy .

@@ -10,7 +10,7 @@ def basicrst(arg1, arg2):
     1. primo elemento elenco numerato *corsivo*;
     2. secondo elemento elenco numerato **grassetto**:
 
-       * sottoelenco puntato 1 
+       * sottoelenco puntato 1
        * sottoelenco puntato 2
 
     3. codice ``print(100)``
@@ -30,7 +30,7 @@ def basicrst(arg1, arg2):
      Description.
 
     Blocchi di codice sono introdotti da doppio due punti (e indentati)::
-    
+
         ls asd
         sudo rm -rf /
 

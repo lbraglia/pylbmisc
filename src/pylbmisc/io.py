@@ -2,16 +2,20 @@ import os as _os
 import pandas as _pd
 import zipfile as _zipfile
 import tempfile as _tempfile
+from pathlib import Path as _Path
+from typing import Sequence as _Sequence
 
-def data_import(fpaths):
+def data_import(fpaths: _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
     '''
     import data from several filepaths (supported formats: .csv .xls .xlsx .zip) and return a dict of DataFrame
     '''
     # import ipdb
     # ipdb.set_trace()
-    accepted_fpaths = [f for f in fpaths
+    accepted_fpaths = [f for f in str(fpaths)
                        if _os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}]
-    rval = {}
+
+    rval: dict[str, _pd.DataFrame] = {}
+    
     for fpath in accepted_fpaths:
         fname = _os.path.splitext(_os.path.basename(fpath))[0]
         fext = _os.path.splitext(fpath)[1].lower()
@@ -23,9 +27,10 @@ def data_import(fpaths):
             else:
                 raise Warning("{0} is probably duplicated, skipping to avoid overwriting ".format(dfname))
         elif fext in {'.xls', '.xlsx'}:
-            data = _pd.read_excel(fpath, None) # import all the sheets as a dict of DataFrame
-            data = {"{0}_{1}".format(fname, k): v for k, v in data.items()} # add xlsx to sheet names
-            rval.update(data)
+            datas = _pd.read_excel(fpath, None) # import all the sheets as a dict of DataFrame
+            datas = {"{0}_{1}".format(fname, k): _pd.DataFrame(v) # shut up mypy
+                     for k, v in data.items()} # add xlsx to sheet names
+            rval.update(datas)
         elif fext == '.zip': # unzip in temporary directory and go by recursion
             with _tempfile.TemporaryDirectory() as tempdir:
                 with _zipfile.ZipFile(fpath) as myzip:
@@ -42,14 +47,14 @@ def data_import(fpaths):
     else:
         raise ValueError("No data to be imported.")
         
-def data_export(dfs, outfile): 
+def data_export(dfs : dict[str, _pd.DataFrame], outfile: str|_Path) -> None: 
     '''
     export a dict of DataFrame as a single excel file
 
     dfs: dict of pandas.DataFrame
     outfile: outfile path
     '''
-    with _pd.ExcelWriter(outfile) as writer:
+    with _pd.ExcelWriter(str(outfile)) as writer:
         for k,v in dfs.items():
             v.to_excel(writer, sheet_name = k)
 

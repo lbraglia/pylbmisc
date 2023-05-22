@@ -1,12 +1,12 @@
 import os as _os
 import tempfile as _tempfile
 
-def save(fig,
-         label = "",
-         caption = "",
-         fdir = "outputs",
-         fname = "",
-         scale = 1):
+def dump(fig,             # sarebbe matplotlib.figure.Figure ma ho paura dei tempi di caricamento
+         label: str = "",
+         caption: str = "",
+         fdir: str = "outputs",
+         fname: str = "",
+         scale: float = 1):
     """
     Save to png, eps and pdf and include in Latex an image; intended to be used inside pythontex pycode.
 

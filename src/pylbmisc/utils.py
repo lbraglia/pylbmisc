@@ -1,15 +1,16 @@
-import argparse as _argparse
-import re  as _re
-import readline as _readline
-_readline.parse_and_bind('set editing-mode emacs')
+import argparse
+import re
+import readline
+readline.parse_and_bind('set editing-mode emacs')
 
-from .iter import unique as _unique
+from typing import Sequence
+from .iter import unique
 
 def argparser(opts):
     '''
     Helper function for argument parsing.
     '''
-    parser = _argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     defaults = {}
     for i in opts:
         optname = i[0]
@@ -48,20 +49,20 @@ def argparser(opts):
     return(args)
 
  
-def line_to_numbers(x):
+def line_to_numbers(x: str) -> list[int]:
     '''
     transform a string of positive numbers "1 2-3, 4, 6-10" to a list [1,2,3,4,6,7,8,9,10] 
     '''
     # replace comma with white chars
     x = x.replace(",", " ")
     # keep only digits, - and white spaces
-    x = _re.sub(r'[^\d\- ]', '', x)
+    x = re.sub(r'[^\d\- ]', '', x)
     # split by whitespaces
     spl = x.split(" ")
     # change ranges to proper
     expanded = []
-    single_page_re = _re.compile("^\d+$")
-    pages_range_re = _re.compile("^(\d+)-(\d+)$")
+    single_page_re = re.compile("^\d+$")
+    pages_range_re = re.compile("^(\d+)-(\d+)$")
     for i in range(len(spl)):
         # Check if the single element match one of the regular expression
         single_page = single_page_re.match(spl[i])
@@ -89,15 +90,14 @@ def line_to_numbers(x):
         else:
             ValueError(str(spl[i]) + "does not match a single page re nor a pages range re.")
     # coerce to integer expanded
-    for i in range(len(expanded)):
-        expanded[i] = int(expanded[i])
-    return(expanded)
+    res: list[int] = [int(x) for x in expanded]
+    return(res)
 
-def menu(choices  = None,
-         title    = "",
-         multiple = False,
-         repeated = False,
-         strict   = True):
+def menu(choices: Sequence[str],
+         title: str|None = None,
+         multiple: bool = False,
+         repeated: bool = False,
+         strict: bool   = True) -> Sequence[str]:
     """ 
     CLI menu for user single/multiple choices
 
@@ -141,14 +141,14 @@ def menu(choices  = None,
             ind = allowed
     # make unique if not allowed repetitions
     if not repeated:
-        ind = list(_unique(ind))
+        ind = list(unique(ind))
     # obtain the selection
     rval = [choices[i - 1] for i in ind if i != 0]
     # return always a list should simplify the code
     return rval
 
 
-def ascii_header(x):
+def ascii_header(x: str) -> None:
     '''
     Create an ascii header given a string as title.
     '''

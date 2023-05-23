@@ -1,41 +1,41 @@
-import os as _os
-import pandas as _pd
-import zipfile as _zipfile
-import tempfile as _tempfile
-from pathlib import Path as _Path
-from typing import Sequence as _Sequence
+import os
+import pandas as pd
+import tempfile
+import zipfile
 
-def data_import(fpaths: _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
+from pathlib import Path
+from typing import Sequence
+
+def data_import(fpaths: Sequence[str | Path]) -> dict[str, pd.DataFrame]:
     '''
     import data from several filepaths (supported formats: .csv .xls .xlsx .zip) and return a dict of DataFrame
     '''
     # import ipdb
     # ipdb.set_trace()
-    accepted_fpaths = [f for f in str(fpaths)
-                       if _os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}]
+    accepted_fpaths = [str(f) for f in fpaths
+                       if os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}]
 
-    rval: dict[str, _pd.DataFrame] = {}
+    rval: dict[str, pd.DataFrame] = {}
     
     for fpath in accepted_fpaths:
-        fname = _os.path.splitext(_os.path.basename(fpath))[0]
-        fext = _os.path.splitext(fpath)[1].lower()
+        fname = os.path.splitext(os.path.basename(fpath))[0]
+        fext = os.path.splitext(fpath)[1].lower()
         if fext == '.csv':
             dfname = fname
-            data = _pd.read_csv(fpath)
+            data = pd.read_csv(fpath)
             if dfname not in rval.keys():  #check for duplicates
                 rval[dfname] = data
             else:
                 raise Warning("{0} is probably duplicated, skipping to avoid overwriting ".format(dfname))
         elif fext in {'.xls', '.xlsx'}:
-            datas = _pd.read_excel(fpath, None) # import all the sheets as a dict of DataFrame
-            datas = {"{0}_{1}".format(fname, k): _pd.DataFrame(v) # shut up mypy
-                     for k, v in data.items()} # add xlsx to sheet names
-            rval.update(datas)
+            sheets = pd.read_excel(fpath, None) # import all the sheets as a dict of DataFrame
+            sheets = {"{0}_{1}".format(fname, k): v for k, v in sheets.items()} # add xlsx to sheet names
+            rval.update(sheets)
         elif fext == '.zip': # unzip in temporary directory and go by recursion
-            with _tempfile.TemporaryDirectory() as tempdir:
-                with _zipfile.ZipFile(fpath) as myzip:
+            with tempfile.TemporaryDirectory() as tempdir:
+                with zipfile.ZipFile(fpath) as myzip:
                     myzip.extractall(tempdir)
-                    zipped_fpaths = [_os.path.join(tempdir, f) for f in _os.listdir(tempdir)]
+                    zipped_fpaths = [os.path.join(tempdir, f) for f in os.listdir(tempdir)]
                     zipped_data = data_import(zipped_fpaths)
             # prepend zip name to fname (as keys) and update results
             zipped_data = { "{0}_{1}".format(fname, k) : v for k, v in zipped_data.items()}
@@ -47,14 +47,14 @@ def data_import(fpaths: _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
     else:
         raise ValueError("No data to be imported.")
         
-def data_export(dfs : dict[str, _pd.DataFrame], outfile: str|_Path) -> None: 
+def data_export(dfs : dict[str, pd.DataFrame], outfile: str|Path) -> None: 
     '''
     export a dict of DataFrame as a single excel file
 
     dfs: dict of pandas.DataFrame
     outfile: outfile path
     '''
-    with _pd.ExcelWriter(str(outfile)) as writer:
+    with pd.ExcelWriter(str(outfile)) as writer:
         for k,v in dfs.items():
             v.to_excel(writer, sheet_name = k)
 

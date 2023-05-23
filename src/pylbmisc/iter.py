@@ -1,4 +1,8 @@
-def unique(x):
+from typing import Any
+from typing import Iterator
+
+
+def unique(x) -> Iterator[Any]:
     '''
     return a stream of unique items contained in x
     '''
@@ -11,7 +15,7 @@ def unique(x):
             yield item
 
 # minor diffs from 1.10 of python cookbook
-def duplicated(x):
+def duplicated(x) -> Iterator[bool]:
     '''
     return a stream of logical value (already seen element)
     '''

@@ -1,5 +1,6 @@
-import os as _os
-import tempfile as _tempfile
+import os
+import tempfile
+
 
 def dump(fig,             # sarebbe matplotlib.figure.Figure ma ho paura dei tempi di caricamento
          label: str = "",
@@ -18,7 +19,7 @@ def dump(fig,             # sarebbe matplotlib.figure.Figure ma ho paura dei tem
     scale: LaTeX includegraphics scale
     """
     # fdir not existing, using /tmp
-    if not _os.path.isdir(fdir):
+    if not os.path.isdir(fdir):
         fdir = '/tmp'
 
     # default filename to be set as label, if available or a temporary one
@@ -26,11 +27,11 @@ def dump(fig,             # sarebbe matplotlib.figure.Figure ma ho paura dei tem
         if label != "":
             fname = label
         else:
-            tempfile = _tempfile.mkstemp(dir = fdir)
-            fname = _os.path.basename(tempfile[1])
+            tempfile = tempfile.mkstemp(dir = fdir)
+            fname = os.path.basename(tempfile[1])
     
     # produce the file paths
-    base_path = _os.path.join(fdir, fname)
+    base_path = os.path.join(fdir, fname)
     eps_path =  base_path + ".eps"
     png_path =  base_path + ".png"
     pdf_path =  base_path + ".pdf"

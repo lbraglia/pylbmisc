@@ -55,8 +55,8 @@ def data_export(dfs : dict[str, pd.DataFrame],
     export a dict of DataFrame as a list of csv or a single excel file
 
     dfs: dict of pandas.DataFrame
-    fpath: fpath path 
-    fmt: str, "csv" (default) or "xlsx"
+    fpath: fpath file path
+    fmt: str, file format as "csv" (default) or "xlsx"
     '''
     fpath = Path(fpath)
     if fmt == "csv":

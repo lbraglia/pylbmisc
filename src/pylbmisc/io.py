@@ -47,17 +47,29 @@ def data_import(fpaths: Sequence[str | Path]) -> dict[str, pd.DataFrame]:
     else:
         raise ValueError("No data to be imported.")
         
-def data_export(dfs : dict[str, pd.DataFrame], outfile: str|Path) -> None: 
+def data_export(dfs : dict[str, pd.DataFrame],
+                fpath: str|Path,
+                fmt: str = "csv"
+                ) -> None: 
     '''
-    export a dict of DataFrame as a single excel file
+    export a dict of DataFrame as a list of csv or a single excel file
 
     dfs: dict of pandas.DataFrame
-    outfile: outfile path
+    fpath: fpath path 
+    fmt: str, "csv" (default) or "xlsx"
     '''
-    with pd.ExcelWriter(str(outfile)) as writer:
+    fpath = Path(fpath)
+    if fmt == "csv":
         for k,v in dfs.items():
-            v.to_excel(writer, sheet_name = k)
-
+            csvpath = fpath.parent / (str(fpath.stem) + "_{0}.csv".format(k))
+            print(k, csvpath)
+            v.to_csv(csvpath, index = False)
+    elif fmt == "excel":
+        with pd.ExcelWriter(str(fpath)) as writer:
+            for k,v in dfs.items():
+                v.to_excel(writer, sheet_name = k)
+    else:
+        raise ValueError("Formato non disponibile: disponibili csv ed xlsx.")
 
 
 # def import_logical(x):

@@ -37,6 +37,14 @@ pylbmisc.iter module
    :undoc-members:
    :show-inheritance:
 
+pylbmisc.tg module
+------------------
+
+.. automodule:: pylbmisc.tg
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.utils module
 ---------------------
 

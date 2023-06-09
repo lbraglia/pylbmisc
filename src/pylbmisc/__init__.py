@@ -2,10 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
+# from . import r
 from . import fig
 from . import io
 from . import iter
-# from . import r
+from . import tg
 from . import utils
+
 
 

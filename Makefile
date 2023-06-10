@@ -9,3 +9,6 @@ doc-refresh:
 
 mypy:
 	mypy .
+
+black:
+	black .

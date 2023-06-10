@@ -12,4 +12,4 @@ mypy:
 	mypy .
 
 black:
-	black --line-length 75 .
+	black --line-length 79 . # make it coherent with flake E501

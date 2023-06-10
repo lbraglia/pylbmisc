@@ -8,12 +8,16 @@ from typing import Sequence
 
 
 def data_import(fpaths: Sequence[str | Path]) -> dict[str, pd.DataFrame]:
-    '''
-    import data from several filepaths (supported formats: .csv .xls .xlsx .zip) and return a dict of DataFrame
+    '''import data from several filepaths (supported formats: .csv
+    .xls .xlsx .zip) and return a dict of DataFrame
     '''
     # import ipdb
     # ipdb.set_trace()
-    accepted_fpaths = [str(f) for f in fpaths if os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}]
+    accepted_fpaths = [
+        str(f)
+        for f in fpaths
+        if os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}
+    ]
 
     rval: dict[str, pd.DataFrame] = {}
 
@@ -26,31 +30,46 @@ def data_import(fpaths: Sequence[str | Path]) -> dict[str, pd.DataFrame]:
             if dfname not in rval.keys():  # check for duplicates
                 rval[dfname] = data
             else:
-                raise Warning("{0} is probably duplicated, skipping to avoid overwriting ".format(dfname))
+                msg = "{0} is duplicated, skipping to avoid overwriting"
+                raise Warning(msg.format(dfname))
         elif fext in {'.xls', '.xlsx'}:
-            sheets = pd.read_excel(fpath, None)  # import all the sheets as a dict of DataFrame
-            sheets = {"{0}_{1}".format(fname, k): v for k, v in sheets.items()}  # add xlsx to sheet names
+            sheets = pd.read_excel(
+                fpath, None
+            )  # import all the sheets as a dict of DataFrame
+            sheets = {
+                "{0}_{1}".format(fname, k): v for k, v in sheets.items()
+            }  # add xlsx to sheet names
             rval.update(sheets)
-        elif fext == '.zip':  # unzip in temporary directory and go by recursion
+        elif (
+            fext == '.zip'
+        ):  # unzip in temporary directory and go by recursion
             with tempfile.TemporaryDirectory() as tempdir:
                 with zipfile.ZipFile(fpath) as myzip:
                     myzip.extractall(tempdir)
-                    zipped_fpaths = [os.path.join(tempdir, f) for f in os.listdir(tempdir)]
+                    zipped_fpaths = [
+                        os.path.join(tempdir, f) for f in os.listdir(tempdir)
+                    ]
                     zipped_data = data_import(zipped_fpaths)
             # prepend zip name to fname (as keys) and update results
-            zipped_data = {"{0}_{1}".format(fname, k): v for k, v in zipped_data.items()}
+            zipped_data = {
+                "{0}_{1}".format(fname, k): v for k, v in zipped_data.items()
+            }
             rval.update(zipped_data)
         else:
-            raise Warning(
-                "Format not supported for {0}. It must be a .csv, .xls, .xlsx, .zip. Ignoring it.".format(fext)
+            msg = "File format not supported for {0}. Ignoring it.".format(
+                fext
             )
+            raise Warning(msg)
+
     if len(rval):
         return rval
     else:
         raise ValueError("No data to be imported.")
 
 
-def data_export(dfs: dict[str, pd.DataFrame], fpath: str | Path, fmt: str = "csv") -> None:
+def data_export(
+    dfs: dict[str, pd.DataFrame], fpath: str | Path, fmt: str = "csv"
+) -> None:
     '''
     export a dict of DataFrame as a list of csv or a single excel file
 

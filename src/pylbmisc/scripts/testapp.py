@@ -9,9 +9,19 @@ def main():
     opts = (
         # (param, help, default, type)
         # --dirs
-        ('dirs', 'str: comma separated list of exercise source directories', '~/src/pypkg/exercises/db', str),
+        (
+            'dirs',
+            'str: comma separated list of exercise source directories',
+            '~/src/pypkg/exercises/db',
+            str,
+        ),
         # --lists
-        ('lists', 'str: comma separated list of file with lists of source directories', None, str),
+        (
+            'lists',
+            'str: comma separated list of file with lists of source dir',
+            None,
+            str,
+        ),
         # --outfile
         ('outfile', 'str:  sqlite3 db to save', '~/.exercises.db', str),
     )

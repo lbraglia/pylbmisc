@@ -3,7 +3,7 @@ import tempfile
 
 
 def dump(
-    fig,  # sarebbe matplotlib.figure.Figure ma ho paura dei tempi di caricamento
+    fig,
     label: str = "",
     caption: str = "",
     fdir: str = "outputs",
@@ -13,7 +13,7 @@ def dump(
     """
     Save to png, eps and pdf and include in Latex an image; intended to be used inside pythontex pycode.
 
-    fig: a matplotlib fig
+    fig: a matplotlib.figure.Figure fig
     label: LaTeX label to be put after "fig:"
     caption: LaTeX caption, if "" a pretty version of label is set
     fdir: the directory where to save, if not existent, save in /tmp"
@@ -29,8 +29,8 @@ def dump(
         if label != "":
             fname = label
         else:
-            tempfile = tempfile.mkstemp(dir=fdir)
-            fname = os.path.basename(tempfile[1])
+            tmp = tempfile.mkstemp(dir=fdir)
+            fname = os.path.basename(tmp[1])
 
     # produce the file paths
     base_path = os.path.join(fdir, fname)

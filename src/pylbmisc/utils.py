@@ -2,10 +2,10 @@ import argparse
 import re
 import readline
 
-readline.parse_and_bind('set editing-mode emacs')
-
 from typing import Sequence
 from .iter import unique
+
+readline.parse_and_bind('set editing-mode emacs')
 
 
 def argparser(opts):
@@ -13,7 +13,7 @@ def argparser(opts):
     Helper function for argument parsing.
     '''
     parser = argparse.ArgumentParser()
-    defaults = {}
+    # defaults = {}
     for i in opts:
         optname = i[0]
         optdescription = i[1]
@@ -152,8 +152,7 @@ def ascii_header(x: str) -> None:
     '''
     Create an ascii header given a string as title.
     '''
-    l = len(x)
-    header = "=" * l
+    header = "=" * len(x)
     print(header)
     print(x)
     print(header, '\n')

@@ -2,12 +2,14 @@ import os
 import tempfile
 
 
-def dump(fig,             # sarebbe matplotlib.figure.Figure ma ho paura dei tempi di caricamento
-         label: str = "",
-         caption: str = "",
-         fdir: str = "outputs",
-         fname: str = "",
-         scale: float = 1):
+def dump(
+    fig,  # sarebbe matplotlib.figure.Figure ma ho paura dei tempi di caricamento
+    label: str = "",
+    caption: str = "",
+    fdir: str = "outputs",
+    fname: str = "",
+    scale: float = 1,
+):
     """
     Save to png, eps and pdf and include in Latex an image; intended to be used inside pythontex pycode.
 
@@ -27,24 +29,23 @@ def dump(fig,             # sarebbe matplotlib.figure.Figure ma ho paura dei tem
         if label != "":
             fname = label
         else:
-            tempfile = tempfile.mkstemp(dir = fdir)
+            tempfile = tempfile.mkstemp(dir=fdir)
             fname = os.path.basename(tempfile[1])
-    
+
     # produce the file paths
     base_path = os.path.join(fdir, fname)
-    eps_path =  base_path + ".eps"
-    png_path =  base_path + ".png"
-    pdf_path =  base_path + ".pdf"
+    eps_path = base_path + ".eps"
+    png_path = base_path + ".png"
+    pdf_path = base_path + ".pdf"
 
     # save figures to hard drive
     fig.savefig(eps_path)
-    fig.savefig(png_path)#, dpi = 600)
+    fig.savefig(png_path)  # , dpi = 600)
     fig.savefig(pdf_path)
 
     # latex stuff
     latex_label = 'fig:' + label
     caption = label.capitalize().replace("_", " ") if caption == "" else caption
     latex = "\\begin{figure} \\centering \\includegraphics[scale=%(scale).2f]{%(base_path)s} \\caption{%(caption)s} \\label{%(label)s} \\end{figure}"
-    subs = {"scale" : scale, "base_path" : base_path ,
-            "caption" : caption, "label" : latex_label}
+    subs = {"scale": scale, "base_path": base_path, "caption": caption, "label": latex_label}
     print(latex % subs)

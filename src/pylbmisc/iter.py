@@ -14,6 +14,7 @@ def unique(x) -> Iterator[Any]:
             seen.add(item)
             yield item
 
+
 # minor diffs from 1.10 of python cookbook
 def duplicated(x) -> Iterator[bool]:
     '''
@@ -26,7 +27,8 @@ def duplicated(x) -> Iterator[bool]:
         else:
             seen.add(item)
             yield False
-            
+
+
 if __name__ == '__main__':
-    l = [1,2,1,3]
+    l = [1, 2, 1, 3]
     print(list(duplicated(l)))

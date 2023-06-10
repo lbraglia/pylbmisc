@@ -7,6 +7,7 @@ import pandas as pd
 
 from pathlib import Path
 
+
 def chat2df(fpath):
     '''Trasforma una chat json esportata dal clienti desktop in un DataFrame Pandas
 

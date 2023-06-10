@@ -6,6 +6,7 @@
 
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../src/'))
 
 
@@ -21,15 +22,14 @@ release = '0.0.1'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',   # generazione automatica api
+    'sphinx.ext.autodoc',  # generazione automatica api
     'sphinx.ext.viewcode',  # aggiungi link ipertestuali al codice
-    'sphinx.ext.napoleon'   # supporta sintassi a-la numpy
+    'sphinx.ext.napoleon',  # supporta sintassi a-la numpy
 ]
 
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
 
 
 # -- Options for HTML output -------------------------------------------------

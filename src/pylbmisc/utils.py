@@ -9,8 +9,7 @@ readline.parse_and_bind('set editing-mode emacs')
 
 
 def argparser(opts):
-    '''
-    Helper function for argument parsing.
+    '''Helper function for argument parsing.
 
     Example usage:
     --------------

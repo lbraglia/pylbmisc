@@ -1,6 +1,3 @@
-"""Modulo con funzioni di utilità per Telegram
-"""
-
 import json
 import pandas as pd
 

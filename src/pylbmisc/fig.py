@@ -17,11 +17,11 @@ def dump(
 
     Args:
        fig (matplotlib.figure.Figure): the fig
-       label (str): LaTeX label to be put after "fig:"
-       caption (str): LaTeX caption, if '' a pretty version of label is set
-       fdir (str): the directory where to save, if not existent, save in /tmp
-       fname (str): basename of the file to be used (otherwise, non '' label
-           will be used or a tempfile will be created)
+       label (str): posta dopo "fig:" in LaTeX
+       caption (str): caption LaTeX, se mancante viene riadattata label
+       fdir (str): directory dove salvare, se mancante si usa /tmp
+       fname (str): basename del file da salvare, se mancante si prova
+          a riusare label oppure a creare un file temporaneo
        scale (float): LaTeX includegraphics scale
 
     Returns:

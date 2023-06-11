@@ -11,10 +11,7 @@ Telegram
    :members:
 
 Figures
-========	     
+========
 .. automodule:: pylbmisc.fig
    :members:
-      
-
-   modules
 

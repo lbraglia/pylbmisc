@@ -1,9 +1,12 @@
 Welcome to pylbmisc's documentation!
 ================================
 
-.. automodule:: pylbmisc.tg
-    :members:
+.. automodule:: tg
+   :members:
 
+.. automodule:: fig
+   :members:
+      
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

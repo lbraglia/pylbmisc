@@ -1,5 +1,4 @@
-"""
-Modulo con funzioni di utilità per Telegram
+"""Modulo con funzioni di utilità per Telegram
 """
 
 import json
@@ -9,11 +8,16 @@ from pathlib import Path
 
 
 def chat2df(fpath):
-    '''Trasforma una chat json esportata dal clienti desktop in un
+    '''Telegram chat json to pandas DataFrame
+
+    Trasforma una chat json esportata dal clienti desktop in un
     DataFrame Pandas.
 
-    fpath: str|Path to a json export of a telegram chat
+    Args:
+        fpath (str|Path): path ad un file json esportato da Telegram
 
+    Returns:
+        pandas.DataFrame: the chat
     '''
     fpath = Path(fpath)
     with fpath.open() as f:

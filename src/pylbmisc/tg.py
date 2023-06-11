@@ -11,10 +11,10 @@ def chat2df(fpath: str | Path) -> pd.DataFrame:
     DataFrame Pandas.
 
     Args:
-        fpath (str|Path): path ad un file json esportato da Telegram
+       fpath (str|Path): path ad un file json esportato da Telegram
 
     Returns:
-        pandas.DataFrame: the chat
+       pandas.DataFrame: the chat
 
     """
     fpath = Path(fpath)

@@ -7,7 +7,7 @@ name = "pylbmisc"
 dynamic = ["version"]
 description = 'Personal functions'
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.11"
 license = "MIT"
 keywords = []
 authors = [
@@ -16,17 +16,12 @@ authors = [
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "pandas"# ,
-  # "rpy2"
+  "pandas"
 ]
 
 [project.urls]
@@ -35,7 +30,7 @@ Issues = "https://github.com/lbraglia/pylbmisc/issues"
 Source = "https://github.com/lbraglia/pylbmisc"
 
 [project.scripts]
-pylbmisctestapp = "pylbmisc.scripts.testapp:main"
+csv2flashcards = "pylbmisc.scripts.csv2flashcards:main"
 
 [tool.hatch.version]
 path = "src/pylbmisc/__about__.py"

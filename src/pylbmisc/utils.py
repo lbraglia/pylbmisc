@@ -11,6 +11,41 @@ readline.parse_and_bind('set editing-mode emacs')
 def argparser(opts):
     '''
     Helper function for argument parsing.
+
+    Example usage:
+    --------------
+    import pylbmisc as lb # third party
+    # from ..utils import argparser # in scripts directory
+    
+    opts = (
+        # (param, help, default, type)
+        # --dirs
+        (
+            'dirs',
+            'str: comma separated list of exercise source directories',
+            '~/src/pypkg/exercises/db',
+            str,
+        ),
+        # --lists
+        (
+            'lists',
+            'str: comma separated list of file with lists of source dir',
+            None,
+            str,
+        ),
+        # --outfile
+        ('outfile', 'str:  sqlite3 db to save', '~/.exercises.db', str),
+    )
+
+    args = lb.utils.argparser(opts)
+    dirs = args['dirs']
+    dirs = dirs.split(',')
+    lists = args['lists']
+    lists = lists.split(',')
+    outfile = args['outfile']
+    print({"dirs": dirs, "lists": lists, "outfile": outfile})
+    return 0
+    
     '''
     parser = argparse.ArgumentParser()
     # defaults = {}

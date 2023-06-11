@@ -7,7 +7,7 @@ import pandas as pd
 from pathlib import Path
 
 
-def chat2df(fpath):
+def chat2df(fpath: str|Path) -> pd.DataFrame:
     '''Telegram chat json to pandas DataFrame
 
     Trasforma una chat json esportata dal clienti desktop in un

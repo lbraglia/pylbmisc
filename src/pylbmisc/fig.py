@@ -22,7 +22,7 @@ def dump(
        fdir (str): directory dove salvare, se mancante si usa /tmp
        fname (str): basename del file da salvare, se mancante si prova
           a riusare label oppure a creare un file temporaneo
-       scale (float): LaTeX includegraphics scale
+       scale (float): scale di includegraphics di LaTeX
 
     Returns:
        None: nothing interesting here

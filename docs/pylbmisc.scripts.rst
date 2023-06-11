@@ -4,10 +4,10 @@ pylbmisc.scripts package
 Submodules
 ----------
 
-pylbmisc.scripts.testapp module
--------------------------------
+pylbmisc.scripts.csv2flashcards module
+--------------------------------------
 
-.. automodule:: pylbmisc.scripts.testapp
+.. automodule:: pylbmisc.scripts.csv2flashcards
    :members:
    :undoc-members:
    :show-inheritance:

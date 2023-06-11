@@ -1,22 +1,20 @@
-Welcome to pylbmisc's documentation!
-================================
-
-.. automodule:: tg
-   :members:
-
-.. automodule:: fig
-   :members:
-      
+Pylbmisc Documentation
+**********************
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+
+Telegram
+========	     
+.. automodule:: pylbmisc.tg
+   :members:
+
+Figures
+========	     
+.. automodule:: pylbmisc.fig
+   :members:
+      
+
    modules
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

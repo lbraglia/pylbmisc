@@ -2,7 +2,7 @@ test:
 	pytest
 
 flake8:
-	flake8
+	flake8 .
 
 doc:
 	sphinx-apidoc -f src/pylbmisc -o docs

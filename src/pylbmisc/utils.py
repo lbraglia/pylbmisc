@@ -16,7 +16,7 @@ def argparser(opts):
     --------------
     import pylbmisc as lb # third party
     # from ..utils import argparser # in scripts directory
-    
+
     opts = (
         # (param, help, default, type)
         # --dirs
@@ -45,7 +45,7 @@ def argparser(opts):
     outfile = args['outfile']
     print({"dirs": dirs, "lists": lists, "outfile": outfile})
     return 0
-    
+
     '''
     parser = argparse.ArgumentParser()
     # defaults = {}

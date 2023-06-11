@@ -1,10 +1,12 @@
 import argparse
 import csv
 from pathlib import Path
+
 # from ..utils import argparser
 
 preamble = r"\documentclass[avery5371, grid]{flashcards} \begin{document}"
 ending = r"\end{document}"
+
 
 def flash(s1, s2):
     res = (
@@ -38,6 +40,6 @@ def main():
             for row in reader:
                 print(flash(row[0], row[1]), "\n", file=out)
         print(ending, file=out)
-    
+
     print("All done, now run:\n\t pdflatex " + str(outfile))
     return

@@ -31,6 +31,7 @@ Source = "https://github.com/lbraglia/pylbmisc"
 
 [project.scripts]
 csv2flashcards = "pylbmisc.scripts.csv2flashcards:main"
+appunti_test = "pylbmisc.scripts.appunti:main"
 
 [tool.hatch.version]
 path = "src/pylbmisc/__about__.py"

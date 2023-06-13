@@ -30,7 +30,7 @@ Issues = "https://github.com/lbraglia/pylbmisc/issues"
 Source = "https://github.com/lbraglia/pylbmisc"
 
 [project.scripts]
-csv2flashcards = "pylbmisc.scripts.csv2flashcards:main"
+flashcards = "pylbmisc.scripts.flashcards:main"
 
 [tool.hatch.version]
 path = "src/pylbmisc/__about__.py"

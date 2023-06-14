@@ -36,6 +36,8 @@ Source = "https://github.com/lbraglia/pylbmisc"
 
 [project.scripts]
 pylbmisctestapp = "pylbmisc.scripts.testapp:main"
+compile_article = "pylbmisc.scripts.compile_latex:article"
+compile_book = "pylbmisc.scripts.compile_latex:book"
 
 [tool.hatch.version]
 path = "src/pylbmisc/__about__.py"

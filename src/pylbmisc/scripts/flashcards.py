@@ -137,45 +137,26 @@ class Flashcards(object):
                                  quoting = csv.QUOTE_NONNUMERIC)
             for x in self.__fc:
                 dataset.writerow(x)
+        print("All done, exported to: " + str(path))
 
     
-def main():
+def flashcards2tex():
     parser = argparse.ArgumentParser()
     parser.add_argument("path")
     args = parser.parse_args()
-
-    # arguments checking: input può essere una directory, un file tex, Rnw o csv
     path = Path(args.path)
     if not path.exists():
         raise FileNotFoundError(str(path) + " does not exists.")
     fc = Flashcards(path)
     fc.to_tex("/tmp/flashcards.tex")
 
-
-
- 
-# def main_old():
-#     '''A csv 2 latex flashcard creator'''
-
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("infile")
-#     args = parser.parse_args()
-
-#     # arguments checking
-#     infile = Path(args.infile)
-#     if not infile.exists():
-#         raise FileNotFoundError(str(infile) + " does not exists.")
-
-#     # gogogo
-#     outfile = infile.with_suffix('.tex')
-#     with open(outfile, mode="w") as out:
-#         print(preamble, file=out)
-#         with open(infile) as csvfile:
-#             reader = csv.reader(csvfile)
-#             for row in reader:
-#                 print(flash(row[0], row[1]), "\n", file=out)
-#         print(ending, file=out)
-
-#     print("All done, now run:\n\t pdflatex " + str(outfile))
-#     return
-   
+def flashcards2csv():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("path")
+    args = parser.parse_args()
+    path = Path(args.path)
+    if not path.exists():
+        raise FileNotFoundError(str(path) + " does not exists.")
+    fc = Flashcards(path)
+    fc.to_csv("/tmp/flashcards.csv")
+    

@@ -10,16 +10,22 @@ def dump(
     fname: str = "",
     scale: float = 1,
 ):
-    """Save to png, eps and pdf and include in Latex an image;
+    """Dump a figure (save to file, include in LaTeX)
+
+    Save to png, eps and pdf and include in Latex an image;
     intended to be used inside pythontex pycode.
 
-    fig: a matplotlib.figure.Figure fig
-    label: LaTeX label to be put after "fig:"
-    caption: LaTeX caption, if "" a pretty version of label is set
-    fdir: the directory where to save, if not existent, save in /tmp"
-    fname: basename of the file to be used (otherwise, non "" label
-    will be used or a tempfile will be created)
-    scale: LaTeX includegraphics scale
+    Args:
+       fig (matplotlib.figure.Figure): the fig
+       label (str): posta dopo "fig:" in LaTeX
+       caption (str): caption LaTeX, se mancante viene riadattata label
+       fdir (str): directory dove salvare, se mancante si usa /tmp
+       fname (str): basename del file da salvare, se mancante si prova
+          a riusare label oppure a creare un file temporaneo
+       scale (float): scale di includegraphics di LaTeX
+
+    Returns:
+       None: nothing interesting here
     """
     # fdir not existing, using /tmp
     if not os.path.isdir(fdir):

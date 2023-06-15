@@ -4,6 +4,14 @@ pylbmisc.scripts package
 Submodules
 ----------
 
+pylbmisc.scripts.compile\_latex module
+--------------------------------------
+
+.. automodule:: pylbmisc.scripts.compile_latex
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.scripts.flashcards module
 ----------------------------------
 

@@ -20,6 +20,14 @@ pylbmisc.scripts.flashcards module
    :undoc-members:
    :show-inheritance:
 
+pylbmisc.scripts.pomodoro module
+--------------------------------
+
+.. automodule:: pylbmisc.scripts.pomodoro
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -34,6 +34,7 @@ compile_article = "pylbmisc.scripts.compile_latex:article"
 compile_book = "pylbmisc.scripts.compile_latex:book"
 flashcards2tex = "pylbmisc.scripts.flashcards:flashcards2tex"
 flashcards2csv = "pylbmisc.scripts.flashcards:flashcards2csv"
+pomodoro = "pylbmisc.scripts.pomodoro:main"
 
 
 [tool.hatch.version]

@@ -19,6 +19,7 @@ preamble = r"""
 \usepackage{cancel}
 \usepackage{hyperref}
 \begin{document}
+\tableofcontents
 """
 
 outro = r"\end{document}"
@@ -28,6 +29,7 @@ def worker(what):
     argparser.add_argument("path", type = str, help="path to a tex or a dir")
     args = argparser.parse_args()
     inpath = Path(args.path)
+    outfname = inpath.stem
     if not inpath.exists():
         raise FileNotFoundError
     if inpath.is_dir():
@@ -42,9 +44,10 @@ def worker(what):
     output = r"""\documentclass{%s}""" % what + preamble + content + outro
     outdir = Path("/tmp")    
     os.chdir(outdir)
-    outfile = Path("%s.tex" % what)
+    outfile = Path("%s.tex" % outfname)
     with outfile.open("w") as f:
         f.write(output)
+    subprocess.run(["pdflatex", outfile])
     subprocess.run(["pdflatex", outfile])
 
 

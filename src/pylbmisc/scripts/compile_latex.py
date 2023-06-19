@@ -30,6 +30,9 @@ def worker(what):
     args = argparser.parse_args()
     inpath = Path(args.path)
     outfname = inpath.stem
+    tmptex = Path("tmp_%s.tex" % outfname)
+    tmppdf = Path("tmp_%s.pdf" % outfname)
+    finalpdf = Path("%s.pdf" % outfname)
     if not inpath.exists():
         raise FileNotFoundError
     if inpath.is_dir():
@@ -41,14 +44,18 @@ def worker(what):
         with tex.open() as f:
             contents.append(f.read())
     content = "\n".join(contents)
-    output = r"""\documentclass{%s}""" % what + preamble + content + outro
-    outdir = Path("/tmp")    
-    os.chdir(outdir)
-    outfile = Path("%s.tex" % outfname)
-    with outfile.open("w") as f:
-        f.write(output)
-    subprocess.run(["pdflatex", outfile])
-    subprocess.run(["pdflatex", outfile])
+    full_content = r"""\documentclass{%s}""" % what + preamble + content + outro
+    with tmptex.open("w") as f:
+        f.write(full_content)
+    # run pdflatex with output in /tmp
+    pdflatex_cmd = ["pdflatex", "-output-directory", "/tmp", tmptex]
+    subprocess.run(pdflatex_cmd)
+    subprocess.run(pdflatex_cmd)
+    # cleaning and renaming (removing "tmp_")
+    tmptex.unlink()
+    subprocess.run(["mv", Path("/tmp")/tmppdf, Path("/tmp")/finalpdf])
+    
+
 
 
 def article():

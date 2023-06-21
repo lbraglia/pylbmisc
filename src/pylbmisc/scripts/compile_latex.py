@@ -18,6 +18,7 @@ preamble = r"""
 \usepackage{rotating}
 \usepackage{cancel}
 \usepackage{hyperref}
+\usepackage[usefamily=R]{pythontex}
 \begin{document}
 \tableofcontents
 """
@@ -30,6 +31,7 @@ def worker(what):
     args = argparser.parse_args()
     inpath = Path(args.path)
     outfname = inpath.stem
+    tmp = Path("/tmp")
     tmptex = Path("tmp_%s.tex" % outfname)
     tmppdf = Path("tmp_%s.pdf" % outfname)
     finalpdf = Path("%s.pdf" % outfname)
@@ -48,12 +50,16 @@ def worker(what):
     with tmptex.open("w") as f:
         f.write(full_content)
     # run pdflatex with output in /tmp
-    pdflatex_cmd = ["pdflatex", "-output-directory", "/tmp", tmptex]
+    pdflatex_cmd = ["pdflatex", "-output-directory", tmp, tmptex]
     subprocess.run(pdflatex_cmd)
-    subprocess.run(pdflatex_cmd)
+    # # if pythontex code file exists, run pythontex before the next pdflatex
+    # pythontexcodef = tmp / tex.with_stem(".pytxcode")
+    # if pythontexcodef.exists():
+    #     subprocess.run(["pythontex", tmp/tex.stem])
+    # subprocess.run(pdflatex_cmd)
     # cleaning and renaming (removing "tmp_")
     tmptex.unlink()
-    subprocess.run(["mv", Path("/tmp")/tmppdf, Path("/tmp")/finalpdf])
+    subprocess.run(["mv", tmp/tmppdf, tmp/finalpdf])
     
 
 

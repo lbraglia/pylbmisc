@@ -13,6 +13,14 @@ Subpackages
 Submodules
 ----------
 
+pylbmisc.dm module
+------------------
+
+.. automodule:: pylbmisc.dm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.fig module
 -------------------
 

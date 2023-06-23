@@ -29,20 +29,37 @@ def to_bool(x: _pd.Series):
     return x.astype("bool", copy=True)
 
 
+def _replace_comma(x: _pd.Series):
+    if _pd.api.types.is_string_dtype(x):
+        return x.str.replace(",", ".")
+    else:
+        return x
+
+
 def to_integer(x: _pd.Series):
-    """Coerce to integer a pd.Series (if possible)
+    """Coerce a pd.Series to integer (if possible)
 
     >>> to_integer(pd.Series([1, 2, 3]))
+    >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6.]))
     >>> to_integer(pd.Series(["2001", "2011", "1999"]))
     >>> to_integer(pd.Series(["1.1", "2,1", "asd"]))
-    >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6.]))
     """
-    return _pd.to_numeric(x, errors='coerce', downcast='integer')
+    s = x.copy()
+    s = _replace_comma(s)
+    return _pd.to_numeric(s, errors='coerce', downcast='integer')
 
 
 def to_numeric(x: _pd.Series):
-    """Coerce to float a pd.Series"""
-    return _pd.to_numeric(x, errors='coerce')
+    """Coerce a pd.Series using pd.to_numeric
+
+    >>> to_integer(pd.Series([1, 2, 3]))
+    >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6.]))
+    >>> to_integer(pd.Series(["2001", "2011", "1999"]))
+    >>> to_integer(pd.Series(["1.1", "2,1", "asd"]))
+    """
+    s = x.copy()
+    s = _replace_comma(s)
+    return _pd.to_numeric(s, errors='coerce')
 
 
 def to_datetime(x: _pd.Series):
@@ -116,8 +133,6 @@ def to_sex(x: _pd.Series):
                               categories = ['male', 'female'])
     else:
         raise ValueError("x must be a pd.Series of strings")
-
-
 
 
 def to_recist(x: _pd.Series):

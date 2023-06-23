@@ -111,7 +111,7 @@ def to_noyes(x: _pd.Series):
         # take the first letter that can be n(o), s(i) or y(es)
         l0 = s.copy().str.strip().str.lower().str[0]
         l0[l0 == 's'] = 'y'
-        l0 = l0.map({"0": "n", "1": "y"}) # for strings 0/1
+        l0 = l0.replace({"0": "n", "1": "y"}) # for strings 0/1
     else:
         l0 = to_bool(s).map({False: 'n', True: 'y'})
     return to_categorical(l0.map({"n": "no", "y": "yes"}),
@@ -124,7 +124,7 @@ def to_sex(x: _pd.Series):
 
     >>> to_sex(pd.Series(["","m","f"," m", "Fm"]))
     """
-    if _pd.api.types.is_string_dtype(s):
+    if _pd.api.types.is_string_dtype(x):
         s = x.copy()
         # take the first letter (Mm/Ff)
         l0 = s.str.strip().str.lower().str[0]
@@ -178,12 +178,37 @@ class Coercer:
     and return it.  If verbose print a report of the introduced
     missing values with the coercion for check
 
-    >>> import pylbmisc as lb
+    >>> from pylbmisc.dm import *
     >>> import pandas as pd
-
-    >>> df = pd.DataFrame({"a": ["1.1", "2,1", "asd"]})
-    >>> directives = {"a": lb.dm.to_integer}
-    >>> coercer = lb.dm.Coercer(df, directives)
+    >>> import numpy as np
+    >>>
+    >>> df = pd.DataFrame({
+    >>>     "idx" :  [1., 2., 3., 4., 5., 6.],
+    >>>     "sex" :  ["m", "maschio", "f", "female", "m", "M"],
+    >>>     "now":   [str(dt.datetime.now())] * 6,
+    >>>     "date":  ["2020-01-02", "2021-01-01", "2022-01-02"] * 2,
+    >>>     "state": ["Ohio", "Ohio", "Ohio", "Nevada", "Nevada", "Nevada"],
+    >>>     "ohio" : [1, 1, 1, 0, 0, 0],
+    >>>     "year":  [str(y) for y in [2000, 2001, 2002, 2001, 2002, 2003]],
+    >>>     "pop":   [str(p) for p in [1.5, 1.7, 3.6, np.nan, 2.9, 3.2]],
+    >>>     "recist" : ["", "pd", "sd", "pr", "rc", "cr"],
+    >>>     "other" : ["b"]*3 + ["a"]*2 + ["c"]
+    >>> })
+    >>> 
+    >>> directives = {
+    >>>     "idx": to_integer,
+    >>>     "sex": to_sex,
+    >>>     "now": to_datetime,
+    >>>     "date": to_date,
+    >>>     "state": to_categorical,
+    >>>     "ohio": to_noyes,
+    >>>     "year": to_integer,
+    >>>     "pop": to_numeric,
+    >>>     "recist" : to_recist,
+    >>>     "other" : to_other_specify
+    >>> }
+    >>> 
+    >>> coercer = Coercer(df, directives)
     >>> coerced = coercer.coerce()
     """
 

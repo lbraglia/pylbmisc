@@ -25,9 +25,10 @@ preamble = r"""
 
 outro = r"\end{document}"
 
+
 def worker(what):
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("path", type = str, help="path to a tex or a dir")
+    argparser.add_argument("path", type=str, help="path to a tex or a dir")
     args = argparser.parse_args()
     inpath = Path(args.path)
     outfname = inpath.stem
@@ -46,7 +47,9 @@ def worker(what):
         with tex.open() as f:
             contents.append(f.read())
     content = "\n".join(contents)
-    full_content = r"""\documentclass{%s}""" % what + preamble + content + outro
+    full_content = (
+        r"""\documentclass{%s}""" % what + preamble + content + outro
+    )
     with tmptex.open("w") as f:
         f.write(full_content)
     # run pdflatex with output in /tmp
@@ -59,16 +62,16 @@ def worker(what):
     # subprocess.run(pdflatex_cmd)
     # cleaning and renaming (removing "tmp_")
     tmptex.unlink()
-    subprocess.run(["mv", tmp/tmppdf, tmp/finalpdf])
-    
-
+    subprocess.run(["mv", tmp / tmppdf, tmp / finalpdf])
 
 
 def article():
     worker("article")
 
+
 def book():
     worker("book")
-    
+
+
 if __name__ == "__main__":
     book()

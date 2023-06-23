@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-# from . import r
+from . import dm
 from . import fig
 from . import io
 from . import iter
@@ -10,4 +10,4 @@ from . import tg
 from . import utils
 
 # make flake happy
-__all__ = ["fig", "io", "iter", "tg", "utils"]
+__all__ = ["dm", "fig", "io", "iter", "tg", "utils"]

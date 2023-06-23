@@ -1,6 +1,7 @@
 import time
 import subprocess
 
+
 def worker(what):
     if what == 'work':
         espeak_msg = 'Studio'
@@ -18,7 +19,7 @@ def worker(what):
     subprocess.Popen(["espeak", "-v", "it", espeak_msg])
     time.sleep(60 * min)
 
-    
+
 def main():
     while True:
         worker("work")
@@ -29,4 +30,3 @@ def main():
         worker("pause")
         worker("work")
         worker("longpause")
-        

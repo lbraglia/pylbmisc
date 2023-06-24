@@ -168,6 +168,15 @@ def to_other_specify(x: _pd.Series):
                           categories = categs)
 
 
+def to_string(x: _pd.Series):
+    """ Coerce the pd.Series passed to a string Series
+
+    >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
+    >>> to_string(x)
+    """
+    s = x.copy()
+    return s.astype('string')
+
 
 # --------------- coercion class ----------------------------------------
 class Coercer:

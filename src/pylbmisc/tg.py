@@ -22,3 +22,26 @@ def chat2df(fpath: str | Path) -> pd.DataFrame:
         js = json.load(f)
         msg = js["messages"]
         return pd.DataFrame(msg)
+
+
+
+def bot_token(b):
+    """
+    Get Bot API token from environment variables.
+    """
+    return os.environ["TG_BOT_%s" % b]
+
+
+def user_id(u):
+    """
+    Get user id from environment variables.
+    """
+    return os.environ["TG_USER_%s" % u]
+
+
+def group_id(g):
+    """
+    Get group id from environment variables.
+    """
+    return os.environ["TG_GROUP_%s" % g]
+    

@@ -68,25 +68,38 @@ def data_import(fpaths: _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
 
 
 def data_export(
-    dfs: dict[str, _pd.DataFrame], fpath: str | _Path, fmt: str = "csv"
+    x: dict[str, _pd.DataFrame], path: str | _Path
 ) -> None:
-    '''
-    export a dict of DataFrame as a list of csv or a single excel file
+    """export a dict of DataFrame as a list of csv or a single excel file
 
-    dfs: dict of pandas.DataFrame
+    in case of a dict is used and a csv path is given, the path is
+    suffixed with dict names
+    
+    x: dict of pandas.DataFrame
     fpath: fpath file path
-    fmt: str, file format as "csv" (default) or "xlsx"
-    '''
-    fpath = _Path(fpath)
-    if fmt == "csv":
-        for k, v in dfs.items():
-            csvpath = fpath.parent / (str(fpath.stem) + "_{0}.csv".format(k))
-            print(k, csvpath)
-            v.to_csv(csvpath, index=False)
-    elif fmt == "excel":
-        with _pd.ExcelWriter(str(fpath)) as writer:
-            for k, v in dfs.items():
-                v.to_excel(writer, sheet_name=k)
+
+    """
+    path = _Path(path)
+    fmt = path.suffix
+    if fmt == ".csv":
+        if isinstance(x, _pd.DataFrame):
+            x.to_csv(path, index=False)
+        elif isinstance(x, dict):
+            for k, v in x.items():
+                csvpath = path.parent / (str(path.stem) + "_{0}.csv".format(k))
+                print(k, csvpath)
+                v.to_csv(csvpath, index=False)
+        else:
+            raise ValueError("x deve essere un pd.DataFrame o un dict di pd.DataFrame")
+    elif fmt == ".xlsx":
+        if isinstance(x, _pd.DataFrame):
+            x.to_excel(writer, sheet_name="Foglio 1")
+        elif isinstance(x, dict):
+            with _pd.ExcelWriter(str(path)) as writer:
+                for k, v in x.items():
+                    v.to_excel(writer, sheet_name=k)
+        else:
+            raise ValueError("x deve essere un pd.DataFrame o un dict di pd.DataFrame")
     else:
         raise ValueError("Formato non disponibile: disponibili csv ed xlsx.")
 

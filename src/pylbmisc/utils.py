@@ -1,11 +1,11 @@
-import argparse
-import re
-import readline
+import argparse as _argparse
+import re as _re
+import readline as _readline
 
-from typing import Sequence
-from .iter import unique
+from typing import Sequence as _Sequence
+from .iter import unique as _unique
 
-readline.parse_and_bind('set editing-mode emacs')
+_readline.parse_and_bind('set editing-mode emacs')
 
 
 def argparser(opts):
@@ -46,7 +46,7 @@ def argparser(opts):
     return 0
 
     '''
-    parser = argparse.ArgumentParser()
+    parser = _argparse.ArgumentParser()
     # defaults = {}
     for i in opts:
         optname = i[0]
@@ -104,13 +104,13 @@ def line_to_numbers(x: str) -> list[int]:
     # replace comma with white chars
     x = x.replace(",", " ")
     # keep only digits, - and white spaces
-    x = re.sub(r'[^\d\- ]', '', x)
+    x = _re.sub(r'[^\d\- ]', '', x)
     # split by whitespaces
     spl = x.split(" ")
     # change ranges to proper
     expanded = []
-    single_page_re = re.compile("^[0-9]+$")
-    pages_range_re = re.compile("^([0-9]+)-([0-9]+)$")
+    single_page_re = _re.compile("^[0-9]+$")
+    pages_range_re = _re.compile("^([0-9]+)-([0-9]+)$")
     for i in range(len(spl)):
         # Check if the single element match one of the regular expression
         single_page = single_page_re.match(spl[i])
@@ -145,12 +145,12 @@ def line_to_numbers(x: str) -> list[int]:
 
 
 def menu(
-    choices: Sequence[str],
+    choices: _Sequence[str],
     title: str | None = None,
     multiple: bool = False,
     repeated: bool = False,
     strict: bool = True,
-) -> Sequence[str]:
+) -> _Sequence[str]:
     """
     CLI menu for user single/multiple choices
 
@@ -198,7 +198,7 @@ def menu(
             ind = allowed
     # make unique if not allowed repetitions
     if not repeated:
-        ind = list(unique(ind))
+        ind = list(_unique(ind))
     # obtain the selection
     rval = [choices[i - 1] for i in ind if i != 0]
     # return always a list should simplify the code

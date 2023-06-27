@@ -1,13 +1,13 @@
-import os
-import pandas as pd
-import tempfile
-import zipfile
+import os as _os
+import pandas as _pd
+import tempfile as _tempfile
+import zipfile as _zipfile
 
-from pathlib import Path
-from typing import Sequence
+from pathlib import Path as _Path
+from typing import Sequence as _Sequence
 
 
-def data_import(fpaths: Sequence[str | Path]) -> dict[str, pd.DataFrame]:
+def data_import(fpaths: _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
     '''import data from several filepaths (supported formats: .csv
     .xls .xlsx .zip) and return a dict of DataFrame
     '''
@@ -16,24 +16,24 @@ def data_import(fpaths: Sequence[str | Path]) -> dict[str, pd.DataFrame]:
     accepted_fpaths = [
         str(f)
         for f in fpaths
-        if os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}
+        if _os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}
     ]
 
-    rval: dict[str, pd.DataFrame] = {}
+    rval: dict[str, _pd.DataFrame] = {}
 
     for fpath in accepted_fpaths:
-        fname = os.path.splitext(os.path.basename(fpath))[0]
-        fext = os.path.splitext(fpath)[1].lower()
+        fname = _os.path.splitext(_os.path.basename(fpath))[0]
+        fext = _os.path.splitext(fpath)[1].lower()
         if fext == '.csv':
             dfname = fname
-            data = pd.read_csv(fpath)
+            data = _pd.read_csv(fpath)
             if dfname not in rval.keys():  # check for duplicates
                 rval[dfname] = data
             else:
                 msg = "{0} is duplicated, skipping to avoid overwriting"
                 raise Warning(msg.format(dfname))
         elif fext in {'.xls', '.xlsx'}:
-            sheets = pd.read_excel(
+            sheets = _pd.read_excel(
                 fpath, None
             )  # import all the sheets as a dict of DataFrame
             sheets = {
@@ -43,11 +43,11 @@ def data_import(fpaths: Sequence[str | Path]) -> dict[str, pd.DataFrame]:
         elif (
             fext == '.zip'
         ):  # unzip in temporary directory and go by recursion
-            with tempfile.TemporaryDirectory() as tempdir:
-                with zipfile.ZipFile(fpath) as myzip:
+            with _tempfile.TemporaryDirectory() as tempdir:
+                with _zipfile.ZipFile(fpath) as myzip:
                     myzip.extractall(tempdir)
                     zipped_fpaths = [
-                        os.path.join(tempdir, f) for f in os.listdir(tempdir)
+                        _os.path.join(tempdir, f) for f in _os.listdir(tempdir)
                     ]
                     zipped_data = data_import(zipped_fpaths)
             # prepend zip name to fname (as keys) and update results
@@ -68,7 +68,7 @@ def data_import(fpaths: Sequence[str | Path]) -> dict[str, pd.DataFrame]:
 
 
 def data_export(
-    dfs: dict[str, pd.DataFrame], fpath: str | Path, fmt: str = "csv"
+    dfs: dict[str, _pd.DataFrame], fpath: str | _Path, fmt: str = "csv"
 ) -> None:
     '''
     export a dict of DataFrame as a list of csv or a single excel file
@@ -77,14 +77,14 @@ def data_export(
     fpath: fpath file path
     fmt: str, file format as "csv" (default) or "xlsx"
     '''
-    fpath = Path(fpath)
+    fpath = _Path(fpath)
     if fmt == "csv":
         for k, v in dfs.items():
             csvpath = fpath.parent / (str(fpath.stem) + "_{0}.csv".format(k))
             print(k, csvpath)
             v.to_csv(csvpath, index=False)
     elif fmt == "excel":
-        with pd.ExcelWriter(str(fpath)) as writer:
+        with _pd.ExcelWriter(str(fpath)) as writer:
             for k, v in dfs.items():
                 v.to_excel(writer, sheet_name=k)
     else:

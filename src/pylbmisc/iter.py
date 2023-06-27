@@ -1,8 +1,8 @@
-from typing import Any
-from typing import Iterator
+from typing import Any as _Any
+from typing import Iterator as _Iterator
 
 
-def unique(x) -> Iterator[Any]:
+def unique(x) -> _Iterator[_Any]:
     '''
     return a stream of unique items contained in x
     '''
@@ -16,7 +16,7 @@ def unique(x) -> Iterator[Any]:
 
 
 # minor diffs from 1.10 of python cookbook
-def duplicated(x) -> Iterator[bool]:
+def duplicated(x) -> _Iterator[bool]:
     '''
     return a stream of logical value (already seen element)
     '''

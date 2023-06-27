@@ -12,6 +12,22 @@ pylbmisc.scripts.compile\_latex module
    :undoc-members:
    :show-inheritance:
 
+pylbmisc.scripts.dnd\_eng2ita module
+------------------------------------
+
+.. automodule:: pylbmisc.scripts.dnd_eng2ita
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pylbmisc.scripts.dnd\_ita2eng module
+------------------------------------
+
+.. automodule:: pylbmisc.scripts.dnd_ita2eng
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.scripts.flashcards module
 ----------------------------------
 

@@ -7,9 +7,9 @@ from . import dnd
 from . import fig
 from . import io
 from . import iter
-from . import stat
+from . import stats
 from . import tg
 from . import utils
 
 # make flake happy
-__all__ = ["dnd", "dm", "fig", "io", "iter", "stat", "tg", "utils"]
+__all__ = ["dnd", "dm", "fig", "io", "iter", "stats", "tg", "utils"]

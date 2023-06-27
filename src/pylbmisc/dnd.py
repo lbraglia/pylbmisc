@@ -1,5 +1,19 @@
 """ Utils for DND """
 
+def eng2ita(x):
+    from .data.dnd import translate_df as df
+    res = df.loc[df.eng.str.contains(x), ["eng", "ita"]]
+    print()
+    print(res.to_string(index=False), "\n")
+
+
+def ita2eng(x):
+    from .data.dnd import translate_df as df
+    res = df.loc[df.ita.str.contains(x), ["ita", "eng"]]
+    print()
+    print(res.to_string(index=False), "\n")
+
+
 def mese(x: int):
     """ Restituisce il nome del mese nei forgotten realms """
     mesi = ["Hammer",                   #  1

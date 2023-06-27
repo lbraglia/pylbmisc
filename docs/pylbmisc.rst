@@ -54,6 +54,14 @@ pylbmisc.iter module
    :undoc-members:
    :show-inheritance:
 
+pylbmisc.stats module
+---------------------
+
+.. automodule:: pylbmisc.stats
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.tg module
 ------------------
 

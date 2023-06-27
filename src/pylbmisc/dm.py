@@ -79,7 +79,9 @@ def to_date(x: _pd.Series):
     return to_datetime(x).dt.floor("D")
 
 
-def to_categorical(x: _pd.Series, lower=True, categories=None):
+def to_categorical(x: _pd.Series,
+                   lowcase: bool = False,
+                   categories: list[str] = None):
     """Coerce to categorical a pd.Series of strings, with blank values as missing
 
     >>> to_categorical(pd.Series([1, 2., 1., 2, 3]))
@@ -93,8 +95,10 @@ def to_categorical(x: _pd.Series, lower=True, categories=None):
         s = s.str.strip()
         s[s == ""] = _pd.NA
         # string: lowercase
-        if lower:
+        if lowcase:
             s = s.str.lower()
+            if categories != None:
+                categories = [c.lower() for c in categories]
     # categorical making
     return _pd.Categorical(s, categories=categories)
 
@@ -115,7 +119,6 @@ def to_noyes(x: _pd.Series):
     else:
         l0 = to_bool(s).map({False: 'n', True: 'y'})
     return to_categorical(l0.map({"n": "no", "y": "yes"}),
-                          lower=False,
                           categories = ['no', 'yes'])
 
 
@@ -129,7 +132,6 @@ def to_sex(x: _pd.Series):
         # take the first letter (Mm/Ff)
         l0 = s.str.strip().str.lower().str[0]
         return to_categorical(l0.map({"m": "male", "f": "female"}),
-                              lower=False,
                               categories = ['male', 'female'])
     else:
         raise ValueError("x must be a pd.Series of strings")
@@ -148,7 +150,7 @@ def to_recist(x: _pd.Series):
         ita2eng = {"RC": "CR", "RP": "PR"}
         s = s.replace(ita2eng)
         categs = ["CR", "PR", "SD", "PD"]
-        return to_categorical(s, lower=False, categories=categs)
+        return to_categorical(s, categories=categs)
     else:
         raise ValueError("x must be a pd.Series of strings")
 
@@ -163,9 +165,7 @@ def to_other_specify(x: _pd.Series):
     s = s.str.strip().str.lower()
     s[s==""] = _pd.NA
     categs = list(s.value_counts().index) # categs ordered by decreasing counts
-    return to_categorical(s,
-                          lower=False,
-                          categories = categs)
+    return to_categorical(s, categories=categs)
 
 
 def to_string(x: _pd.Series):
@@ -228,7 +228,7 @@ class Coercer:
         self._directives = directives
         self._verbose = verbose
 
-    def coerce(self) -> _pd.DataFrame:
+    def coerce(self, keep_only_coerced = False) -> _pd.DataFrame:
         # do not modify the input data
         df = self._df.copy()
         directives = self._directives
@@ -243,4 +243,7 @@ class Coercer:
                 print("Processing {}.".format(var))
             df[var] = fun(df[var])
         # return results
+        if keep_only_coerced:
+            vars = list(directives.keys())
+            df = df[vars]
         return df

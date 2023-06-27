@@ -2,7 +2,25 @@
 
 import numpy as _np
 import pandas as _pd
+import subprocess as _subprocess
+import tempfile as _tempfile
 
+
+# -------------------------------------------------------------------------
+# Utilities
+# -------------------------------------------------------------------------
+
+def view(df: _pd.DataFrame):
+    """ View a pd.DataFrame using LibreOffice """
+    tempfile = _tempfile.mkstemp(suffix = '.xlsx')
+    fname = tempfile[1]
+    df.to_excel(fname)
+    _subprocess.Popen(["libreoffice", fname])
+
+
+# -------------------------------------------------------------------------
+# Coercion stuff below
+# -------------------------------------------------------------------------
 
 # decorators
 def _verboser(f):
@@ -80,8 +98,9 @@ def to_date(x: _pd.Series):
 
 
 def to_categorical(x: _pd.Series,
-                   lowcase: bool = False,
-                   categories: list[str] = None):
+                   categories: list[str] = None,
+                   lowcase: bool = False
+                   ):
     """Coerce to categorical a pd.Series of strings, with blank values as missing
 
     >>> to_categorical(pd.Series([1, 2., 1., 2, 3]))
@@ -242,6 +261,8 @@ class Coercer:
         old_nrows = _pd.get_option("display.max_rows")
         _pd.set_option('display.max_rows', None)
         for var, fun in directives.items():
+            if var not in df.columns:
+                raise ValueError("{} not in df.columns, aborting.".format(var))
             if verbose:
                 print("Processing {}.".format(var))
             df[var] = fun(df[var])

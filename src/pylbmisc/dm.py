@@ -237,11 +237,15 @@ class Coercer:
         if verbose:
             for var in directives.keys():
                 directives[var] = _verboser(directives[var])
-        # apply the coercers
+        # apply the coercers, but first modify the pd printing options temporarily to
+        # handle long reporting of changes
+        old_nrows = _pd.get_option("display.max_rows")
+        _pd.set_option('display.max_rows', None)
         for var, fun in directives.items():
             if verbose:
                 print("Processing {}.".format(var))
             df[var] = fun(df[var])
+        _pd.set_option('display.max_rows', old_nrows)
         # return results
         if keep_only_coerced:
             vars = list(directives.keys())

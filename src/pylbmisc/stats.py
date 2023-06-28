@@ -62,37 +62,40 @@ def p_adjust(p, method = "holm"):
         raise ValueError("method can be bonferroni or holm")
 
     # checking content type
-    if not np.issubdtype(x.dtype, np.floating):
+    if not _np.issubdtype(x.dtype, _np.floating):
         raise ValueError("p-values must be a float.")
 
     n = len(x)
     n_nonmiss = (~_np.isnan(x)).sum()
 
     # methods implementation
-    if method == "bonferroni":
+    if method == "none":
+        p_adj = x
+    elif method == "bonferroni":
         p_adj = x * n_nonmiss
         for i, p in enumerate(p_adj):
             if p > 1:
                 p_adj[i] = 1
-
     elif method == "holm":
-        p_adj = np.empty(n)
+        p_adj = _np.empty(n)
         values = [(pval, prog_id) for prog_id, pval in enumerate(x)]
         # ordino sulla base dei p.value, i missing finiscono alla fine ma ho
         # tenuto l'ordine dove compaiono nel secondo elemento
         # ora per poter ordinare sulla base dei p, in presenza di missing è necessario
         # usare np.sort che richiede uno structured array (vedi np.sort)
         dtype = [('pval', float), ('prog_id', int)]
-        values = np.array(values, dtype=dtype)
-        sa = np.sort(values, order='pval')
+        values = _np.array(values, dtype=dtype)
+        sa = _np.sort(values, order='pval')
         pmax = 0 # initialize so the first maximum
         for k, vals in enumerate(sa, start=1):
             pval, prog_id = vals
-            if not np.isnan(pval):
+            if not _np.isnan(pval):
                 res = pval * (n_nonmiss - k +1)
                 res = res if res < 1 else 1
                 pmax = res if res > pmax else pmax
                 p_adj[prog_id] = pmax
+            else:
+                p_adj[prog_id] = _np.nan
     else:
         raise ValueError("method can be bonferroni or holm")
 

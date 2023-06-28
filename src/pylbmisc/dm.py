@@ -11,11 +11,21 @@ import tempfile as _tempfile
 # -------------------------------------------------------------------------
 
 def view(df: _pd.DataFrame):
-    """ View a pd.DataFrame using LibreOffice """
+    """ View a pd.DataFrame using LibreOffice. """
     tempfile = _tempfile.mkstemp(suffix = '.xlsx')
     fname = tempfile[1]
     df.to_excel(fname)
     _subprocess.Popen(["libreoffice", fname])
+
+
+def table2df(df: _pd.DataFrame):
+    """Transform a pd.DataFrame representing a two-way table (es
+    crosstable, correlation matrix, p.val matrix) in a
+    pd.DataFrame with long format.
+    """
+    x = df.copy()
+    x = x.stack().reset_index()
+    return x.rename(columns={0: 'x'})
 
 
 # -------------------------------------------------------------------------

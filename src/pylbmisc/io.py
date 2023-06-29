@@ -141,6 +141,7 @@ def _rdf_integer(x: _pd.Series, xn: str):
 # placeholder
 _rdf_numeric = _rdf_integer
 
+
 def _rdf_factor(x: _pd.Series, xn: str):
     # to be safe it's seems to be better rather than
     # pd.Categorical
@@ -173,9 +174,29 @@ def _rdf_factor(x: _pd.Series, xn: str):
     )
     return rval
 
-    
-def rdf(df: _pd.DataFrame, path: str|Path, dfname:str = "df"):
-    path = Path(path)
+
+def _rdf_object(x: _pd.Series, xn: str):                                              
+    data_l = x.to_list()
+    data_l2 = []
+    for s in data_l:
+        if isinstance(s, str) and s != "":
+            data_l2.append('"{}"'.format(s))
+        else:
+            data_l2.append('NA')
+    data_str = ', '.join(data_l2)
+    rval = "{} = c({})".format(xn, data_str)
+    return rval  
+
+
+# Thigs yet TODO
+def _rdf_NA(x: _pd.Series, xn: str):
+    rval = "{} = NA".format(xn)
+    return rval
+
+# _rdf_object = _rdf_NA
+
+def rdf(df: _pd.DataFrame, path: str|_Path, dfname:str = "df"):
+    path = _Path(path)
 
     r_code = []
     r_code.append("{} <- data.frame(".format(dfname))
@@ -187,13 +208,20 @@ def rdf(df: _pd.DataFrame, path: str|Path, dfname:str = "df"):
             r_code.append(_rdf_numeric(x, var))
         elif _pd.api.types.is_categorical_dtype(x):
             r_code.append(_rdf_factor(x, var))
+        elif _pd.api.types.is_object_dtype(x):
+            r_code.append(_rdf_object(x, var))
         else:
-            raise Value
+            msg = "{} deve essere intera, numerica o categorica, invece è {}.".format(
+                var, str(x.dtype))
+            raise ValueError(msg)
         is_last = var == df.columns[-1]
-        if is_last:
-            r_code.append(")\n")
-        else:
+        if not is_last:
             r_code.append(",\n")
+        else:
+            r_code.append(")\n")
     
-    with path.open() as f:
+    with path.open(mode = "w") as f:
         f.writelines(r_code)
+
+
+        

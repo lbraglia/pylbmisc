@@ -181,7 +181,7 @@ def rdf(df: _pd.DataFrame, path: str|Path, dfname:str = "df"):
     r_code.append("{} <- data.frame(".format(dfname))
     for var in df.columns:
         x = df[var]
-        if _pd.api.types.is_integer_dtype(x) or:
+        if _pd.api.types.is_integer_dtype(x):
             r_code.append(_rdf_integer(x, var))
         elif _pd.api.types.is_numeric_dtype(x):
             r_code.append(_rdf_numeric(x, var))

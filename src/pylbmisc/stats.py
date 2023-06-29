@@ -14,6 +14,8 @@ def _pstar_worker(p):
 def _pformat_worker(p):
     if p < 0.001:
         return "< 0.001"
+    elif p == 1:
+        return "0.999"
     else:
         return "%.3f" % p
 

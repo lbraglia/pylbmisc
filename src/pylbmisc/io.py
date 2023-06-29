@@ -124,3 +124,76 @@ def data_export(
 #         return None
 #     else:
 #         return str(x)
+
+# --------------------------------------------------
+# rdf: pd.DataFrame to R data.frame converter (a-la dput)
+# --------------------------------------------------
+
+def _rdf_integer(x: _pd.Series, xn: str):
+    data_str = x.to_string(
+        na_rep="NA",
+        index=False,
+        header=False,
+    ).replace("\n", ", ")
+    rval = "{} = c({})".format(xn, data_str)
+    return rval
+
+# placeholder
+_rdf_numeric = _rdf_integer
+
+def _rdf_factor(x: _pd.Series, xn: str):
+    # to be safe it's seems to be better rather than
+    # pd.Categorical
+    x = _pd.Series(x, dtype='category')
+    # raw data (integers)
+    data = x.cat.codes
+    data_str = "c({})".format(data.to_string(
+        na_rep="NA",
+        index=False,
+        header=False,
+    ).replace("\n", ", "))
+    # unique categories and labels
+    categs = x.cat.categories
+    levels = []
+    labels = []
+    for lev, lab in enumerate(categs):
+        levels.append(str(lev))
+        labels.append("'{}'".format(lab))
+        
+    levs = ", ".join(levels)
+    labs = ", ".join(labels)
+    levels_str = "levels = c({})".format(levs)
+    labels_str = "labels = c({})".format(labs)
+    # return
+    rval = "{} = factor({}, {}, {})".format(
+        xn,
+        data_str,
+        levels_str,
+        labels_str
+    )
+    return rval
+
+    
+def rdf(df: _pd.DataFrame, path: str|Path, dfname:str = "df"):
+    path = Path(path)
+
+    r_code = []
+    r_code.append("{} <- data.frame(".format(dfname))
+    for var in df.columns:
+        x = df[var]
+        if _pd.api.types.is_integer_dtype(x) or:
+            r_code.append(_rdf_integer(x, var))
+        elif _pd.api.types.is_numeric_dtype(x):
+            r_code.append(_rdf_numeric(x, var))
+        elif _pd.api.types.is_categorical_dtype(x):
+            r_code.append(_rdf_factor(x, var))
+        else:
+            raise Value
+        is_last = var == df.columns[-1]
+        if is_last:
+            r_code.append(")\n")
+        else:
+            r_code.append(",\n")
+    
+    with path.open() as f:
+        f.writelines(r_code)

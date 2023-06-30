@@ -52,9 +52,7 @@ def dump(
 
     # latex stuff
     latex_label = 'fig:' + label
-    caption = (
-        label.capitalize().replace("_", " ") if caption == "" else caption
-    )
+    caption = label.capitalize().replace("_", " ") if caption == "" else caption
     latex = (
         "\\begin{figure} \\centering "
         + "\\includegraphics[scale=%(scale).2f]{%(base_path)s}"

@@ -54,9 +54,7 @@ def argparser(opts):
         optdefault = i[2]
         opttype = i[3]
         # create help string and add argument to parsing
-        help_string = '{0} (default: {1})'.format(
-            optdescription, str(optdefault)
-        )
+        help_string = '{0} (default: {1})'.format(optdescription, str(optdefault))
         parser.add_argument('--' + optname, help=help_string, type=str)
     # do parsing
     args = vars(parser.parse_args())  # vars to change to a dict
@@ -135,10 +133,7 @@ def line_to_numbers(x: str) -> list[int]:
             expanded_range = [str(val) for val in range(first, second, step)]
             expanded += expanded_range
         else:
-            ValueError(
-                str(spl[i])
-                + "does not match a single page re nor a pages range re."
-            )
+            ValueError(str(spl[i]) + "does not match a single page re nor a pages range re.")
     # coerce to integer expanded
     res: list[int] = [int(x) for x in expanded]
     return res
@@ -163,9 +158,7 @@ def menu(
     """
     available_ind = [i + 1 for i in range(len(choices))]
     avail_with_0 = [0] + available_ind
-    the_menu = "\n".join(
-        [str(i) + '. ' + str(c) for i, c in zip(available_ind, choices)]
-    )
+    the_menu = "\n".join([str(i) + '. ' + str(c) for i, c in zip(available_ind, choices)])
     if multiple:
         select_msg = "Selection (values as '1, 2-3, 6') or 0 to exit: "
     else:
@@ -213,3 +206,25 @@ def ascii_header(x: str) -> None:
     print(header)
     print(x)
     print(header, '\n')
+
+
+def match_arg(arg, choices):
+    """R's match.arg equivalent for programming function for interactive use
+
+    >>> # questo ritorna errore perché matcha troppo
+    >>> user_input = "foo"
+    >>> a = match_arg(user_input, ["foobar", "foos", "asdomar"])
+
+    >>> # questo è ok e viene espanso
+    >>> user_input2 = "foob"
+    >>> a = match_arg(user_input2, ["foobar", "foos", "asdomar"])
+    >>> print(a)
+    """
+    res = [expanded for expanded in choices if expanded.startswith(arg)]
+    l = len(res)
+    if l == 0:
+        raise ValueError("Parameter ", arg, "must be one of ", choices)
+    elif l > 1:
+        raise ValueError(arg, "matches multiple choices from ", choices)
+    else:
+        return res[0]

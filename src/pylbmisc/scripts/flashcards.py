@@ -27,13 +27,7 @@ ending = r"\end{document}"
 
 
 def flash(s1, s2):
-    res = (
-        (r"\begin{flashcard}{%s}" % s1)
-        + "   "
-        + s2
-        + "   "
-        + r"\end{flashcard}"
-    )
+    res = (r"\begin{flashcard}{%s}" % s1) + "   " + s2 + "   " + r"\end{flashcard}"
     return res
 
 
@@ -48,20 +42,11 @@ class Flashcards(object):
         self.__fc = []
         paste = "|".join(latex_envirs)
         fmt = (paste, paste)
-        self.__env_re = re.compile(
-            r"\\begin{(%s)}(\[.+?\])?(.+?)\\end{(%s)}" % fmt
-        )
+        self.__env_re = re.compile(r"\\begin{(%s)}(\[.+?\])?(.+?)\\end{(%s)}" % fmt)
         # load data from files given in the path
         path = Path(path)
         if path.is_dir():
-            files = [
-                f
-                for f in path.iterdir()
-                if (
-                    (f.suffix in ('.tex', '.Rnw', '.csv'))
-                    and f.name != "_region_.tex"
-                )
-            ]
+            files = [f for f in path.iterdir() if ((f.suffix in ('.tex', '.Rnw', '.csv')) and f.name != "_region_.tex")]
         else:
             files = [path]
         for f in files:
@@ -122,9 +107,7 @@ class Flashcards(object):
         else:
             path = Path(path)
         with path.open(mode='w') as f:
-            dataset = csv.writer(
-                f, delimiter=';', quotechar='"', quoting=csv.QUOTE_NONNUMERIC
-            )
+            dataset = csv.writer(f, delimiter=';', quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
             for x in self.__fc:
                 dataset.writerow(x)
         print("All done, exported to: " + str(path))

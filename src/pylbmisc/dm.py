@@ -10,9 +10,10 @@ import tempfile as _tempfile
 # Utilities
 # -------------------------------------------------------------------------
 
+
 def view(df: _pd.DataFrame):
-    """ View a pd.DataFrame using LibreOffice. """
-    tempfile = _tempfile.mkstemp(suffix = '.xlsx')
+    """View a pd.DataFrame using LibreOffice."""
+    tempfile = _tempfile.mkstemp(suffix='.xlsx')
     fname = tempfile[1]
     df.to_excel(fname)
     _subprocess.Popen(["libreoffice", fname])
@@ -31,6 +32,7 @@ def table2df(df: _pd.DataFrame):
 # -------------------------------------------------------------------------
 # Coercion stuff below
 # -------------------------------------------------------------------------
+
 
 # decorators
 def _verboser(f):
@@ -107,10 +109,7 @@ def to_date(x: _pd.Series):
     return to_datetime(x).dt.floor("D")
 
 
-def to_categorical(x: _pd.Series,
-                   categories: list[str] = None,
-                   lowcase: bool = False
-                   ):
+def to_categorical(x: _pd.Series, categories: list[str] = None, lowcase: bool = False):
     """Coerce to categorical a pd.Series of strings, with blank values as missing
 
     >>> to_categorical(pd.Series([1, 2., 1., 2, 3]))
@@ -144,11 +143,10 @@ def to_noyes(x: _pd.Series):
         # take the first letter that can be n(o), s(i) or y(es)
         l0 = s.copy().str.strip().str.lower().str[0]
         l0[l0 == 's'] = 'y'
-        l0 = l0.replace({"0": "n", "1": "y"}) # for strings 0/1
+        l0 = l0.replace({"0": "n", "1": "y"})  # for strings 0/1
     else:
         l0 = to_bool(s).map({False: 'n', True: 'y'})
-    return to_categorical(l0.map({"n": "no", "y": "yes"}),
-                          categories = ['no', 'yes'])
+    return to_categorical(l0.map({"n": "no", "y": "yes"}), categories=['no', 'yes'])
 
 
 def to_sex(x: _pd.Series):
@@ -160,8 +158,7 @@ def to_sex(x: _pd.Series):
         s = x.copy()
         # take the first letter (Mm/Ff)
         l0 = s.str.strip().str.lower().str[0]
-        return to_categorical(l0.map({"m": "male", "f": "female"}),
-                              categories = ['male', 'female'])
+        return to_categorical(l0.map({"m": "male", "f": "female"}), categories=['male', 'female'])
     else:
         raise ValueError("x must be a pd.Series of strings")
 
@@ -192,13 +189,13 @@ def to_other_specify(x: _pd.Series):
     """
     s = x.copy().astype("str")
     s = s.str.strip().str.lower()
-    s[s==""] = _pd.NA
-    categs = list(s.value_counts().index) # categs ordered by decreasing counts
+    s[s == ""] = _pd.NA
+    categs = list(s.value_counts().index)  # categs ordered by decreasing counts
     return to_categorical(s, categories=categs)
 
 
 def to_string(x: _pd.Series):
-    """ Coerce the pd.Series passed to a string Series
+    """Coerce the pd.Series passed to a string Series
 
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_string(x)
@@ -232,7 +229,7 @@ class Coercer:
     >>>     "recist" : ["", "pd", "sd", "pr", "rc", "cr"],
     >>>     "other" : ["b"]*3 + ["a"]*2 + ["c"]
     >>> })
-    >>> 
+    >>>
     >>> directives = {
     >>>     "idx": to_integer,
     >>>     "sex": to_sex,
@@ -245,19 +242,17 @@ class Coercer:
     >>>     "recist" : to_recist,
     >>>     "other" : to_other_specify
     >>> }
-    >>> 
+    >>>
     >>> coercer = Coercer(df, directives)
     >>> coerced = coercer.coerce()
     """
 
-    def __init__(
-        self, df: _pd.DataFrame, directives: dict, verbose: bool = True
-    ):
+    def __init__(self, df: _pd.DataFrame, directives: dict, verbose: bool = True):
         self._df = df
         self._directives = directives
         self._verbose = verbose
 
-    def coerce(self, keep_only_coerced = False) -> _pd.DataFrame:
+    def coerce(self, keep_only_coerced=False) -> _pd.DataFrame:
         # do not modify the input data
         df = self._df.copy()
         directives = self._directives

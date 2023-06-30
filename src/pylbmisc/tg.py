@@ -25,7 +25,6 @@ def chat2df(fpath: str | _Path) -> _pd.DataFrame:
         return _pd.DataFrame(msg)
 
 
-
 def bot_token(b):
     """
     Get Bot API token from environment variables.
@@ -45,4 +44,3 @@ def group_id(g):
     Get group id from environment variables.
     """
     return _os.environ["TG_GROUP_%s" % g]
-    

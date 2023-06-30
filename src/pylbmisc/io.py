@@ -7,17 +7,17 @@ from pathlib import Path as _Path
 from typing import Sequence as _Sequence
 
 
-def data_import(fpaths: _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
-    '''import data from several filepaths (supported formats: .csv
+def data_import(fpaths: str | _Path | _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
+    '''import data from one or several filepaths (supported formats: .csv
     .xls .xlsx .zip) and return a dict of DataFrame
     '''
     # import ipdb
     # ipdb.set_trace()
-    accepted_fpaths = [
-        str(f)
-        for f in fpaths
-        if _os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}
-    ]
+
+    # uniform 1 to many and clean input
+    if isinstance(fpaths, str) or isinstance(fpaths, _Path):
+        fpaths = [fpaths]
+    accepted_fpaths = [str(f) for f in fpaths if _os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}]
 
     rval: dict[str, _pd.DataFrame] = {}
 
@@ -33,32 +33,20 @@ def data_import(fpaths: _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
                 msg = "{0} is duplicated, skipping to avoid overwriting"
                 raise Warning(msg.format(dfname))
         elif fext in {'.xls', '.xlsx'}:
-            sheets = _pd.read_excel(
-                fpath, None
-            )  # import all the sheets as a dict of DataFrame
-            sheets = {
-                "{0}_{1}".format(fname, k): v for k, v in sheets.items()
-            }  # add xlsx to sheet names
+            sheets = _pd.read_excel(fpath, None)  # import all the sheets as a dict of DataFrame
+            sheets = {"{0}_{1}".format(fname, k): v for k, v in sheets.items()}  # add xlsx to sheet names
             rval.update(sheets)
-        elif (
-            fext == '.zip'
-        ):  # unzip in temporary directory and go by recursion
+        elif fext == '.zip':  # unzip in temporary directory and go by recursion
             with _tempfile.TemporaryDirectory() as tempdir:
                 with _zipfile.ZipFile(fpath) as myzip:
                     myzip.extractall(tempdir)
-                    zipped_fpaths = [
-                        _os.path.join(tempdir, f) for f in _os.listdir(tempdir)
-                    ]
+                    zipped_fpaths = [_os.path.join(tempdir, f) for f in _os.listdir(tempdir)]
                     zipped_data = data_import(zipped_fpaths)
             # prepend zip name to fname (as keys) and update results
-            zipped_data = {
-                "{0}_{1}".format(fname, k): v for k, v in zipped_data.items()
-            }
+            zipped_data = {"{0}_{1}".format(fname, k): v for k, v in zipped_data.items()}
             rval.update(zipped_data)
         else:
-            msg = "File format not supported for {0}. Ignoring it.".format(
-                fext
-            )
+            msg = "File format not supported for {0}. Ignoring it.".format(fext)
             raise Warning(msg)
 
     if len(rval):
@@ -67,14 +55,12 @@ def data_import(fpaths: _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
         raise ValueError("No data to be imported.")
 
 
-def data_export(
-    x: dict[str, _pd.DataFrame], path: str | _Path
-) -> None:
+def data_export(x: dict[str, _pd.DataFrame], path: str | _Path) -> None:
     """export a dict of DataFrame as a list of csv or a single excel file
 
     in case of a dict is used and a csv path is given, the path is
     suffixed with dict names
-    
+
     x: dict of pandas.DataFrame
     fpath: fpath file path
 
@@ -129,6 +115,7 @@ def data_export(
 # rdf: pd.DataFrame to R data.frame converter (a-la dput)
 # --------------------------------------------------
 
+
 def _rdf_integer(x: _pd.Series, xn: str):
     data_str = x.to_string(
         na_rep="NA",
@@ -137,6 +124,7 @@ def _rdf_integer(x: _pd.Series, xn: str):
     ).replace("\n", ", ")
     rval = "{} = c({})".format(xn, data_str)
     return rval
+
 
 # placeholder
 _rdf_numeric = _rdf_integer
@@ -148,11 +136,13 @@ def _rdf_factor(x: _pd.Series, xn: str):
     x = _pd.Series(x, dtype='category')
     # raw data (integers)
     data = x.cat.codes
-    data_str = "c({})".format(data.to_string(
-        na_rep="NA",
-        index=False,
-        header=False,
-    ).replace("\n", ", "))
+    data_str = "c({})".format(
+        data.to_string(
+            na_rep="NA",
+            index=False,
+            header=False,
+        ).replace("\n", ", ")
+    )
     # unique categories and labels
     categs = x.cat.categories
     levels = []
@@ -160,22 +150,17 @@ def _rdf_factor(x: _pd.Series, xn: str):
     for lev, lab in enumerate(categs):
         levels.append(str(lev))
         labels.append("'{}'".format(lab))
-        
+
     levs = ", ".join(levels)
     labs = ", ".join(labels)
     levels_str = "levels = c({})".format(levs)
     labels_str = "labels = c({})".format(labs)
     # return
-    rval = "{} = factor({}, {}, {})".format(
-        xn,
-        data_str,
-        levels_str,
-        labels_str
-    )
+    rval = "{} = factor({}, {}, {})".format(xn, data_str, levels_str, labels_str)
     return rval
 
 
-def _rdf_object(x: _pd.Series, xn: str):                                              
+def _rdf_object(x: _pd.Series, xn: str):
     data_l = x.to_list()
     data_l2 = []
     for s in data_l:
@@ -185,7 +170,7 @@ def _rdf_object(x: _pd.Series, xn: str):
             data_l2.append('NA')
     data_str = ', '.join(data_l2)
     rval = "{} = c({})".format(xn, data_str)
-    return rval  
+    return rval
 
 
 # Thigs yet TODO
@@ -193,9 +178,11 @@ def _rdf_NA(x: _pd.Series, xn: str):
     rval = "{} = NA".format(xn)
     return rval
 
+
 # _rdf_object = _rdf_NA
 
-def rdf(df: _pd.DataFrame, path: str|_Path, dfname:str = "df"):
+
+def rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
     path = _Path(path)
 
     r_code = []
@@ -211,17 +198,13 @@ def rdf(df: _pd.DataFrame, path: str|_Path, dfname:str = "df"):
         elif _pd.api.types.is_object_dtype(x):
             r_code.append(_rdf_object(x, var))
         else:
-            msg = "{} deve essere intera, numerica o categorica, invece è {}.".format(
-                var, str(x.dtype))
+            msg = "{} deve essere intera, numerica o categorica, invece è {}.".format(var, str(x.dtype))
             raise ValueError(msg)
         is_last = var == df.columns[-1]
         if not is_last:
             r_code.append(",\n")
         else:
             r_code.append(")\n")
-    
-    with path.open(mode = "w") as f:
+
+    with path.open(mode="w") as f:
         f.writelines(r_code)
-
-
-        

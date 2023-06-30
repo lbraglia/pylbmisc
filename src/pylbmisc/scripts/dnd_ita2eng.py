@@ -1,6 +1,7 @@
 import argparse
 from ..dnd import ita2eng
 
+
 def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument("term", type=str, help="italian term to translate")

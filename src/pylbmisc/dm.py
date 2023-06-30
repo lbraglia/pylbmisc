@@ -4,7 +4,7 @@ import numpy as _np
 import pandas as _pd
 import subprocess as _subprocess
 import tempfile as _tempfile
-
+import inspect as _inspect #
 
 # -------------------------------------------------------------------------
 # Utilities
@@ -230,7 +230,42 @@ class Coercer:
     >>>     "other" : ["b"]*3 + ["a"]*2 + ["c"]
     >>> })
     >>>
-    >>> directives = {
+    >>>
+    >>> directives_new = {
+    >>>     lb.dm.to_categorical: ["state"],
+    >>>     lb.dm.to_date: ["date"],
+    >>>     lb.dm.to_datetime : ["now"],
+    >>>     lb.dm.to_integer: ["idx", "year"],
+    >>>     lb.dm.to_noyes: ["ohio"],
+    >>>     lb.dm.to_numeric: ["pop"],
+    >>>     lb.dm.to_other_specify: ["other"],
+    >>>     lb.dm.to_recist: ["recist"],
+    >>>     lb.dm.to_sex : ["sex"]
+    >>> }
+    >>> 
+    >>> coercer1 = lb.dm.Coercer(df, fvs_dict = directives_new)
+    >>> cleaned1 = coercer1.coerce()
+    >>> 
+    >>> # ------------------------------------------------
+    >>> 
+    >>> directives_new2 = {
+    >>>     "lb.dm.to_categorical": ["state"],
+    >>>     "lb.dm.to_date": ["date"],
+    >>>     "lb.dm.to_datetime" : ["now"],
+    >>>     "lb.dm.to_integer": ["idx", "year"],
+    >>>     "lb.dm.to_noyes": ["ohio"],
+    >>>     "lb.dm.to_numeric": ["pop"],
+    >>>     "lb.dm.to_other_specify": ["other"],
+    >>>     "lb.dm.to_recist": ["recist"],
+    >>>     "lb.dm.to_sex" : ["sex"]
+    >>> }
+    >>> 
+    >>> 
+    >>> coercer2 = lb.dm.Coercer(df, fvs_dict = directives_new2)
+    >>> cleaned2 = coercer2.coerce()
+    >>> 
+    >>>  #------------------------------------------------------
+    >>> directives_old = {
     >>>     "idx": to_integer,
     >>>     "sex": to_sex,
     >>>     "now": to_datetime,
@@ -243,14 +278,38 @@ class Coercer:
     >>>     "other" : to_other_specify
     >>> }
     >>>
-    >>> coercer = Coercer(df, directives)
+    >>> coercer = Coercer(df, vf_dict = directives_old)
     >>> coerced = coercer.coerce()
     """
 
-    def __init__(self, df: _pd.DataFrame, directives: dict, verbose: bool = True):
+    def __init__(self,
+                 df: _pd.DataFrame,
+                 fvs_dict: dict|None = None,
+                 vf_dict: dict|None = None,
+                 verbose: bool = True):
         self._df = df
-        self._directives = directives
         self._verbose = verbose
+        if fvs_dict == None and vf_dict == None:
+            raise ValueError("Both directives dict can't be None")
+        if isinstance(fvs_dict, dict) and  isinstance(vf_dict, dict):
+            raise ValueError("Both directives dict are specified. Only one admitted.")
+        if fvs_dict != None:
+            # Experimental below
+            parent_frame = _inspect.currentframe().f_back
+            # put it in the vf_dict format evaluating the f in
+            # parent frame variable dict
+            reversed = {}
+            for f, vars in fvs_dict.items():
+                # if f is a string change it to function taking from the enclosing
+                # environment
+                f = eval(f, parent_frame.f_locals, parent_frame.f_globals) \
+                    if isinstance(f, str) else f
+                for v in vars:
+                    reversed.update({v: f})
+            self._directives = reversed
+        if vf_dict != None:
+            self._directives = vf_dict
+        
 
     def coerce(self, keep_only_coerced=False) -> _pd.DataFrame:
         # do not modify the input data

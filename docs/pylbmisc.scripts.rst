@@ -28,6 +28,14 @@ pylbmisc.scripts.dnd\_ita2eng module
    :undoc-members:
    :show-inheritance:
 
+pylbmisc.scripts.dnd\_spell module
+----------------------------------
+
+.. automodule:: pylbmisc.scripts.dnd_spell
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.scripts.flashcards module
 ----------------------------------
 

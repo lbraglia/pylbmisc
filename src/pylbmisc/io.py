@@ -7,7 +7,9 @@ from pathlib import Path as _Path
 from typing import Sequence as _Sequence
 
 
-def data_import(fpaths: str | _Path | _Sequence[str | _Path]) -> dict[str, _pd.DataFrame]:
+def data_import(fpaths: str | _Path | _Sequence[str | _Path],
+                csv_kwargs: dict = {},
+                excel_kwargs: dict = {}) -> dict[str, _pd.DataFrame]:
     '''import data from one or several filepaths (supported formats: .csv
     .xls .xlsx .zip) and return a dict of DataFrame
     '''
@@ -26,14 +28,14 @@ def data_import(fpaths: str | _Path | _Sequence[str | _Path]) -> dict[str, _pd.D
         fext = _os.path.splitext(fpath)[1].lower()
         if fext == '.csv':
             dfname = fname
-            data = _pd.read_csv(fpath)
+            data = _pd.read_csv(fpath, **csv_kwargs)
             if dfname not in rval.keys():  # check for duplicates
                 rval[dfname] = data
             else:
                 msg = "{0} is duplicated, skipping to avoid overwriting"
                 raise Warning(msg.format(dfname))
         elif fext in {'.xls', '.xlsx'}:
-            sheets = _pd.read_excel(fpath, None)  # import all the sheets as a dict of DataFrame
+            sheets = _pd.read_excel(fpath, None, **excel_kwargs)  # import all the sheets as a dict of DataFrame
             sheets = {"{0}_{1}".format(fname, k): v for k, v in sheets.items()}  # add xlsx to sheet names
             rval.update(sheets)
         elif fext == '.zip':  # unzip in temporary directory and go by recursion

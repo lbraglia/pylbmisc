@@ -37,6 +37,7 @@ flashcards2csv = "pylbmisc.scripts.flashcards:flashcards2csv"
 pomodoro = "pylbmisc.scripts.pomodoro:main"
 dnd_eng2ita = "pylbmisc.scripts.dnd_eng2ita:main"
 dnd_ita2eng = "pylbmisc.scripts.dnd_ita2eng:main"
+dnd_spell = "pylbmisc.scripts.dnd_spell:main"
 
 
 [tool.hatch.version]

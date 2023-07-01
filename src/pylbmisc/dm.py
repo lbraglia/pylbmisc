@@ -1,10 +1,13 @@
 """Data management utilities for pandas Series/DataFrame"""
 
+import functools as _functools
+import inspect as _inspect 
 import numpy as _np
 import pandas as _pd
+import re as _re
+import string as _string
 import subprocess as _subprocess
 import tempfile as _tempfile
-import inspect as _inspect #
 
 # -------------------------------------------------------------------------
 # Utilities
@@ -27,6 +30,72 @@ def table2df(df: _pd.DataFrame):
     x = df.copy()
     x = x.stack().reset_index()
     return x.rename(columns={0: 'x'})
+
+
+# -------------------------------------------------------------------------
+# preprocessing varnames (from shitty excel)
+# -------------------------------------------------------------------------
+
+
+def _compose(f, g):
+    return lambda x: f(g(x))
+
+
+def _replace_unwanted_chars(s):
+    keep = _string.ascii_lowercase + _string.digits
+    for ch in s:
+        if ch not in keep:
+            s = s.replace(ch, "_")
+    return s
+
+
+def _remove_duplicated_underscore(s):
+    return _re.sub('_+', '_', s)
+
+
+def _remove_external_underscore(s):
+    return _re.sub('^_', '', _re.sub("_$", "", s))
+
+
+def _add_x_if_first_is_digit(s):
+    if s.startswith(tuple(_string.digits)):
+        return "x" + s
+    else:
+        return s
+
+
+def fix_colnames(x: list | _pd.DataFrame):
+    """ The good-old R preprocess_varnames
+
+    >>> fix_colnames([" 98n2 3", " L< KIAFJ8 0_________"])
+    >>> ft = fix_colnames(shitty_df)
+    >>> shitty_df.rename(ft)
+    """
+    if isinstance(x, list):
+        original = x
+    elif isinstance(x, _pd.DataFrame):
+        original = list(x.columns.values)
+    else:
+        raise ValueError("only list and pd.DataFrame s are allowed")
+    # let's go functional: s is a str, the following are to be applied
+    # in order
+    funcs = [
+        lambda s: s.lower().strip(),
+        lambda s: _replace_unwanted_chars(s),
+        lambda s: _remove_duplicated_underscore(s),
+        lambda s: _remove_external_underscore(s), 
+        lambda s: _add_x_if_first_is_digit(s),
+    ]
+    # sotto serve dato che compose applica prima la funzione a destra
+    # e poi quella a sx (come in math) mentre vogliamo tenere l'ordine
+    # di sopra
+    funcs.reverse()
+    worker = _functools.reduce(_compose, funcs)
+    mod = [worker(s) for s in original]
+    rename_dict = {}
+    for o, m in zip(original, mod):
+        rename_dict.update({o: m})
+    return rename_dict
 
 
 # -------------------------------------------------------------------------

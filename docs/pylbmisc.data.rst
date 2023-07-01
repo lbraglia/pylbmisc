@@ -4,10 +4,18 @@ pylbmisc.data package
 Submodules
 ----------
 
-pylbmisc.data.dnd module
-------------------------
+pylbmisc.data.dnd\_spells module
+--------------------------------
 
-.. automodule:: pylbmisc.data.dnd
+.. automodule:: pylbmisc.data.dnd_spells
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pylbmisc.data.dnd\_terms module
+-------------------------------
+
+.. automodule:: pylbmisc.data.dnd_terms
    :members:
    :undoc-members:
    :show-inheritance:

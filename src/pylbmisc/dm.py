@@ -95,7 +95,8 @@ def _has_mobile_numbers(x):
 
 
 def pii_find(x: _pd.DataFrame):
-    """ Find columns with probable piis and return the colnames for further processing.
+    """Find columns with probable piis (Personally Identifiable
+    Informations) and return the colnames for further processing.
 
     >>> df = pd.DataFrame({
     >>>     "id" : [1,2,3],
@@ -110,6 +111,7 @@ def pii_find(x: _pd.DataFrame):
     >>> probable_piis = pii_find(df)
     >>> if probable_piis:
     >>>    df.drop(columns=probable_piis)
+
     """
     
     if not isinstance(x, _pd.DataFrame):

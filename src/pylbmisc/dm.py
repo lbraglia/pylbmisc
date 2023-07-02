@@ -33,9 +33,130 @@ def table2df(df: _pd.DataFrame):
 
 
 # -------------------------------------------------------------------------
-# preprocessing varnames (from shitty excel)
-# -------------------------------------------------------------------------
+# pii_erase
+# ------------------------------------------------------------------------
 
+# Searching by column name
+def _columns_match(df_columns, searched):
+    """ Search in columns names, both exact match and contains match"""
+    # coerce single string to list of one string
+    if isinstance(searched, str):
+        searched = [searched]
+    perfect_match = [c in set(searched) for c in df_columns]
+    return perfect_match
+
+
+# Searching by regex in data
+# https://stackoverflow.com/questions/51170763 for general setup
+
+
+# Mail: https://stackoverflow.com/questions/8022530/ for mail regex
+_mail_re = _re.compile(r"[^@]+@[^@]+\.[^@]+") 
+is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
+def _has_emails(x):
+    if _pd.api.types.is_string_dtype(x):
+        check = is_email(x)
+        return _np.any(check)
+    else:
+        return False
+
+
+# Fiscal code
+_fc_re = _re.compile(r"[A-Za-z]{6}[0-9]{2}[A-Za-z]{1}[0-9]{2}[A-Za-z]{1}[0-9]{3}[A-Za-z]{1}") 
+is_fiscal_code = _np.vectorize(lambda x: bool(_fc_re.match(x)))
+def _has_fiscal_codes(x):
+    if _pd.api.types.is_string_dtype(x):
+        check = is_fiscal_code(x)
+        return _np.any(check)
+    else:
+        return False
+
+
+# Telephone number: 
+_tel_re = _re.compile(r"(.+)?0[0-9]{1,3}[\. /\-]?[0-9]{6,7}") 
+is_telephone_number = _np.vectorize(lambda x: bool(_tel_re.match(x)))
+def _has_telephone_numbers(x):
+    if _pd.api.types.is_string_dtype(x):
+        check = is_telephone_number(x)
+        return _np.any(check)
+    else:
+        return False
+
+
+# Mobile number
+_mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
+is_mobile_number = _np.vectorize(lambda x: bool(_mobile_re.match(x)))
+def _has_mobile_numbers(x):
+    if _pd.api.types.is_string_dtype(x):
+        check = is_mobile_number(x)
+        return _np.any(check)
+    else:
+        return False
+
+
+def pii_find(x: _pd.DataFrame):
+    """ Find columns with probable piis and return the colnames for further processing.
+
+    >>> df = pd.DataFrame({
+    >>>     "id" : [1,2,3],
+    >>>     "cognome": ["brazorv", "gigetti", "ginetti"],
+    >>>     "nome  " : [1,2,3],
+    >>>     "mail": ["lgasd@asdkj.com", " asòdlk@asd.com", "aaaa"],
+    >>>     "fc": ["nrgasd12h05h987z", "aaaa", "eee"],
+    >>>     "num": ["0654-6540123", "aa", "eee"],
+    >>>     "cel": ["3921231231", "aa", "eee"]
+    >>>     })
+    >>>     
+    >>> probable_piis = pii_find(df)
+    >>> if probable_piis:
+    >>>    df.drop(columns=probable_piis)
+    """
+    
+    if not isinstance(x, _pd.DataFrame):
+        raise ValueError("x must be a pd.DataFrame")
+
+    col = list(x.columns.values)
+    
+    # name and surname (looking at columns names)
+    col_clean = [c.lower().strip() for c in col]
+    surname_match = _columns_match(col_clean, ["cognome", "surname"])
+    name_match = _columns_match(col_clean, ["nome", "name"])
+
+    # finding other pii loking at data
+    has_mails = [_has_emails(x[c]) for c in col]
+    has_fcs = [_has_fiscal_codes(x[c]) for c in col]
+    has_telephones = [_has_telephone_numbers(x[c]) for c in col]
+    has_mobiles = [_has_mobile_numbers(x[c]) for c in col]
+
+    probable_pii = []
+    zipped = zip(col,
+                 surname_match,
+                 name_match,
+                 has_mails,
+                 has_fcs,
+                 has_telephones,
+                 has_mobiles)
+    for var, is_surname, is_name, has_mail, has_fc, has_telephone, has_mobile in zipped:
+        pii_sum = is_surname + is_name + has_mail + has_fc + has_telephone + has_mobile
+        if pii_sum:
+            probable_pii.append(var)
+            if is_surname:
+                print("{} matches 'surname'/'cognome'.".format(var))
+            if is_name:
+                print("{} matches 'name'/'nome'.".format(var))
+            if has_mail:
+                print("{} probably contains emails.".format(var))
+            if has_fc:
+                print("{} probably contains fiscal codes.".format(var))
+            if has_telephone:
+                print("{} probably contains telephone numbers.".format(var))
+            if has_mobile:
+                print("{} probably contains mobile phones numbers.".format(var))
+    return probable_pii
+
+# -------------------------------------------------------------------------
+# preprocessing varnames (from shitty excel): fix_columns
+# -------------------------------------------------------------------------
 
 def _compose(f, g):
     return lambda x: f(g(x))
@@ -64,12 +185,12 @@ def _add_x_if_first_is_digit(s):
         return s
 
 
-def fix_colnames(x: list | _pd.DataFrame):
+def fix_columns(x: list | _pd.DataFrame):
     """ The good-old R preprocess_varnames
 
     >>> fix_colnames([" 98n2 3", " L< KIAFJ8 0_________"])
-    >>> ft = fix_colnames(shitty_df)
-    >>> shitty_df.rename(ft)
+    >>> fix_colnames(["asd", "foo0", "asd"])
+    >>> df.columns = fix_columns(shitty_df)
     """
     if isinstance(x, list):
         original = x
@@ -92,10 +213,26 @@ def fix_colnames(x: list | _pd.DataFrame):
     funcs.reverse()
     worker = _functools.reduce(_compose, funcs)
     mod = [worker(s) for s in original]
-    rename_dict = {}
-    for o, m in zip(original, mod):
-        rename_dict.update({o: m})
-    return rename_dict
+    # handle duplicated names by adding numeric postfix
+    has_duplicates = len(mod) != len(set(mod))
+    if has_duplicates:
+        seen = {}
+        uniq = []
+        for v in mod:
+            if v not in seen:
+                seen[v] = 0
+                uniq.append(v)
+            else:
+                seen[v] += 1
+                uniq.append("{}_{}".format(v, seen[v]))
+    else:
+        uniq = mod
+    # se ci sono doppi nei nomi di partenza meglio evitare i dict se no i
+    # doppi vengono considerati solo una volta
+    # rename_dict = {}
+    # for o, m in zip(original, uniq_mod):
+    #     rename_dict.update({o: m})
+    return uniq
 
 
 # -------------------------------------------------------------------------

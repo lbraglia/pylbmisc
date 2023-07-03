@@ -6,6 +6,151 @@ import zipfile as _zipfile
 from pathlib import Path as _Path
 from typing import Sequence as _Sequence
 
+# ------------------------------------
+# LaTeX stuff
+# ------------------------------------
+
+# Thanks PyLaTeX guys
+_latex_special_chars = {
+    '&': r'\&',
+    '%': r'\%',
+    '$': r'\$',
+    '#': r'\#',
+    '_': r'\_',
+    '{': r'\{',
+    '}': r'\}',
+    '~': r'\textasciitilde{}',
+    '^': r'\^{}',
+    '\\': r'\textbackslash{}',
+    '\n': '\\newline%\n',
+    '-': r'{-}',
+    '\xA0': '~',  # Non-breaking space
+    '[': r'{[}',
+    ']': r'{]}',
+}
+
+def latex_escape(s):
+    """
+    latex_escape from PyLaTeX
+
+    s: a str or something coercible to it
+    >>> print(latex_escape("asd_foo_bar"))
+    """
+    string = str(s)
+    return ''.join(_latex_special_chars.get(c, c) for c in string)
+
+
+
+def latex_table(tab,
+                label: str = "",
+                caption: str = "",
+                digits = 3):
+    """ Print a table (a pd.DataFrame or inheriting object with
+    to_latex method) with sensible defaults.
+    tab: a pd.DataFrame or other object with .to_latex method
+    label (str): posta dopo "fig:" in LaTeX
+    caption (str): posta dopo "fig:" in LaTeX
+    """
+    # todo:
+    #- format float
+    #- table (o altro) con label caption etc
+    if (label == "") or (not isinstance(label, str)):
+        raise ValueError("Please provide a label for the table.")
+    caption = label.capitalize().replace("_", " ") \
+        if caption == "" else caption
+    latex_caption = latex_escape(caption)
+    # latex_label = lb.io.latex_escape('fig:' + label)
+    latex_label = 'tab:' + label
+    # rimuovo eventuali nomi colonna perché non sono
+    # escapati da pandas e mi ritrovo colonna_stratificazione
+    # in analisi
+    # https://github.com/pandas-dev/pandas/blob/v2.0.3/pandas/core/generic.py#L3174-L3466
+    # non è detto che sia sempre ok (es su indici di
+    # colonna piu stratificati) ma si vedràs strada facendo
+    if isinstance(tab, _pd.DataFrame):
+        tab.columns.name = None
+    content = tab.to_latex(na_rep = "",
+                           index = True,
+                           index_names = False,
+                           escape = True,
+                           label = latex_label,
+                           caption = latex_caption)
+    print(content)
+
+
+# ------------------------------------
+# Figure and images stuff
+# ------------------------------------
+
+def fig_dump(
+    fig,
+    label: str = "",
+    caption: str = "",
+    fdir: str = "outputs",
+    fname: str = "",
+    scale: float = 1,
+):
+    """Dump a figure (save to file, include in LaTeX)
+
+    Save to png, eps and pdf and include in Latex an image;
+    intended to be used inside pythontex pycode.
+
+    Args:
+       fig (matplotlib.figure.Figure): the fig
+       label (str): posta dopo "fig:" in LaTeX
+       caption (str): caption LaTeX, se mancante viene riadattata label
+       fdir (str): directory dove salvare, se mancante si usa /tmp
+       fname (str): basename del file da salvare, se mancante si prova
+          a riusare label oppure a creare un file temporaneo
+       scale (float): scale di includegraphics di LaTeX
+
+    Returns:
+       None: nothing interesting here
+    """
+    # fdir not existing, using /tmp
+    if not _os.path.isdir(fdir):
+        fdir = '/tmp'
+
+    # default filename to be set as label, if available or a temporary one
+    if fname == "":
+        if label != "":
+            fname = label
+        else:
+            tmp = _tempfile.mkstemp(dir=fdir)
+            fname = _os.path.basename(tmp[1])
+
+    # produce the file paths
+    base_path = _os.path.join(fdir, fname)
+    eps_path = base_path + ".eps"
+    png_path = base_path + ".png"
+    pdf_path = base_path + ".pdf"
+
+    # save figures to hard drive
+    fig.savefig(eps_path)
+    fig.savefig(png_path)  # , dpi = 600)
+    fig.savefig(pdf_path)
+
+    # latex stuff
+    latex_label = 'fig:' + label
+    caption = label.capitalize().replace("_", " ") if caption == "" else caption
+    latex = (
+        "\\begin{figure} \\centering "
+        + "\\includegraphics[scale=%(scale).2f]{%(base_path)s}"
+        + " \\caption{%(caption)s} \\label{%(label)s} \\end{figure}"
+    )
+    subs = {
+        "scale": scale,
+        "base_path": base_path,
+        "caption": caption,
+        "label": latex_label,
+    }
+    print(latex % subs)
+
+
+
+# ------------------------------------
+# Data Import/export (from/to csv/xls)
+# ------------------------------------
 
 def data_import(fpaths: str | _Path | _Sequence[str | _Path],
                 csv_kwargs: dict = {},
@@ -92,27 +237,6 @@ def data_export(x: dict[str, _pd.DataFrame], path: str | _Path) -> None:
         raise ValueError("Formato non disponibile: disponibili csv ed xlsx.")
 
 
-# def import_logical(x):
-#     """
-#     Function to import logical values saved in csv
-#     """
-#     if ((x == "TRUE") or (x == "True") or (x == True)):
-#         return True
-#     elif (x == "NA") or (x == None) or (x == ""):
-#         return None
-#     else:
-#         return False
-
-
-# def import_character(x):
-#     """
-#     Function to import characters values saved in csv
-#     """
-#     if (x == "" or x == "NA"):
-#         return None
-#     else:
-#         return str(x)
-
 # --------------------------------------------------
 # rdf: pd.DataFrame to R data.frame converter (a-la dput)
 # --------------------------------------------------
@@ -175,16 +299,31 @@ def _rdf_object(x: _pd.Series, xn: str):
     return rval
 
 
+def _rdf_bool(x: _pd.Series, xn: str):
+    ft = {True : "TRUE", False : "FALSE"}
+    data_str = x.map(ft).to_string(
+        na_rep="NA",
+        index=False,
+        header=False,
+    ).replace("\n", ", ")
+    rval = "{} = c({})".format(xn, data_str)
+    return rval
+
+
 # Thigs yet TODO
 def _rdf_NA(x: _pd.Series, xn: str):
     rval = "{} = NA".format(xn)
     return rval
 
+_rdf_datetime = _rdf_NA
 
-# _rdf_object = _rdf_NA
+
 
 
 def rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
+    """
+    pd.DataFrame to R data.frame 'converter'
+    """
     path = _Path(path)
 
     r_code = []
@@ -197,10 +336,14 @@ def rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
             r_code.append(_rdf_numeric(x, var))
         elif _pd.api.types.is_categorical_dtype(x):
             r_code.append(_rdf_factor(x, var))
+        elif _pd.api.types.is_bool_dtype(x):
+            r_code.append(_rdf_bool(x, var))
+        elif _pd.api.types.is_datetime64_any_dtype(x):
+            r_code.append(_rdf_datetime(x, var))
         elif _pd.api.types.is_object_dtype(x):
             r_code.append(_rdf_object(x, var))
         else:
-            msg = "{} deve essere intera, numerica o categorica, invece è {}.".format(var, str(x.dtype))
+            msg = "{}: il tipo {} non è ancora gestito.".format(var, str(x.dtype))
             raise ValueError(msg)
         is_last = var == df.columns[-1]
         if not is_last:

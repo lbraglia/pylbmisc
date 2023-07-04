@@ -187,19 +187,22 @@ def _add_x_if_first_is_digit(s):
         return s
 
 
-def fix_columns(x: list | _pd.DataFrame):
+def fix_columns(x: str | list | _pd.DataFrame):
     """ The good-old R preprocess_varnames
 
+    >>> fix_colnames("  asd 98n2 3")
     >>> fix_colnames([" 98n2 3", " L< KIAFJ8 0_________"])
     >>> fix_colnames(["asd", "foo0", "asd"])
     >>> df.columns = fix_columns(shitty_df)
     """
-    if isinstance(x, list):
+    if isinstance(x, str):
+        original = [x]
+    elif isinstance(x, list):
         original = x
     elif isinstance(x, _pd.DataFrame):
         original = list(x.columns.values)
     else:
-        raise ValueError("only list and pd.DataFrame s are allowed")
+        raise ValueError("Only str, list and pd.DataFrame are allowed.")
     # let's go functional: s is a str, the following are to be applied
     # in order
     funcs = [
@@ -234,7 +237,8 @@ def fix_columns(x: list | _pd.DataFrame):
     # rename_dict = {}
     # for o, m in zip(original, uniq_mod):
     #     rename_dict.update({o: m})
-    return uniq
+    # if it was a string that was passed, return a string, not a list
+    return uniq if not isinstance(x, str) else uniq[0] 
 
 
 # -------------------------------------------------------------------------

@@ -44,37 +44,43 @@ def latex_escape(s):
 def latex_table(tab,
                 label: str = "",
                 caption: str = "",
-                digits = 3):
+                position: str|None = None, 
+                float_format: str = "%.1f",
+                column_format: str|None = None):
     """ Print a table (a pd.DataFrame or inheriting object with
     to_latex method) with sensible defaults.
+    
     tab: a pd.DataFrame or other object with .to_latex method
     label (str): posta dopo "fig:" in LaTeX
     caption (str): posta dopo "fig:" in LaTeX
+    position (str): lettere posizionamento tabella (ad esempio https://stackoverflow.com/questions/1673942)
     """
-    # todo:
-    #- format float
-    #- table (o altro) con label caption etc
     if (label == "") or (not isinstance(label, str)):
         raise ValueError("Please provide a label for the table.")
     caption = label.capitalize().replace("_", " ") \
         if caption == "" else caption
     latex_caption = latex_escape(caption)
-    # latex_label = lb.io.latex_escape('fig:' + label)
     latex_label = 'tab:' + label
-    # rimuovo eventuali nomi colonna perché non sono
-    # escapati da pandas e mi ritrovo colonna_stratificazione
-    # in analisi
-    # https://github.com/pandas-dev/pandas/blob/v2.0.3/pandas/core/generic.py#L3174-L3466
-    # non è detto che sia sempre ok (es su indici di
-    # colonna piu stratificati) ma si vedràs strada facendo
     if isinstance(tab, _pd.DataFrame):
         tab.columns.name = None
-    content = tab.to_latex(na_rep = "",
-                           index = True,
-                           index_names = False,
-                           escape = True,
-                           label = latex_label,
-                           caption = latex_caption)
+    if (column_format == None) and isinstance(tab, _pd.DataFrame):
+        ncols = tab.shape[1]
+        column_format = "".join(["l"] + ["r"] * ncols )
+    # per avere il centering è necessario impostare lo stile
+    # https://pandas.pydata.org/docs/reference/api/pandas.io.formats.style.Styler.to_latex.html
+    content = tab.to_latex(
+        # fissi
+        na_rep = "",
+        index = True,
+        index_names = False,
+        escape = True,
+        position_float = 'centering',
+        # variabili
+        label = latex_label,
+        caption = latex_caption,
+        position = position,
+        float_format=float_format,
+        column_format=column_format)
     print(content)
 
 

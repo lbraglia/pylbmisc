@@ -77,7 +77,7 @@ def latex_table(
         index=True,
         index_names=False,
         escape=True,
-        position_float='centering',
+        # position_float='centering', # one day. maybe.
         # variabili
         label=latex_label,
         caption=latex_caption,

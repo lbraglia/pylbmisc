@@ -32,14 +32,12 @@ Source = "https://github.com/lbraglia/pylbmisc"
 [project.scripts]
 compile_article = "pylbmisc.scripts.compile_latex:article"
 compile_book = "pylbmisc.scripts.compile_latex:book"
-flashcards = "pylbmisc.scripts.flashcards:flashcards"
-# flashcards2csv = "pylbmisc.scripts.flashcards:flashcards2csv"
-# flashcards2tex = "pylbmisc.scripts.flashcards:flashcards2tex"
-# flashcards2anki = "pylbmisc.scripts.flashcards:flashcards2anki"
-pomodoro = "pylbmisc.scripts.pomodoro:main"
-dnd_eng2ita = "pylbmisc.scripts.dnd_eng2ita:main"
-dnd_ita2eng = "pylbmisc.scripts.dnd_ita2eng:main"
+dnd_eng2ita = "pylbmisc.scripts.dnd_translate:eng2ita"
+dnd_ita2eng = "pylbmisc.scripts.dnd_translate:ita2eng"
 dnd_spell = "pylbmisc.scripts.dnd_spell:main"
+flashcards = "pylbmisc.scripts.flashcards:flashcards"
+pomodoro = "pylbmisc.scripts.pomodoro:main"
+winston_sends = "pylbmisc.scripts.winston_sends:winston_sends"
 
 
 [tool.hatch.version]

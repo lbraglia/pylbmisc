@@ -29,6 +29,7 @@ _latex_special_chars = {
     ']': r'{]}',
 }
 
+
 def latex_escape(s):
     """
     latex_escape from PyLaTeX
@@ -40,16 +41,17 @@ def latex_escape(s):
     return ''.join(_latex_special_chars.get(c, c) for c in string)
 
 
-
-def latex_table(tab,
-                label: str = "",
-                caption: str = "",
-                position: str|None = None, 
-                float_format: str = "%.1f",
-                column_format: str|None = None):
-    """ Print a table (a pd.DataFrame or inheriting object with
+def latex_table(
+    tab,
+    label: str = "",
+    caption: str = "",
+    position: str | None = None,
+    float_format: str = "%.1f",
+    column_format: str | None = None,
+):
+    """Print a table (a pd.DataFrame or inheriting object with
     to_latex method) with sensible defaults.
-    
+
     tab: a pd.DataFrame or other object with .to_latex method
     label (str): posta dopo "fig:" in LaTeX
     caption (str): posta dopo "fig:" in LaTeX
@@ -57,36 +59,39 @@ def latex_table(tab,
     """
     if (label == "") or (not isinstance(label, str)):
         raise ValueError("Please provide a label for the table.")
-    caption = label.capitalize().replace("_", " ") \
-        if caption == "" else caption
+    caption = (
+        label.capitalize().replace("_", " ") if caption == "" else caption
+    )
     latex_caption = latex_escape(caption)
     latex_label = 'tab:' + label
     if isinstance(tab, _pd.DataFrame):
         tab.columns.name = None
     if (column_format == None) and isinstance(tab, _pd.DataFrame):
         ncols = tab.shape[1]
-        column_format = "".join(["l"] + ["r"] * ncols )
+        column_format = "".join(["l"] + ["r"] * ncols)
     # per avere il centering è necessario impostare lo stile
     # https://pandas.pydata.org/docs/reference/api/pandas.io.formats.style.Styler.to_latex.html
     content = tab.to_latex(
         # fissi
-        na_rep = "",
-        index = True,
-        index_names = False,
-        escape = True,
-        position_float = 'centering',
+        na_rep="",
+        index=True,
+        index_names=False,
+        escape=True,
+        position_float='centering',
         # variabili
-        label = latex_label,
-        caption = latex_caption,
-        position = position,
+        label=latex_label,
+        caption=latex_caption,
+        position=position,
         float_format=float_format,
-        column_format=column_format)
+        column_format=column_format,
+    )
     print(content)
 
 
 # ------------------------------------
 # Figure and images stuff
 # ------------------------------------
+
 
 def fig_dump(
     fig,
@@ -138,7 +143,9 @@ def fig_dump(
 
     # latex stuff
     latex_label = 'fig:' + label
-    caption = label.capitalize().replace("_", " ") if caption == "" else caption
+    caption = (
+        label.capitalize().replace("_", " ") if caption == "" else caption
+    )
     latex = (
         "\\begin{figure} \\centering "
         + "\\includegraphics[scale=%(scale).2f]{%(base_path)s}"
@@ -153,14 +160,16 @@ def fig_dump(
     print(latex % subs)
 
 
-
 # ------------------------------------
 # Data Import/export (from/to csv/xls)
 # ------------------------------------
 
-def data_import(fpaths: str | _Path | _Sequence[str | _Path],
-                csv_kwargs: dict = {},
-                excel_kwargs: dict = {}) -> dict[str, _pd.DataFrame]:
+
+def data_import(
+    fpaths: str | _Path | _Sequence[str | _Path],
+    csv_kwargs: dict = {},
+    excel_kwargs: dict = {},
+) -> dict[str, _pd.DataFrame]:
     '''import data from one or several filepaths (supported formats: .csv
     .xls .xlsx .zip) and return a dict of DataFrame
     '''
@@ -170,7 +179,11 @@ def data_import(fpaths: str | _Path | _Sequence[str | _Path],
     # uniform 1 to many and clean input
     if isinstance(fpaths, str) or isinstance(fpaths, _Path):
         fpaths = [fpaths]
-    accepted_fpaths = [str(f) for f in fpaths if _os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}]
+    accepted_fpaths = [
+        str(f)
+        for f in fpaths
+        if _os.path.splitext(f)[1].lower() in {".csv", ".xls", ".xlsx", ".zip"}
+    ]
 
     rval: dict[str, _pd.DataFrame] = {}
 
@@ -186,20 +199,32 @@ def data_import(fpaths: str | _Path | _Sequence[str | _Path],
                 msg = "{0} is duplicated, skipping to avoid overwriting"
                 raise Warning(msg.format(dfname))
         elif fext in {'.xls', '.xlsx'}:
-            sheets = _pd.read_excel(fpath, None, **excel_kwargs)  # import all the sheets as a dict of DataFrame
-            sheets = {"{0}_{1}".format(fname, k): v for k, v in sheets.items()}  # add xlsx to sheet names
+            sheets = _pd.read_excel(
+                fpath, None, **excel_kwargs
+            )  # import all the sheets as a dict of DataFrame
+            sheets = {
+                "{0}_{1}".format(fname, k): v for k, v in sheets.items()
+            }  # add xlsx to sheet names
             rval.update(sheets)
-        elif fext == '.zip':  # unzip in temporary directory and go by recursion
+        elif (
+            fext == '.zip'
+        ):  # unzip in temporary directory and go by recursion
             with _tempfile.TemporaryDirectory() as tempdir:
                 with _zipfile.ZipFile(fpath) as myzip:
                     myzip.extractall(tempdir)
-                    zipped_fpaths = [_os.path.join(tempdir, f) for f in _os.listdir(tempdir)]
+                    zipped_fpaths = [
+                        _os.path.join(tempdir, f) for f in _os.listdir(tempdir)
+                    ]
                     zipped_data = data_import(zipped_fpaths)
             # prepend zip name to fname (as keys) and update results
-            zipped_data = {"{0}_{1}".format(fname, k): v for k, v in zipped_data.items()}
+            zipped_data = {
+                "{0}_{1}".format(fname, k): v for k, v in zipped_data.items()
+            }
             rval.update(zipped_data)
         else:
-            msg = "File format not supported for {0}. Ignoring it.".format(fext)
+            msg = "File format not supported for {0}. Ignoring it.".format(
+                fext
+            )
             raise Warning(msg)
 
     if len(rval):
@@ -229,7 +254,9 @@ def data_export(x: dict[str, _pd.DataFrame], path: str | _Path) -> None:
                 print(k, csvpath)
                 v.to_csv(csvpath, index=False)
         else:
-            raise ValueError("x deve essere un pd.DataFrame o un dict di pd.DataFrame")
+            raise ValueError(
+                "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
+            )
     elif fmt == ".xlsx":
         if isinstance(x, _pd.DataFrame):
             x.to_excel(writer, sheet_name="Foglio 1")
@@ -238,7 +265,9 @@ def data_export(x: dict[str, _pd.DataFrame], path: str | _Path) -> None:
                 for k, v in x.items():
                     v.to_excel(writer, sheet_name=k)
         else:
-            raise ValueError("x deve essere un pd.DataFrame o un dict di pd.DataFrame")
+            raise ValueError(
+                "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
+            )
     else:
         raise ValueError("Formato non disponibile: disponibili csv ed xlsx.")
 
@@ -288,7 +317,9 @@ def _rdf_factor(x: _pd.Series, xn: str):
     levels_str = "levels = c({})".format(levs)
     labels_str = "labels = c({})".format(labs)
     # return
-    rval = "{} = factor({}, {}, {})".format(xn, data_str, levels_str, labels_str)
+    rval = "{} = factor({}, {}, {})".format(
+        xn, data_str, levels_str, labels_str
+    )
     return rval
 
 
@@ -306,12 +337,16 @@ def _rdf_object(x: _pd.Series, xn: str):
 
 
 def _rdf_bool(x: _pd.Series, xn: str):
-    ft = {True : "TRUE", False : "FALSE"}
-    data_str = x.map(ft).to_string(
-        na_rep="NA",
-        index=False,
-        header=False,
-    ).replace("\n", ", ")
+    ft = {True: "TRUE", False: "FALSE"}
+    data_str = (
+        x.map(ft)
+        .to_string(
+            na_rep="NA",
+            index=False,
+            header=False,
+        )
+        .replace("\n", ", ")
+    )
     rval = "{} = c({})".format(xn, data_str)
     return rval
 
@@ -321,9 +356,8 @@ def _rdf_NA(x: _pd.Series, xn: str):
     rval = "{} = NA".format(xn)
     return rval
 
+
 _rdf_datetime = _rdf_NA
-
-
 
 
 def rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
@@ -349,7 +383,9 @@ def rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
         elif _pd.api.types.is_object_dtype(x):
             r_code.append(_rdf_object(x, var))
         else:
-            msg = "{}: il tipo {} non è ancora gestito.".format(var, str(x.dtype))
+            msg = "{}: il tipo {} non è ancora gestito.".format(
+                var, str(x.dtype)
+            )
             raise ValueError(msg)
         is_last = var == df.columns[-1]
         if not is_last:

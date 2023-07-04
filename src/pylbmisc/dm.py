@@ -1,7 +1,7 @@
 """Data management utilities for pandas Series/DataFrame"""
 
 import functools as _functools
-import inspect as _inspect 
+import inspect as _inspect
 import numpy as _np
 import pandas as _pd
 import re as _re
@@ -36,9 +36,10 @@ def table2df(df: _pd.DataFrame):
 # pii_erase
 # ------------------------------------------------------------------------
 
+
 # Searching by column name
 def _columns_match(df_columns, searched):
-    """ Search in columns names, both exact match and contains match"""
+    """Search in columns names, both exact match and contains match"""
     # coerce single string to list of one string
     if isinstance(searched, str):
         searched = [searched]
@@ -51,8 +52,10 @@ def _columns_match(df_columns, searched):
 
 
 # Mail: https://stackoverflow.com/questions/8022530/ for mail regex
-_mail_re = _re.compile(r"[^@]+@[^@]+\.[^@]+") 
+_mail_re = _re.compile(r"[^@]+@[^@]+\.[^@]+")
 is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
+
+
 def _has_emails(x):
     if _pd.api.types.is_string_dtype(x):
         check = is_email(x)
@@ -62,8 +65,12 @@ def _has_emails(x):
 
 
 # Fiscal code
-_fc_re = _re.compile(r"[A-Za-z]{6}[0-9]{2}[A-Za-z]{1}[0-9]{2}[A-Za-z]{1}[0-9]{3}[A-Za-z]{1}") 
+_fc_re = _re.compile(
+    r"[A-Za-z]{6}[0-9]{2}[A-Za-z]{1}[0-9]{2}[A-Za-z]{1}[0-9]{3}[A-Za-z]{1}"
+)
 is_fiscal_code = _np.vectorize(lambda x: bool(_fc_re.match(x)))
+
+
 def _has_fiscal_codes(x):
     if _pd.api.types.is_string_dtype(x):
         check = is_fiscal_code(x)
@@ -72,9 +79,11 @@ def _has_fiscal_codes(x):
         return False
 
 
-# Telephone number: 
-_tel_re = _re.compile(r"(.+)?0[0-9]{1,3}[\. /\-]?[0-9]{6,7}") 
+# Telephone number:
+_tel_re = _re.compile(r"(.+)?0[0-9]{1,3}[\. /\-]?[0-9]{6,7}")
 is_telephone_number = _np.vectorize(lambda x: bool(_tel_re.match(x)))
+
+
 def _has_telephone_numbers(x):
     if _pd.api.types.is_string_dtype(x):
         check = is_telephone_number(x)
@@ -86,6 +95,8 @@ def _has_telephone_numbers(x):
 # Mobile number
 _mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
 is_mobile_number = _np.vectorize(lambda x: bool(_mobile_re.match(x)))
+
+
 def _has_mobile_numbers(x):
     if _pd.api.types.is_string_dtype(x):
         check = is_mobile_number(x)
@@ -107,18 +118,18 @@ def pii_find(x: _pd.DataFrame):
     >>>     "num": ["0654-6540123", "aa", "eee"],
     >>>     "cel": ["3921231231", "aa", "eee"]
     >>>     })
-    >>>     
+    >>>
     >>> probable_piis = pii_find(df)
     >>> if probable_piis:
     >>>    df.drop(columns=probable_piis)
 
     """
-    
+
     if not isinstance(x, _pd.DataFrame):
         raise ValueError("x must be a pd.DataFrame")
 
     col = list(x.columns.values)
-    
+
     # name and surname (looking at columns names)
     col_clean = [c.lower().strip() for c in col]
     surname_match = _columns_match(col_clean, ["cognome", "surname"])
@@ -131,15 +142,32 @@ def pii_find(x: _pd.DataFrame):
     has_mobiles = [_has_mobile_numbers(x[c]) for c in col]
 
     probable_pii = []
-    zipped = zip(col,
-                 surname_match,
-                 name_match,
-                 has_mails,
-                 has_fcs,
-                 has_telephones,
-                 has_mobiles)
-    for var, is_surname, is_name, has_mail, has_fc, has_telephone, has_mobile in zipped:
-        pii_sum = is_surname + is_name + has_mail + has_fc + has_telephone + has_mobile
+    zipped = zip(
+        col,
+        surname_match,
+        name_match,
+        has_mails,
+        has_fcs,
+        has_telephones,
+        has_mobiles,
+    )
+    for (
+        var,
+        is_surname,
+        is_name,
+        has_mail,
+        has_fc,
+        has_telephone,
+        has_mobile,
+    ) in zipped:
+        pii_sum = (
+            is_surname
+            + is_name
+            + has_mail
+            + has_fc
+            + has_telephone
+            + has_mobile
+        )
         if pii_sum:
             probable_pii.append(var)
             if is_surname:
@@ -153,12 +181,16 @@ def pii_find(x: _pd.DataFrame):
             if has_telephone:
                 print("{} probably contains telephone numbers.".format(var))
             if has_mobile:
-                print("{} probably contains mobile phones numbers.".format(var))
+                print(
+                    "{} probably contains mobile phones numbers.".format(var)
+                )
     return probable_pii
+
 
 # -------------------------------------------------------------------------
 # preprocessing varnames (from shitty excel): fix_columns
 # -------------------------------------------------------------------------
+
 
 def _compose(f, g):
     return lambda x: f(g(x))
@@ -188,7 +220,7 @@ def _add_x_if_first_is_digit(s):
 
 
 def fix_columns(x: str | list | _pd.DataFrame):
-    """ The good-old R preprocess_varnames
+    """The good-old R preprocess_varnames
 
     >>> fix_colnames("  asd 98n2 3")
     >>> fix_colnames([" 98n2 3", " L< KIAFJ8 0_________"])
@@ -209,7 +241,7 @@ def fix_columns(x: str | list | _pd.DataFrame):
         lambda s: s.lower().strip(),
         lambda s: _replace_unwanted_chars(s),
         lambda s: _remove_duplicated_underscore(s),
-        lambda s: _remove_external_underscore(s), 
+        lambda s: _remove_external_underscore(s),
         lambda s: _add_x_if_first_is_digit(s),
     ]
     # sotto serve dato che compose applica prima la funzione a destra
@@ -238,7 +270,7 @@ def fix_columns(x: str | list | _pd.DataFrame):
     # for o, m in zip(original, uniq_mod):
     #     rename_dict.update({o: m})
     # if it was a string that was passed, return a string, not a list
-    return uniq if not isinstance(x, str) else uniq[0] 
+    return uniq if not isinstance(x, str) else uniq[0]
 
 
 # -------------------------------------------------------------------------
@@ -321,7 +353,9 @@ def to_date(x: _pd.Series):
     return to_datetime(x).dt.floor("D")
 
 
-def to_categorical(x: _pd.Series, categories: list[str] = None, lowcase: bool = False):
+def to_categorical(
+    x: _pd.Series, categories: list[str] = None, lowcase: bool = False
+):
     """Coerce to categorical a pd.Series of strings, with blank values as missing
 
     >>> to_categorical(pd.Series([1, 2., 1., 2, 3]))
@@ -358,7 +392,9 @@ def to_noyes(x: _pd.Series):
         l0 = l0.replace({"0": "n", "1": "y"})  # for strings 0/1
     else:
         l0 = to_bool(s).map({False: 'n', True: 'y'})
-    return to_categorical(l0.map({"n": "no", "y": "yes"}), categories=['no', 'yes'])
+    return to_categorical(
+        l0.map({"n": "no", "y": "yes"}), categories=['no', 'yes']
+    )
 
 
 def to_sex(x: _pd.Series):
@@ -370,7 +406,9 @@ def to_sex(x: _pd.Series):
         s = x.copy()
         # take the first letter (Mm/Ff)
         l0 = s.str.strip().str.lower().str[0]
-        return to_categorical(l0.map({"m": "male", "f": "female"}), categories=['male', 'female'])
+        return to_categorical(
+            l0.map({"m": "male", "f": "female"}), categories=['male', 'female']
+        )
     else:
         raise ValueError("x must be a pd.Series of strings")
 
@@ -402,7 +440,9 @@ def to_other_specify(x: _pd.Series):
     s = x.copy().astype("str")
     s = s.str.strip().str.lower()
     s[s == ""] = _pd.NA
-    categs = list(s.value_counts().index)  # categs ordered by decreasing counts
+    categs = list(
+        s.value_counts().index
+    )  # categs ordered by decreasing counts
     return to_categorical(s, categories=categs)
 
 
@@ -454,12 +494,12 @@ class Coercer:
     >>>     lb.dm.to_recist: ["recist"],
     >>>     lb.dm.to_sex : ["sex"]
     >>> }
-    >>> 
+    >>>
     >>> coercer1 = lb.dm.Coercer(df, fvs_dict = directives_new)
     >>> cleaned1 = coercer1.coerce()
-    >>> 
+    >>>
     >>> # ------------------------------------------------
-    >>> 
+    >>>
     >>> directives_new2 = {
     >>>     "lb.dm.to_categorical": ["state"],
     >>>     "lb.dm.to_date": ["date"],
@@ -471,11 +511,11 @@ class Coercer:
     >>>     "lb.dm.to_recist": ["recist"],
     >>>     "lb.dm.to_sex" : ["sex"]
     >>> }
-    >>> 
-    >>> 
+    >>>
+    >>>
     >>> coercer2 = lb.dm.Coercer(df, fvs_dict = directives_new2)
     >>> cleaned2 = coercer2.coerce()
-    >>> 
+    >>>
     >>>  #------------------------------------------------------
     >>> directives_old = {
     >>>     "idx": to_integer,
@@ -494,17 +534,21 @@ class Coercer:
     >>> coerced = coercer.coerce()
     """
 
-    def __init__(self,
-                 df: _pd.DataFrame,
-                 fvs_dict: dict|None = None,
-                 vf_dict: dict|None = None,
-                 verbose: bool = True):
+    def __init__(
+        self,
+        df: _pd.DataFrame,
+        fvs_dict: dict | None = None,
+        vf_dict: dict | None = None,
+        verbose: bool = True,
+    ):
         self._df = df
         self._verbose = verbose
         if fvs_dict == None and vf_dict == None:
             raise ValueError("Both directives dict can't be None")
-        if isinstance(fvs_dict, dict) and  isinstance(vf_dict, dict):
-            raise ValueError("Both directives dict are specified. Only one admitted.")
+        if isinstance(fvs_dict, dict) and isinstance(vf_dict, dict):
+            raise ValueError(
+                "Both directives dict are specified. Only one admitted."
+            )
         if fvs_dict != None:
             # Experimental below
             parent_frame = _inspect.currentframe().f_back
@@ -514,14 +558,16 @@ class Coercer:
             for f, vars in fvs_dict.items():
                 # if f is a string change it to function taking from the enclosing
                 # environment
-                f = eval(f, parent_frame.f_locals, parent_frame.f_globals) \
-                    if isinstance(f, str) else f
+                f = (
+                    eval(f, parent_frame.f_locals, parent_frame.f_globals)
+                    if isinstance(f, str)
+                    else f
+                )
                 for v in vars:
                     reversed.update({v: f})
             self._directives = reversed
         if vf_dict != None:
             self._directives = vf_dict
-        
 
     def coerce(self, keep_only_coerced=False) -> _pd.DataFrame:
         # do not modify the input data

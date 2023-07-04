@@ -47,7 +47,9 @@ def worker(what):
         with tex.open() as f:
             contents.append(f.read())
     content = "\n".join(contents)
-    full_content = r"""\documentclass{%s}""" % what + preamble + content + outro
+    full_content = (
+        r"""\documentclass{%s}""" % what + preamble + content + outro
+    )
     with tmptex.open("w") as f:
         f.write(full_content)
     # run pdflatex with output in /tmp

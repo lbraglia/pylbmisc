@@ -33,7 +33,9 @@ ending = r"\end{document}"
 model_id = 1607392319
 deck_id = 2059400110
 card_model_name = 'card_model_test'
-card_model = genanki.Model(model_id, card_model_name,
+card_model = genanki.Model(
+    model_id,
+    card_model_name,
     fields=[
         {'name': 'Domanda'},
         {'name': 'Risposta'},
@@ -44,41 +46,67 @@ card_model = genanki.Model(model_id, card_model_name,
             'qfmt': '{{Domanda}}',
             'afmt': '{{Risposta}}',
         },
-    ])
+    ],
+)
 
 
 @dataclass
 class Card:
-
     s1: str = ""
     s2: str = ""
     source: str = ""
 
     def to_tex(self) -> None:
-        return (r"\begin{flashcard}{%s}" % self.s1) + "   " + self.s2 + "   " + r"\end{flashcard}"
+        return (
+            (r"\begin{flashcard}{%s}" % self.s1)
+            + "   "
+            + self.s2
+            + "   "
+            + r"\end{flashcard}"
+        )
 
     def to_csv(self) -> tuple:
         return (self.s1, self.s2)
 
     def to_anki(self):
-        s1 = "[latex] {} [/latex]".format(self.s1) if self.source == 'tex' else self.s1
-        s2 = "[latex] {} [/latex]".format(self.s2) if self.source == 'tex' else self.s2
+        s1 = (
+            "[latex] {} [/latex]".format(self.s1)
+            if self.source == 'tex'
+            else self.s1
+        )
+        s2 = (
+            "[latex] {} [/latex]".format(self.s2)
+            if self.source == 'tex'
+            else self.s2
+        )
         return (s1, s2)
 
 
 class Flashcards(object):
-
-    def __init__(self, path: str | Path, latex_envirs: list[str] = ["defn", "thm", "proof", "es"]):
+    def __init__(
+        self,
+        path: str | Path,
+        latex_envirs: list[str] = ["defn", "thm", "proof", "es"],
+    ):
         # initialization: flashcards list (lista di tuple) e regex per
         # gli env latex
         self.__fc = []
         paste = "|".join(latex_envirs)
         fmt = (paste, paste)
-        self.__env_re = re.compile(r"\\begin{(%s)}(\[.+?\])?(.+?)\\end{(%s)}" % fmt)
+        self.__env_re = re.compile(
+            r"\\begin{(%s)}(\[.+?\])?(.+?)\\end{(%s)}" % fmt
+        )
         # load data from files given in the path
         path = Path(path)
         if path.is_dir():
-            files = [f for f in path.iterdir() if ((f.suffix in ('.tex', '.Rnw', '.csv')) and f.name != "_region_.tex")]
+            files = [
+                f
+                for f in path.iterdir()
+                if (
+                    (f.suffix in ('.tex', '.Rnw', '.csv'))
+                    and f.name != "_region_.tex"
+                )
+            ]
         else:
             files = [path]
         for f in files:
@@ -87,14 +115,12 @@ class Flashcards(object):
             elif f.suffix == '.csv':
                 self.add_from_csv(f)
 
-
     def add_from_csv(self, path: str | Path) -> None:
         path = Path(path)
         with path.open() as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 self.__fc.append(Card(row[0], row[1], 'csv'))
-
 
     def add_from_tex(self, path: str | Path) -> None:
         path = Path(path)
@@ -119,7 +145,6 @@ class Flashcards(object):
                     content = match[2]
                 self.__fc.append(Card(side1, content, 'tex'))
 
-
     def to_csv(self, path: str | Path) -> None:
         '''Export to a csv'''
         if path is None:
@@ -127,11 +152,12 @@ class Flashcards(object):
         else:
             path = Path(path)
         with path.open(mode='w') as f:
-            dataset = csv.writer(f, delimiter=';', quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
+            dataset = csv.writer(
+                f, delimiter=';', quotechar='"', quoting=csv.QUOTE_NONNUMERIC
+            )
             for card in self.__fc:
                 dataset.writerow(card.to_csv())
         print("All done, exported to: " + str(path))
-
 
     def to_tex(self, path: str | Path) -> None:
         if path is None:
@@ -145,22 +171,20 @@ class Flashcards(object):
             print(ending, file=f)
         print("All done, now run:\n\t pdflatex " + str(path))
 
-
     def to_anki(self, path: str | Path | None, deck_name: str | None):
-        """ Export to anki """
+        """Export to anki"""
         if deck_name is None:
             deck_name = "test"
         if path is None:
             path = Path("/tmp/flashcards.apkg")
         else:
             path = Path(path)
-        deck = genanki.Deck(deck_id, deck_name)    
+        deck = genanki.Deck(deck_id, deck_name)
         for card in self.__fc:
             elem = card.to_anki()
             note = genanki.Note(model=card_model, fields=[elem[0], elem[1]])
             deck.add_note(note)
         genanki.Package(deck).write_to_file(path)
-
 
     def export(self, outfile: str | Path):
         outfile = Path(outfile)
@@ -171,8 +195,6 @@ class Flashcards(object):
             self.to_tex(path=outfile)
         if ext == '.apkg':
             self.to_anki(path=outfile, deck_name=outfile.stem)
-            
-        
 
 
 def flashcards():
@@ -187,7 +209,7 @@ def flashcards():
     fc = Flashcards(infile)
     fc.export(outfile)
 
-    
+
 def flashcards2csv():
     parser = argparse.ArgumentParser()
     parser.add_argument("path")
@@ -219,9 +241,6 @@ def flashcards2anki():
         raise FileNotFoundError(str(path) + " does not exists.")
     fc = Flashcards(path)
     fc.to_anki()
-
-
-
 
     # opts = (
     #     # (param, help, default, type)

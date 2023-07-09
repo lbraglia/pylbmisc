@@ -47,17 +47,17 @@ def ita2eng(x: str):
     print("\n", sel.to_string(index=False), "\n")
 
 
-def spell(x: str):
-    """Stampa la spell in inglese"""
-    if "spells" not in _dnd_cache:
-        print("Importing spells data.")
-        from .data.dnd_spells import spells
+def srd(x: str):
+    """Stampa la srd (spell, classe etc) in inglese"""
+    if "srd" not in _dnd_cache:
+        print("Importing SRD data.")
+        from .data.dnd_srd import srd
 
-        _dnd_cache["spells"] = spells
+        _dnd_cache["srd"] = srd
 
-    sel = [s for s in _dnd_cache["spells"] if x.lower() in s["name"].lower()]
+    sel = [s for s in _dnd_cache["srd"] if x.lower() in s["name"].lower()]
     _pprint.pprint(sel, sort_dicts=False)
-
+    
 
 def dividi_loot(
     MO: int = 0, MA: int = 0, MR: int = 0, MP: int = 0, ME: int = 0, n: int = 7

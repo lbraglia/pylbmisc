@@ -7,10 +7,11 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-# from ..utils import argparser
+# -----------
+# latex stuff
+# -----------
 
-preamble = r"""\documentclass[avery5371, grid]{flashcards}
-\usepackage[T1]{fontenc}
+latex_packages = r"""\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english, italian]{babel}
 \usepackage{minitoc}
@@ -22,17 +23,50 @@ preamble = r"""\documentclass[avery5371, grid]{flashcards}
 \usepackage{rotating}
 \usepackage{cancel}
 \usepackage{hyperref}
-\begin{document}
 """
 
-ending = r"\end{document}"
+latex_preamble = r"\documentclass[avery5371, grid]{flashcards}" + latex_packages + r"\begin{document}"
+latex_ending = r"\end{document}"
 
-
+# ----------
 # anki stuff
 # ----------
+
+# Aggiunta di preamboli latex custom
+
+# To use the package with Anki, click "Add" in the main window, then
+# click the note type selection button. Click the "Manage" button,
+# then select the note type you plan to use and click "Options". The
+# LaTeX header and footer are shown. The header will look something
+# like:
+
+# \documentclass[12pt]{article}
+# \special{papersize=3in,5in}
+# \usepackage{amssymb,amsmath}
+# \pagestyle{empty}
+# \setlength{\parindent}{0in}
+# \begin{document}
+
+# To use chemtex, you’d add the usepackage line in the earlier example, so it looks like:
+
+# \documentclass[12pt]{article}
+# \special{papersize=3in,5in}
+# \usepackage{amssymb,amsmath}
+# \usepackage{chemtex}
+# \pagestyle{empty}
+# \setlength{\parindent}{0in}
+# \begin{document}
+
+# After that, you should be able to include lines like the following in your Anki cards:
+
+# Per quanto riguarda le API di genanki per creare il modello di carta fare riferimento a
+
+# https://github.com/kerrickstaley/genanki/blob/master/genanki/model.py
+anki_latex_preamble = "\\documentclass[12pt]{article}\n" + latex_packages + "\\begin{document}"
 model_id = 1607392319
 deck_id = 2059400110
-card_model_name = 'card_model_test'
+card_model_name = 'model_with_my_latex_packages'
+
 card_model = genanki.Model(
     model_id,
     card_model_name,
@@ -47,6 +81,7 @@ card_model = genanki.Model(
             'afmt': '{{Risposta}}',
         },
     ],
+    latex_pre=anki_latex_preamble
 )
 
 
@@ -54,7 +89,6 @@ card_model = genanki.Model(
 class Card:
     s1: str = ""
     s2: str = ""
-    source: str = ""
 
     def to_tex(self) -> None:
         return (
@@ -68,15 +102,15 @@ class Card:
     def to_csv(self) -> tuple:
         return (self.s1, self.s2)
 
-    def to_anki(self):
+    def to_anki(self, add_latex_tags):
         s1 = (
             "[latex] {} [/latex]".format(self.s1)
-            if self.source == 'tex'
+            if add_latex_tags
             else self.s1
         )
         s2 = (
             "[latex] {} [/latex]".format(self.s2)
-            if self.source == 'tex'
+            if add_latex_tags
             else self.s2
         )
         return (s1, s2)
@@ -120,7 +154,7 @@ class Flashcards(object):
         with path.open() as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                self.__fc.append(Card(row[0], row[1], 'csv'))
+                self.__fc.append(Card(row[0], row[1]))
 
     def add_from_tex(self, path: str | Path) -> None:
         path = Path(path)
@@ -143,7 +177,7 @@ class Flashcards(object):
                     rm_paren = match[1].replace("[", "").replace("]", "")
                     side1 = "[{0}]".format(match[0]) + " " + rm_paren
                     content = match[2]
-                self.__fc.append(Card(side1, content, 'tex'))
+                self.__fc.append(Card(side1, content))
 
     def to_csv(self, path: str | Path) -> None:
         '''Export to a csv'''
@@ -165,13 +199,13 @@ class Flashcards(object):
         else:
             path = Path(path)
         with path.open(mode="w") as f:
-            print(preamble, file=f)
+            print(latex_preamble, file=f)
             for card in self.__fc:
                 print(card.to_tex(), "\n", file=f)
-            print(ending, file=f)
+            print(latex_ending, file=f)
         print("All done, now run:\n\t pdflatex " + str(path))
 
-    def to_anki(self, path: str | Path | None, deck_name: str | None):
+    def to_anki(self, path: str | Path | None, deck_name: str | None, add_latex_tags: bool):
         """Export to anki"""
         if deck_name is None:
             deck_name = "test"
@@ -181,12 +215,12 @@ class Flashcards(object):
             path = Path(path)
         deck = genanki.Deck(deck_id, deck_name)
         for card in self.__fc:
-            elem = card.to_anki()
+            elem = card.to_anki(add_latex_tags=add_latex_tags)
             note = genanki.Note(model=card_model, fields=[elem[0], elem[1]])
             deck.add_note(note)
         genanki.Package(deck).write_to_file(path)
 
-    def export(self, outfile: str | Path):
+    def export(self, outfile: str | Path, infile_ext: str):
         outfile = Path(outfile)
         ext = outfile.suffix
         if ext == '.csv':
@@ -194,7 +228,8 @@ class Flashcards(object):
         if ext == '.tex':
             self.to_tex(path=outfile)
         if ext == '.apkg':
-            self.to_anki(path=outfile, deck_name=outfile.stem)
+            add_latex_tags = True if infile_ext == '.tex' else False
+            self.to_anki(path=outfile, deck_name=outfile.stem, add_latex_tags=add_latex_tags)
 
 
 def flashcards():
@@ -203,44 +238,12 @@ def flashcards():
     parser.add_argument("outfile")
     args = parser.parse_args()
     infile = Path(args.infile).resolve()
+    infile_ext = infile.suffix
     outfile = Path(args.outfile).resolve()
     if not infile.exists():
         raise FileNotFoundError(str(infile) + " does not exists.")
     fc = Flashcards(infile)
-    fc.export(outfile)
-
-
-def flashcards2csv():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("path")
-    args = parser.parse_args()
-    path = Path(args.path)
-    if not path.exists():
-        raise FileNotFoundError(str(path) + " does not exists.")
-    fc = Flashcards(path)
-    fc.to_csv()
-
-
-def flashcards2tex():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("path")
-    args = parser.parse_args()
-    path = Path(args.path)
-    if not path.exists():
-        raise FileNotFoundError(str(path) + " does not exists.")
-    fc = Flashcards(path)
-    fc.to_tex()
-
-
-def flashcards2anki():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("path")
-    args = parser.parse_args()
-    path = Path(args.path)
-    if not path.exists():
-        raise FileNotFoundError(str(path) + " does not exists.")
-    fc = Flashcards(path)
-    fc.to_anki()
+    fc.export(outfile, infile_ext)
 
     # opts = (
     #     # (param, help, default, type)

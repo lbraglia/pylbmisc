@@ -7,7 +7,8 @@ import subprocess
 from pathlib import Path
 
 preamble = r"""
-\usepackage[T1]{fontenc}
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
 \usepackage[utf8]{inputenc}
 \usepackage[english, italian]{babel}
 \usepackage{mypkg}

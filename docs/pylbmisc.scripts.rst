@@ -12,10 +12,10 @@ pylbmisc.scripts.compile\_latex module
    :undoc-members:
    :show-inheritance:
 
-pylbmisc.scripts.dnd\_spell module
-----------------------------------
+pylbmisc.scripts.dnd\_srd module
+--------------------------------
 
-.. automodule:: pylbmisc.scripts.dnd_spell
+.. automodule:: pylbmisc.scripts.dnd_srd
    :members:
    :undoc-members:
    :show-inheritance:

@@ -222,9 +222,9 @@ def _add_x_if_first_is_digit(s):
 def fix_columns(x: str | list | _pd.DataFrame):
     """The good-old R preprocess_varnames
 
-    >>> fix_colnames("  asd 98n2 3")
-    >>> fix_colnames([" 98n2 3", " L< KIAFJ8 0_________"])
-    >>> fix_colnames(["asd", "foo0", "asd"])
+    >>> fix_columns("  asd 98n2 3")
+    >>> fix_columns([" 98n2 3", " L< KIAFJ8 0_________"])
+    >>> fix_columns(["asd", "foo0", "asd"])
     >>> df.columns = fix_columns(shitty_df)
     """
     if isinstance(x, str):

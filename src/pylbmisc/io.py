@@ -3,6 +3,8 @@ import pandas as _pd
 import tempfile as _tempfile
 import zipfile as _zipfile
 
+from .dm import fix_columns
+
 from pathlib import Path as _Path
 from typing import Sequence as _Sequence
 
@@ -263,6 +265,9 @@ def data_export(x: dict[str, _pd.DataFrame], path: str | _Path) -> None:
         elif isinstance(x, dict):
             with _pd.ExcelWriter(str(path)) as writer:
                 for k, v in x.items():
+                    # preprocess the key of the dict, it must be an accepted excel
+                    # sheetname. Trim it to the first x characters
+                    k = fix_columns(k)[:31]
                     v.to_excel(writer, sheet_name=k)
         else:
             raise ValueError(

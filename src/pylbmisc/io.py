@@ -56,7 +56,7 @@ def latex_table(
 
     tab: a pd.DataFrame or other object with .to_latex method
     label (str): posta dopo "fig:" in LaTeX
-    caption (str): posta dopo "fig:" in LaTeX
+    caption (str): caption tabella LaTeX
     position (str): lettere posizionamento tabella (ad esempio https://stackoverflow.com/questions/1673942)
     """
     if (label == "") or (not isinstance(label, str)):

@@ -38,6 +38,7 @@ dnd_srd = "pylbmisc.scripts.dnd_srd:main"
 flashcards = "pylbmisc.scripts.flashcards:flashcards"
 pomodoro = "pylbmisc.scripts.pomodoro:main"
 winston_sends = "pylbmisc.scripts.winston_sends:winston_sends"
+av_datecubianno = "pylbmisc.scripts.av:av_datecubianno"
 
 
 [tool.hatch.version]

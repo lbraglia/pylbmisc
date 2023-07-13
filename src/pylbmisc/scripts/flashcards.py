@@ -120,7 +120,7 @@ class Flashcards(object):
     def __init__(
         self,
         path: str | Path,
-        latex_envirs: list[str] = ["thm", "cor", "lem", "prop", "proof", "defn", "es"],
+        latex_envirs: list[str] = ["thm", "cor", "lem", "prop", "proof", "defn", "es", "rmk"],
     ):
         # initialization: flashcards list (lista di tuple) e regex per
         # gli env latex

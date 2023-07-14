@@ -53,6 +53,8 @@ def worker(what):
     )
     with tmptex.open("w") as f:
         f.write(full_content)
+    # # here clean if there are old shit in /tmp
+    # old_files = tmp / tmp_shit
     # run pdflatex with output in /tmp
     pdflatex_cmd = ["pdflatex", "-output-directory", tmp, tmptex]
     subprocess.run(pdflatex_cmd)
@@ -60,7 +62,7 @@ def worker(what):
     # pythontexcodef = tmp / tex.with_stem(".pytxcode")
     # if pythontexcodef.exists():
     #     subprocess.run(["pythontex", tmp/tex.stem])
-    # subprocess.run(pdflatex_cmd)
+    subprocess.run(pdflatex_cmd)
     # cleaning and renaming (removing "tmp_")
     tmptex.unlink()
     subprocess.run(["mv", tmp / tmppdf, tmp / finalpdf])

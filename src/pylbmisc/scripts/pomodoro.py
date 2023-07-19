@@ -17,7 +17,9 @@ def worker(what):
 
     print("Status = %s" % what)
     subprocess.Popen(["espeak", "-v", "it", espeak_msg])
-    time.sleep(60 * min)
+    for m in range(min):
+        time.sleep(60)
+        print("min: %2d" % (m+1))
 
 
 def main():

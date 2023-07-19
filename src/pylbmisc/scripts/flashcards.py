@@ -3,9 +3,12 @@ import csv
 import genanki
 import re
 import sys
+import pandas as pd
 
 from dataclasses import dataclass
 from pathlib import Path
+
+from ..io import data_export
 
 # -----------
 # latex stuff
@@ -193,6 +196,20 @@ class Flashcards(object):
                 dataset.writerow(card.to_csv())
         print("All done, exported to: " + str(path))
 
+    def to_xlsx(self, path: str | Path) -> None:
+        '''Export to a xlsx'''
+        if path is None:
+            path = Path("/tmp/flashcards.xlsx")
+        else:
+            path = Path(path)
+        data = []
+        for card in self.__fc:
+            side1, side2 = card.to_csv()
+            data.append([side1, side2])
+        df = pd.DataFrame(data, columns = ["side1", "side2"])
+        data_export({"flashcards": df},  path= path)            
+        print("All done, exported to: " + str(path))
+        
     def to_tex(self, path: str | Path) -> None:
         if path is None:
             path = Path("/tmp/flashcards.tex")
@@ -225,6 +242,8 @@ class Flashcards(object):
         ext = outfile.suffix
         if ext == '.csv':
             self.to_csv(path=outfile)
+        if ext == '.xlsx':
+            self.to_xlsx(path=outfile)
         if ext == '.tex':
             self.to_tex(path=outfile)
         if ext == '.apkg':

@@ -236,7 +236,8 @@ def data_import(
 
 
 def data_export(x: _pd.DataFrame | dict[str, _pd.DataFrame],
-                path: str | _Path) -> None:
+                path: str | _Path,
+                index = True) -> None:
     """export a DataFrame or a dict of DataFrames as csv/xlsx
 
      (or a list of) or a single excel file
@@ -246,32 +247,35 @@ def data_export(x: _pd.DataFrame | dict[str, _pd.DataFrame],
 
     x: dict of pandas.DataFrame
     fpath: fpath file path
+    index: bool add index in exporting (typically True for results, False for data)
 
     """
     path = _Path(path)
     fmt = path.suffix
     if fmt == ".csv":
         if isinstance(x, _pd.DataFrame):
-            x.to_csv(path, index=False)
+            x.to_csv(path, index=index)
         elif isinstance(x, dict):
             for k, v in x.items():
                 csvpath = path.parent / (str(path.stem) + "_{0}.csv".format(k))
                 print(k, csvpath)
-                v.to_csv(csvpath, index=False)
+                v.to_csv(csvpath, index=index)
         else:
             raise ValueError(
                 "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
             )
     elif fmt == ".xlsx":
         if isinstance(x, _pd.DataFrame):
-            x.to_excel(writer, sheet_name="Foglio 1", index=False)
+            x.to_excel(writer, sheet_name="Foglio 1", index=index)
         elif isinstance(x, dict):
             with _pd.ExcelWriter(str(path)) as writer:
                 for k, v in x.items():
                     # preprocess the key of the dict, it must be an accepted excel
                     # sheetname. Trim it to the first x characters
                     k = fix_columns(k)[:31]
-                    v.to_excel(writer, sheet_name=k, index=False)
+                    v.to_excel(writer,
+                               sheet_name=k,
+                               index=index) 
         else:
             raise ValueError(
                 "x deve essere un pd.DataFrame o un dict di pd.DataFrame"

@@ -36,10 +36,10 @@ pylbmisc.scripts.dnd\_translate module
    :undoc-members:
    :show-inheritance:
 
-pylbmisc.scripts.flashcards module
-----------------------------------
+pylbmisc.scripts.flashcards\_exercises module
+---------------------------------------------
 
-.. automodule:: pylbmisc.scripts.flashcards
+.. automodule:: pylbmisc.scripts.flashcards_exercises
    :members:
    :undoc-members:
    :show-inheritance:

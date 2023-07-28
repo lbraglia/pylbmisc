@@ -315,7 +315,7 @@ class Database(object):
     (id text, page int, source text, topic text, question text, 
     hint text, solution text)'''
     __sql_create_biblio_table = '''CREATE TABLE sources
-    (key text, title text, authors text, subject text)'''
+    (key text, title text, author text, subject text)'''
     __sql_insert_ex_table =  '''INSERT INTO exercises VALUES
     (?, ?, ?, ?, ?, ?, ?)'''
     __sql_insert_biblio_table =  '''INSERT INTO sources VALUES
@@ -434,9 +434,15 @@ class Database(object):
         for entry in bib_data.entries.values():
             # keep only those with a subject
             if 'subject' in entry.fields:
+                cognomi = []
+                for author in entry.persons["author"]:
+                    cognomi.append(str(author.last_names[0]))
                 self.biblio_list.append(
-                    (entry.key, entry.fields['title'],
-                     entry.fields['author'], entry.fields['subject'] ))
+                    (entry.key,
+                     entry.fields['title'],
+                     ", ".join(cognomi),
+                     entry.fields['subject'])
+                )
         
 
 # -------------------------------------------------------------------
@@ -579,7 +585,7 @@ def exercises_db():
         # --dirs
         ('dirs',
          'str: comma separated list of exercise source directories',
-         '~/src/other/exercises/db',
+         '~/src/other/exercises',
          str),
         # --lists
         ('lists',

@@ -307,7 +307,7 @@ class Database(object):
     __page_re     = re.compile(r'\\page{(.+?)}')
     __source_re   = re.compile(r'\\source{(.+?)}')
     __topic_re    = re.compile(r'\\topic{(.+?)}')
-    __question_re     = re.compile(r'\\begin{question}(.+?)\\end{question}')
+    __question_re = re.compile(r'\\begin{question}(.+?)\\end{question}')
     __hint_re     = re.compile(r'\\begin{hint}(.+?)\\end{hint}')
     __solution_re = re.compile(r'\\begin{solution}(.+?)\\end{solution}')
 
@@ -411,7 +411,7 @@ class Database(object):
         page     = self.__get_regex_value(self.__page_re, ex)
         source   = self.__get_regex_value(self.__source_re, ex)
         topic    = self.__get_regex_value(self.__topic_re, ex)
-        question     = self.__get_regex_value(self.__question_re, ex)
+        question = self.__get_regex_value(self.__question_re, ex)
         hint     = self.__get_regex_value(self.__hint_re, ex)
         solution = self.__get_regex_value(self.__solution_re, ex)
 
@@ -535,7 +535,7 @@ class Worksheet(object):
                   'page'     : 1,
                   'source'   : 2,
                   'topic'    : 3,
-                  'question'     : 4, 
+                  'question' : 4, 
                   'hint'     : 5,
                   'solution' : 6,
                   'subject'  : 7}
@@ -546,7 +546,7 @@ class Worksheet(object):
             page = (self.exercises_list[i])[column['page']]
             source = (self.exercises_list[i])[column['source']]
             topic = (self.exercises_list[i])[column['topic']]
-            testo = (self.exercises_list[i])[column['question']]
+            question = (self.exercises_list[i])[column['question']]
             hint = (self.exercises_list[i])[column['hint']]
 
             if show_hint and (hint is not None):
@@ -564,9 +564,9 @@ class Worksheet(object):
             
             header_sol = '\\paragraph{Sol.~es.~' + header_tail
             
-            if testo is not None or testo == '':
+            if question is not None or question == '':
                 soluzione = (self.exercises_list[i])[column['solution']]
-                ex_section += ([header_es] + [testo] + [hint])
+                ex_section += ([header_es] + [question] + [hint])
                 if soluzione is not None or soluzione == '':
                     res_section += ([header_sol] + [soluzione])
         return(['''\\section{Esercizi}'''] + \

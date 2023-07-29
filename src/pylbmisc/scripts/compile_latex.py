@@ -68,7 +68,7 @@ def worker(what):
     subprocess.run(["mv", tmp / tmppdf, tmp / finalpdf])
     print("""All done, open the final file with:
 
-    okular {}
+    okular {} &
     """.format(tmp / finalpdf))
 
 

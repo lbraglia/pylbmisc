@@ -8,6 +8,7 @@ import random
 import re
 import sqlite3
 import sys
+import pprint
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -325,34 +326,73 @@ class Database(object):
         # list like this [(), ()] which are easy to handle with sqlite3
         self.exercises_list = []
         self.biblio_list = []
+        self.__parsed = set() # already parsed paths
 
     # ------------
     # main methods
     # ------------
-
-    def feed(self, dirs = None, lists = None):
-        'Read exercises from a list of directories and load into the object'
-        # normalize to unique list parameter input
-        dirs = make_unique_list(dirs)
-        lists = make_unique_list(lists)
-        lists_dir = []
-        # parse list of directory files, add directories to dirs
-        for l in lists:
-            if os.path.isfile(l):
-                with open(os.path.expanduser(l), 'r') as f:
-                    lists_dir += f.read().splitlines()
-        dirs = make_unique_list(dirs + lists_dir)
-        # parse directories
-        for d in dirs:
-            # todo: normalize somewhat here
-            d = os.path.expanduser(d)
-            if os.path.isdir(d):
-                self.__parse_texfiles(d = d)
-                self.__parse_bibfiles(d = d)
+    def feed(self, paths = None, paths_f = None):
+        '''Read exercises from comma separated paths (directory/files)
+        and/from files of paths'''
+        paths_f_paths = []
+        # parse list of paths files  
+        for pf in paths_f:
+            if os.path.isfile(pf):
+                with open(os.path.expanduser(pf), 'r') as f:
+                    paths_f_paths += f.read().splitlines()
+        # make a single unique list
+        paths += paths_f_paths
+        # now start parsing recursively: if file, parse it; if dir: go recursive
+        for p in paths:
+            p = Path(p).expanduser()
+            # controllo che non sia gia stato parsato per evitare cicli infiniti
+            if p in self.__parsed:
+                print(p, 'è già stato parsato, lo salto.')
+                continue
+            if p.is_dir():
+                self.__parse_dir(d = p)
+                self.__parsed.add(p)
+            elif p.is_file():
+                self.__parse_file(f = p)
+                self.__parsed.add(p)
             else:
-                print(d, ' does not exists. Skipping\n')
+                print(p, 'non è ne una directory ne un file, lo salto.')
+        print("Processed files:")
+        pprint.pprint(self.__parsed)
+        print("Extracted exercises:", len(self.exercises_list))
         return(self)
 
+    
+    def __parse_dir(self, d):
+        # effettua lo stesso ciclo di feed sul contenuto della singola directory
+        # if file: parse it
+        # if dir: go recursive on each entry
+        # else do nothing
+        for p in d.iterdir():
+            if p in self.__parsed:
+                print(p, 'è già stato parsato, lo salto.')
+                continue
+            if p.is_dir():
+                self.__parse_dir(d = p)
+                self.__parsed.add(p)
+            elif p.is_file():
+                self.__parse_file(f = p)
+                self.__parsed.add(p)
+            else:
+                print(p, 'non è ne una directory ne un file, lo salto.')
+
+                
+    def __parse_file(self, f):
+        # parsa un singolo file in base all'estensione
+        ext = f.suffix
+        if ext in {".tex"}:
+            self.__parse_tex(path = f)
+        elif ext in {".bib"}:
+            self.__parse_bib(path = f)
+        else:
+            print(f, 'non è un file .tex o .bib; ignoro.')
+        
+    
     def write(self, f = None):
         'Write exercises to a sqlite3 file'
         # erase old version
@@ -376,12 +416,6 @@ class Database(object):
     # ----------------
     # helper functions
     # ----------------
-
-    def __parse_texfiles(self, d = None):
-        filelist = glob.glob(d + '/**/*.tex', recursive = True)
-        for path in filelist:
-            self.__parse_tex(path = path)
-    
     def __parse_tex(self, path = None):
         # reading
         with open(path, 'r') as f:
@@ -396,6 +430,7 @@ class Database(object):
             self.exercises_list.append(
                 self.__parse_exercise(ex = ex, f = path))
 
+
     def __get_regex_value(self, re, x):
         found = re.search(x)
         if found:
@@ -405,6 +440,7 @@ class Database(object):
             return(res)
         else:
             return(None)
+
         
     def __parse_exercise(self, ex = None, f = None):
         ID       = self.__get_regex_value(self.__id_re, ex)
@@ -414,20 +450,13 @@ class Database(object):
         question = self.__get_regex_value(self.__question_re, ex)
         hint     = self.__get_regex_value(self.__hint_re, ex)
         solution = self.__get_regex_value(self.__solution_re, ex)
-
         try:
             page = int(page)
         except ValueError:
             page = None
-            print('Invalid integer page in ' + f + '. Setting it to None')
-            
+            print('Invalid integer page in ' + str(f) + '. Setting it to None')
         return((ID, page, source, topic, question, hint, solution))
         
-
-    def __parse_bibfiles(self, d = None):
-        filelist = glob.glob(d + '/**/*.bib', recursive = True)
-        for path in filelist:
-            self.__parse_bib(path = path)
 
     def __parse_bib(self, path = None):
         bib_data = parse_file(path)
@@ -582,30 +611,32 @@ class Worksheet(object):
 def exercises_db():
     opts = (
         # (param, help, default, type)
-        # --dirs
-        ('dirs',
-         'str: comma separated list of exercise source directories',
-         '~/src/other/exercises',
+        # --paths
+        ('paths',
+         'str: comma separated list of exercise paths (source directories/files)',
+         # '~/src/other/exercises',
+         None,
          str),
         # --lists
         ('lists',
-         'str: comma separated list of file with lists of source directories',
+         'str: comma separated list of file having a lists of paths (dir/files) one per line',
          None,
          str),
         # --outfile
         ('outfile',
          'str:  sqlite3 db to save',
-         '~/.exercises.db',
+         None,
+         # '~/.exercises.db',
          str))
 
     args = my_argparse(opts)
-    dirs = args['dirs']
-    dirs = dirs.split(',')
+    paths = args['paths']
+    paths = paths.split(',')
     lists = args['lists']
     lists = lists.split(',')
     outfile = args['outfile']
     ex = Database()
-    ex.feed(dirs = dirs, lists = lists).write(outfile)
+    ex.feed(paths = paths, paths_f = lists).write(outfile)
     return(0)
 
 def exercises_ws():
@@ -614,7 +645,8 @@ def exercises_ws():
         # --dbs
         ('dbs',
          'str: comma separated list of db produced by exercises_db',
-         '~/.exercises.db',
+         # '~/.exercises_dbs',
+         None,
          str),
         # --select_where
         ('select_where',

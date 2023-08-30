@@ -526,7 +526,8 @@ class Worksheet(object):
                      where + \
                      order_by + \
                      limit
-        
+
+        anydb = False
         for f in files:
             f = os.path.expanduser(f)
             if os.path.isfile(f):
@@ -539,8 +540,11 @@ class Worksheet(object):
                           "              ", sql)
                 self.exercises_list += c.fetchall()
                 con.close()
+                anydb = True
             else:
                 print(f, ' does not exists. Skipping\n')
+        if not anydb:
+            raise Exception("No useful db files were provided")
         return(self)
 
     def to_tex(self,

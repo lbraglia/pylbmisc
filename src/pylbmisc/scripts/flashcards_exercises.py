@@ -339,7 +339,12 @@ class Database(object):
         for pf in paths_f:
             if os.path.isfile(pf):
                 with open(os.path.expanduser(pf), 'r') as f:
-                    paths_f_paths += f.read().splitlines()
+                    for line in f:
+                        # keep it if not comment or blank line
+                        ok = (not line.startswith("#")) and (line.strip() != "")
+                        if ok:
+                            paths_f_paths += line
+                    # paths_f_paths += f.read().splitlines()
         # make a single unique list
         paths += paths_f_paths
         # now start parsing recursively: if file, parse it; if dir: go recursive

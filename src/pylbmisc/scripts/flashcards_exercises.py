@@ -331,7 +331,7 @@ class Database(object):
     # ------------
     # main methods
     # ------------
-    def feed(self, paths = None, paths_f = None):
+    def feed(self, paths = None, paths_f = None, biblio_dirs = None):
         '''Read exercises from comma separated paths (directory/files)
         and/from files of paths'''
         if paths is None:
@@ -346,6 +346,9 @@ class Database(object):
                         paths_f_paths += [l for l in f.read().splitlines() \
                                           if ((not l.startswith("#")) and (l.strip() != ""))]
             paths += paths_f_paths
+        if biblio_dirs is None:
+            biblio_dirs = ["~/src/other/exercises/biblio"]
+        paths += biblio_dirs
         if not paths:
             raise Exception("Cosa strana che non vi sian elementi qui ne da paths ne da list")
         # now start parsing recursively: if file, parse it; if dir: go recursive

@@ -92,8 +92,9 @@ def argparser(opts):
                 args[optname] = 'True'
             else:
                 args[optname] = ''
-        # converti il tipo a quello specificato
-        args[optname] = opttype(args[optname])
+        # converti il tipo a quello specificato, a meno che non sia None se no lascialo così
+        if args[optname] is not None:
+            args[optname] = opttype(args[optname])
     return args
 
 

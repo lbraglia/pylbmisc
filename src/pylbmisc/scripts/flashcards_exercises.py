@@ -334,19 +334,20 @@ class Database(object):
     def feed(self, paths = None, paths_f = None):
         '''Read exercises from comma separated paths (directory/files)
         and/from files of paths'''
-        paths_f_paths = []
-        # parse list of paths files  
-        for pf in paths_f:
-            if os.path.isfile(pf):
-                with open(os.path.expanduser(pf), 'r') as f:
-                    for line in f:
+        if paths is None:
+            paths = []
+        if paths_f: # se non è None aggiungi i path inseriti nei file
+            paths_f_paths = []
+            for pf in paths_f:
+                pf = Path(pf).expanduser()
+                if pf.is_file():
+                    with open(pf, 'r') as f:
                         # keep it if not comment or blank line
-                        ok = (not line.startswith("#")) and (line.strip() != "")
-                        if ok:
-                            paths_f_paths += line
-                    # paths_f_paths += f.read().splitlines()
-        # make a single unique list
-        paths += paths_f_paths
+                        paths_f_paths += [l for l in f.read().splitlines() \
+                                          if ((not l.startswith("#")) and (l.strip() != ""))]
+            paths += paths_f_paths
+        if not paths:
+            raise Exception("Cosa strana che non vi sian elementi qui ne da paths ne da list")
         # now start parsing recursively: if file, parse it; if dir: go recursive
         for p in paths:
             p = Path(p).expanduser()
@@ -636,11 +637,20 @@ def exercises_db():
 
     args = my_argparse(opts)
     paths = args['paths']
-    paths = paths.split(',')
     lists = args['lists']
-    lists = lists.split(',')
     outfile = args['outfile']
+    # se sono entrambi a none c'è qualcosa che non torna
+    if ((paths is None) and (lists is None)):
+        raise Exception("uno tra --paths e --lists deve essere specificato")
+    if outfile is None:
+        raise Exception("Bisogna specificare  il file sqlite3 su cui esportare mediante --outfile")
+    # da qui in poi dovrebbe essere a posto
+    if isinstance(paths, str):
+        paths = paths.split(',')
+    if isinstance(lists, str):
+        lists = lists.split(',')
     ex = Database()
+    # print(paths, lists)
     ex.feed(paths = paths, paths_f = lists).write(outfile)
     return(0)
 

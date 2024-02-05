@@ -23,27 +23,21 @@ def av_datecubianno():
     args = parser.parse_args()
     anno = int(args.anno)
     data_reggio = []
+    giorno_reggio = []
     for month in [1,2,3,4,5,6,7,9,10,11,12]: # avoid august
         m = calendar.monthcalendar(anno, month)
         for week in m:
             if (month in [6,7]):
                 select = calendar.SATURDAY
+                giorno_reggio.append("Sab")
             else:
                 select = calendar.SUNDAY
+                giorno_reggio.append("Dom")
             giorno = week[select]
             if giorno:
                 data_reggio.append(dt.date(anno, month, giorno))
                 break
     print("```")
-    # for LR, DR, OR, LM, DM, OM in zip(location_reggio, data_reggio, ora_reggio, location_modena, data_modena, ora_modena):
-    #     print("Reggio ({}), {}, {}".format(LR, DR.strftime("%d-%m"), OR))
-    for DR, OR, LR in zip(data_reggio, ora_reggio, location_reggio):
-        print("{}, {}, {}".format(DR.strftime("%d/%m"), OR, LR))
+    for GR, DR, OR, LR in zip(giorno_reggio, data_reggio, ora_reggio, location_reggio):
+        print("{} {}, {}, {}".format(GR, DR.strftime("%d/%m"), OR, LR))
     print("```")
-    # print("""
-    # **Legenda**:
-    # PDM = Piazza del Monte,
-    # M7L = Piazza Martiri del 7 Luglio,
-    # PM  = Piazza Matteotti (Via Emilia)
-    # PDP = Piazza della Pomposa
-    # """)

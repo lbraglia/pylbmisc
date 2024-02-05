@@ -11,10 +11,8 @@ mesi_ita = ["", "gennaio", "febbraio", "marzo", "aprile", "maggio",
             "novembre", "dicembre"]
 
 # orari di ciascun mese
-ora_reggio = ["16-19"] * 4 + ["16.30-19.30", "17-20", "20-23", "16.30-19.30"] + ["16-19"] * 3
-ora_modena = ["16-19"] * 3 + ["17-20"] *2  + ["20-22.30", "20.30-23.30"] + ["vedi_ora"]*4
-location_reggio = ["PDM"]*5 + ["M7L"]*2 + ["PDM"]*4
-location_modena = ["PM"]*5 + ["PDP"]*2 + ["PM"]*4
+ora_reggio = ["16.00-19.00"] * 4 + ["16.30-19.30", "20.30-23.30", "20.30-23.30", "16.30-19.30"] + ["16.00-19.00"] * 3
+location_reggio = ["P. del Monte"]*5 + ["P. Martiri 7 Luglio"]*2 + ["P. del Monte"]*4
 
 def av_datecubianno():
     """
@@ -28,18 +26,19 @@ def av_datecubianno():
     for month in [1,2,3,4,5,6,7,9,10,11,12]: # avoid august
         m = calendar.monthcalendar(anno, month)
         for week in m:
-            sab = week[calendar.SATURDAY]
-            if sab:
-                data_reggio.append(dt.date(anno, month, sab))
+            if (month in [6,7]):
+                select = calendar.SATURDAY
+            else:
+                select = calendar.SUNDAY
+            giorno = week[select]
+            if giorno:
+                data_reggio.append(dt.date(anno, month, giorno))
                 break
-    data_modena = [d + dt.timedelta(days=14) for d in data_reggio]
     print("```")
     # for LR, DR, OR, LM, DM, OM in zip(location_reggio, data_reggio, ora_reggio, location_modena, data_modena, ora_modena):
     #     print("Reggio ({}), {}, {}".format(LR, DR.strftime("%d-%m"), OR))
-    #     print("Modena ({}), {}, {}".format(LM, DM.strftime("%d-%m"), OM))
-    for DR, OR, DM, OM in zip(data_reggio, ora_reggio, data_modena, ora_modena):
-        print("Reggio, {}, {}".format(DR.strftime("%d-%m"), OR))
-        print("Modena, {}, {}".format(DM.strftime("%d-%m"), OM))
+    for DR, OR, LR in zip(data_reggio, ora_reggio, location_reggio):
+        print("{}, {}, {}".format(DR.strftime("%d/%m"), OR, LR))
     print("```")
     # print("""
     # **Legenda**:

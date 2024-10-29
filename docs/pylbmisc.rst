@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   pylbmisc.data
    pylbmisc.experiments
    pylbmisc.scripts
 
@@ -18,14 +17,6 @@ pylbmisc.dm module
 ------------------
 
 .. automodule:: pylbmisc.dm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pylbmisc.dnd module
--------------------
-
-.. automodule:: pylbmisc.dnd
    :members:
    :undoc-members:
    :show-inheritance:

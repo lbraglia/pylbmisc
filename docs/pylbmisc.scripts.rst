@@ -4,14 +4,6 @@ pylbmisc.scripts package
 Submodules
 ----------
 
-pylbmisc.scripts.av module
---------------------------
-
-.. automodule:: pylbmisc.scripts.av
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pylbmisc.scripts.compile\_latex module
 --------------------------------------
 
@@ -20,34 +12,10 @@ pylbmisc.scripts.compile\_latex module
    :undoc-members:
    :show-inheritance:
 
-pylbmisc.scripts.dnd\_srd module
---------------------------------
-
-.. automodule:: pylbmisc.scripts.dnd_srd
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pylbmisc.scripts.dnd\_translate module
---------------------------------------
-
-.. automodule:: pylbmisc.scripts.dnd_translate
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pylbmisc.scripts.flashcards\_exercises module
 ---------------------------------------------
 
 .. automodule:: pylbmisc.scripts.flashcards_exercises
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pylbmisc.scripts.pomodoro module
---------------------------------
-
-.. automodule:: pylbmisc.scripts.pomodoro
    :members:
    :undoc-members:
    :show-inheritance:

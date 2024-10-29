@@ -1,8 +1,6 @@
-# pip install --user python-telegram-bot
-
 import argparse
 import asyncio
-import telegram
+import telegram  # pip install --user python-telegram-bot
 from pathlib import Path
 from ..tg import bot_token, user_id, group_id
 

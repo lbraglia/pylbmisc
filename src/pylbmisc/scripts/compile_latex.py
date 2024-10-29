@@ -66,10 +66,14 @@ def worker(what):
     # cleaning and renaming (removing "tmp_")
     tmptex.unlink()
     subprocess.run(["mv", tmp / tmppdf, tmp / finalpdf])
-    print("""All done, open the final file with:
+    print(
+        """All done, open the final file with:
 
     okular {} &
-    """.format(tmp / finalpdf))
+    """.format(
+            tmp / finalpdf
+        )
+    )
 
 
 def article():

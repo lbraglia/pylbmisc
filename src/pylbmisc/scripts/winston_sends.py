@@ -13,22 +13,22 @@ async def main(what, to):
         ext = what_path.suffix.lower()
     else:
         msg = what
-        
+
     winston_token = bot_token("winston_lb_bot")
     winston = telegram.Bot(winston_token)
     async with winston:
         if send == "msg":
-            await winston.send_message(chat_id = to, text = msg)
+            await winston.send_message(chat_id=to, text=msg)
         elif ext in {".mp3", ".m4a"}:
-            await winston.send_audio(chat_id = to, audio = what_path)
+            await winston.send_audio(chat_id=to, audio=what_path)
         elif ext in {".png", ".jpg", ".jpeg"}:
-            await winston.send_photo(chat_id = to, photo = what_path)
+            await winston.send_photo(chat_id=to, photo=what_path)
         elif ext in {".mp4"}:
-            await winston.send_video(chat_id = to, video = what_path)
+            await winston.send_video(chat_id=to, video=what_path)
         else:
-            await winston.send_document(chat_id = to, document = what_path)
+            await winston.send_document(chat_id=to, document=what_path)
 
-        
+
 def winston_sends():
     """
     winston_sends "ciao" user::lucailgarb
@@ -51,4 +51,3 @@ def winston_sends():
     else:
         raise ValueError("Currently only user::* and group::* parsed.")
     asyncio.run(main(what, to_id))
-

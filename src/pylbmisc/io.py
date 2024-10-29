@@ -235,13 +235,13 @@ def data_import(
         raise ValueError("No data to be imported.")
 
 
-def data_export(x: _pd.DataFrame | dict[str, _pd.DataFrame],
-                path: str | _Path,
-                index = True) -> None:
+def data_export(
+    x: _pd.DataFrame | dict[str, _pd.DataFrame], path: str | _Path, index=True
+) -> None:
     """export a DataFrame or a dict of DataFrames as csv/xlsx
 
      (or a list of) or a single excel file
-    
+
     in case of a dict is used and a csv path is given, the path is
     suffixed with dict names
 
@@ -273,9 +273,7 @@ def data_export(x: _pd.DataFrame | dict[str, _pd.DataFrame],
                     # preprocess the key of the dict, it must be an accepted excel
                     # sheetname. Trim it to the first x characters
                     k = fix_columns(k)[:31]
-                    v.to_excel(writer,
-                               sheet_name=k,
-                               index=index) 
+                    v.to_excel(writer, sheet_name=k, index=index)
         else:
             raise ValueError(
                 "x deve essere un pd.DataFrame o un dict di pd.DataFrame"

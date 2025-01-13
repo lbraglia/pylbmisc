@@ -405,3 +405,14 @@ def rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
 
     with path.open(mode="w") as f:
         f.writelines(r_code)
+
+
+
+def dfdump(df: _pd.DataFrame, path: str | _Path = "df"):
+    path = _Path(path)
+    pyfile = path.with_suffix('.pkl')
+    df.to_pickle(pyfile)
+    rfile = path.with_suffix('.R')
+    rdf(df, rfile)
+
+

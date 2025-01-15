@@ -409,6 +409,8 @@ def rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
 
 
 def dfdump(df: _pd.DataFrame, path: str | _Path = "df"):
+    """Export a dataset in multiple formats (pickle and ascii R) given a common
+    path/prefix"""
     path = _Path(path)
     pyfile = path.with_suffix('.pkl')
     df.to_pickle(pyfile)
@@ -416,3 +418,27 @@ def dfdump(df: _pd.DataFrame, path: str | _Path = "df"):
     rdf(df, rfile)
 
 
+def export_tables(tabs_dict):
+    """Latex print and excel Export a dict of tables (caption as key)
+
+    Example usage:
+    --------------
+    exported = {
+       "Descrittive": desc_df,
+       "Analisi 1"  : analysis1_df,
+       "Analisi 2"  : analysis2_df
+    }
+    export_tables(exported)
+    
+    """
+    # excel
+    data_export(tabs_dict, "outputs/tables.xlsx")
+    # latex
+    labels = []
+    for caption, tab in tabs_dict.items():
+        lab = fix_columns(caption)
+        labels.append(lab)
+        latex_table(tab, label = lab, caption = caption)
+    # return latex references
+    refs = ["\ref{tab:" + lab + "}" for lab in labels]
+    return refs

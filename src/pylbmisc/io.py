@@ -273,10 +273,10 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
 def export_data(
         x: _pd.DataFrame | dict[str, _pd.DataFrame],
         path: str | _Path,
-        formats = ["xlsx", "csv", "pkl", "R"],
+        ext: str | list[str] = ["xlsx", "csv", "pkl", "R"],
         index=True
 ) -> None:
-    """export a DataFrame or a dict of DataFrames as csv/xlsx
+    """Export a DataFrame or a dict of DataFrames as csv/xlsx
 
     In case of a dict is used and a csv path is given, the path is
     suffixed with dict names
@@ -284,19 +284,22 @@ def export_data(
     x: dict of pandas.DataFrame
     fpath: file path, if extension is provided it will overwrite formats
     otherwise formats is considered
+    ext: str or list of string with file extensions
     index: bool add index in exporting (typically True for results, False for data)
-
     """
 
     if not (isinstance(x, _pd.DataFrame) or isinstance(x, dict)):
         raise ValueError("x deve essere un pd.DataFrame o un dict di pd.DataFrame")
+
+    if isinstance(ext, str): #uniforma
+        ext = [ext]
 
     path = _Path(path)
     path_has_suffix = path.suffix != ""
     if path_has_suffix:
         used_formats = [path.suffix.replace(".", "")]
     else:
-        used_formats = formats
+        used_formats = ext
 
     if "xlsx" in used_formats:
         xlsx_path = path if path_has_suffix else path.with_suffix(".xlsx")

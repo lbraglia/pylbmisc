@@ -9,6 +9,8 @@ import string as _string
 import subprocess as _subprocess
 import tempfile as _tempfile
 
+from pprint import pprint as _pprint
+
 # -------------------------------------------------------------------------
 # Utilities
 # -------------------------------------------------------------------------
@@ -30,6 +32,25 @@ def table2df(df: _pd.DataFrame):
     x = df.copy()
     x = x.stack().reset_index()
     return x.rename(columns={0: 'x'})
+
+
+def dump_unique_values(dfs, fpath = "data/uniq_"):
+    """Save unique value of a (dict of) dataframe for inspection and monitor during time."""
+    
+    if not (isinstance(dfs, _pd.DataFrame) or isinstance(dfs, dict)):
+        raise ValueError("x deve essere un pd.DataFrame o un dict di pd.DataFrame")
+
+    # normalize single dataframe
+    if isinstance(dfs, _pd.DataFrame):
+        dfs = {"df": dfs}
+    
+    for df_lab, df in dfs.items():
+        outfile = fpath + df_lab + ".txt"
+        with open(outfile, "w") as f:
+            for col in df:
+                print(f"DataFrame: {df_lab}, Column: '{col}', Dtype: {df[col].dtype} Unique values:", file = f)
+                _pprint(df[col].unique().tolist(), stream = f)
+                print(file = f)
 
 
 # -------------------------------------------------------------------------

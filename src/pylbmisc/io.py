@@ -87,7 +87,7 @@ def import_data(
     csv_kwargs: dict = {},
     excel_kwargs: dict = {},
 ) -> dict[str, _pd.DataFrame]:
-    '''import data from one or several filepaths (supported formats: .csv
+    '''Import data from one or several filepaths (supported formats: .csv
     .xls .xlsx .zip) and return a dict of DataFrame
     '''
     # import ipdb

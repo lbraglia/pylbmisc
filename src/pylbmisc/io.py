@@ -3,98 +3,15 @@ import pandas as _pd
 import tempfile as _tempfile
 import zipfile as _zipfile
 
-from .dm import fix_columns
+from .dm import fix_columns as _fix_columns
 
 from pathlib import Path as _Path
 from typing import Sequence as _Sequence
-
-# ------------------------------------
-# LaTeX stuff
-# ------------------------------------
-
-# Thanks PyLaTeX guys
-_latex_special_chars = {
-    '&': r'\&',
-    '%': r'\%',
-    '$': r'\$',
-    '#': r'\#',
-    '_': r'\_',
-    '{': r'\{',
-    '}': r'\}',
-    '~': r'\textasciitilde{}',
-    '^': r'\^{}',
-    '\\': r'\textbackslash{}',
-    '\n': '\\newline%\n',
-    '-': r'{-}',
-    '\xA0': '~',  # Non-breaking space
-    '[': r'{[}',
-    ']': r'{]}',
-}
-
-
-def latex_escape(s):
-    """
-    latex_escape from PyLaTeX
-
-    s: a str or something coercible to it
-    >>> print(latex_escape("asd_foo_bar"))
-    """
-    string = str(s)
-    return ''.join(_latex_special_chars.get(c, c) for c in string)
-
-
-def latex_table(
-    tab,
-    label: str = "",
-    caption: str = "",
-    position: str | None = None,
-    float_format: str = "%.1f",
-    column_format: str | None = None,
-):
-    """Print a table (a pd.DataFrame or inheriting object with
-    to_latex method) with sensible defaults.
-
-    tab: a pd.DataFrame or other object with .to_latex method
-    label (str): posta dopo "fig:" in LaTeX
-    caption (str): caption tabella LaTeX
-    position (str): lettere posizionamento tabella (ad esempio https://stackoverflow.com/questions/1673942)
-    """
-    if (label == "") or (not isinstance(label, str)):
-        raise ValueError("Please provide a label for the table.")
-    caption = (
-        label.capitalize().replace("_", " ") if caption == "" else caption
-    )
-    latex_caption = latex_escape(caption)
-    latex_label = 'tab:' + label
-    if isinstance(tab, _pd.DataFrame):
-        tab.columns.name = None
-    if (column_format == None) and isinstance(tab, _pd.DataFrame):
-        ncols = tab.shape[1]
-        column_format = "".join(["l"] + ["r"] * ncols)
-    # per avere il centering è necessario impostare lo stile
-    # https://pandas.pydata.org/docs/reference/api/pandas.io.formats.style.Styler.to_latex.html
-    content = tab.to_latex(
-        # fissi
-        na_rep="",
-        index=True,
-        index_names=False,
-        escape=True,
-        # position_float='centering', # one day. maybe.
-        # variabili
-        label=latex_label,
-        caption=latex_caption,
-        position=position,
-        float_format=float_format,
-        column_format=column_format,
-    )
-    print(content)
 
 
 # ------------------------------------
 # Figure and images stuff
 # ------------------------------------
-
-
 def export_figure(
     fig,
     label: str = "",
@@ -163,10 +80,8 @@ def export_figure(
 
 
 # ------------------------------------
-# Data Import/export
+# Dataset Import/export routines
 # ------------------------------------
-
-
 def import_data(
     fpaths: str | _Path | _Sequence[str | _Path],
     csv_kwargs: dict = {},
@@ -235,58 +150,9 @@ def import_data(
         raise ValueError("No data to be imported.")
 
 
-def export_data(
-    x: _pd.DataFrame | dict[str, _pd.DataFrame], path: str | _Path, index=True
-) -> None:
-    """export a DataFrame or a dict of DataFrames as csv/xlsx
 
-     (or a list of) or a single excel file
-
-    in case of a dict is used and a csv path is given, the path is
-    suffixed with dict names
-
-    x: dict of pandas.DataFrame
-    fpath: fpath file path
-    index: bool add index in exporting (typically True for results, False for data)
-
-    """
-    path = _Path(path)
-    fmt = path.suffix
-    if fmt == ".csv":
-        if isinstance(x, _pd.DataFrame):
-            x.to_csv(path, index=index)
-        elif isinstance(x, dict):
-            for k, v in x.items():
-                csvpath = path.parent / (str(path.stem) + "_{0}.csv".format(k))
-                print(k, csvpath)
-                v.to_csv(csvpath, index=index)
-        else:
-            raise ValueError(
-                "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
-            )
-    elif fmt == ".xlsx":
-        if isinstance(x, _pd.DataFrame):
-            x.to_excel(writer, sheet_name="Foglio 1", index=index)
-        elif isinstance(x, dict):
-            with _pd.ExcelWriter(str(path)) as writer:
-                for k, v in x.items():
-                    # preprocess the key of the dict, it must be an accepted excel
-                    # sheetname. Trim it to the first x characters
-                    k = fix_columns(k)[:31]
-                    v.to_excel(writer, sheet_name=k, index=index)
-        else:
-            raise ValueError(
-                "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
-            )
-    else:
-        raise ValueError("Formato non disponibile: disponibili csv ed xlsx.")
-
-
-# --------------------------------------------------
-# rdf: pd.DataFrame to R data.frame converter (a-la dput)
-# --------------------------------------------------
-
-
+# _rdf: pd.DataFrame to R data.frame converter (a-la dput)
+# --------------------------------------------------------
 def _rdf_integer(x: _pd.Series, xn: str):
     data_str = x.to_string(
         na_rep="NA",
@@ -296,10 +162,8 @@ def _rdf_integer(x: _pd.Series, xn: str):
     rval = "{} = c({})".format(xn, data_str)
     return rval
 
-
 # placeholder
 _rdf_numeric = _rdf_integer
-
 
 def _rdf_factor(x: _pd.Series, xn: str):
     # to be safe it's seems to be better rather than
@@ -332,7 +196,6 @@ def _rdf_factor(x: _pd.Series, xn: str):
     )
     return rval
 
-
 def _rdf_object(x: _pd.Series, xn: str):
     data_l = x.to_list()
     data_l2 = []
@@ -344,7 +207,6 @@ def _rdf_object(x: _pd.Series, xn: str):
     data_str = ', '.join(data_l2)
     rval = "{} = c({})".format(xn, data_str)
     return rval
-
 
 def _rdf_bool(x: _pd.Series, xn: str):
     ft = {True: "TRUE", False: "FALSE"}
@@ -360,17 +222,14 @@ def _rdf_bool(x: _pd.Series, xn: str):
     rval = "{} = c({})".format(xn, data_str)
     return rval
 
-
 # Thigs yet TODO
 def _rdf_NA(x: _pd.Series, xn: str):
     rval = "{} = NA".format(xn)
     return rval
 
-
 _rdf_datetime = _rdf_NA
 
-
-def rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
+def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
     """
     pd.DataFrame to R data.frame 'converter'
     """
@@ -408,14 +267,156 @@ def rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
 
 
 
-def dfdump(df: _pd.DataFrame, path: str | _Path = "df"):
-    """Export a dataset in multiple formats (pickle and ascii R) given a common
-    path/prefix"""
+def export_data(
+        x: _pd.DataFrame | dict[str, _pd.DataFrame],
+        path: str | _Path,
+        formats = ["xlsx", "csv", "pkl", "R"],
+        index=True
+) -> None:
+    """export a DataFrame or a dict of DataFrames as csv/xlsx
+
+    In case of a dict is used and a csv path is given, the path is
+    suffixed with dict names
+
+    x: dict of pandas.DataFrame
+    fpath: file path, if extension is provided it will overwrite formats
+    otherwise formats is considered
+    index: bool add index in exporting (typically True for results, False for data)
+
+    """
+
+    if not (isinstance(x, _pd.DataFrame) or isinstance(x, dict)):
+        raise ValueError("x deve essere un pd.DataFrame o un dict di pd.DataFrame")
+
     path = _Path(path)
-    pyfile = path.with_suffix('.pkl')
-    df.to_pickle(pyfile)
-    rfile = path.with_suffix('.R')
-    rdf(df, rfile)
+    path_has_suffix = path.suffix != ""
+    if path_has_suffix:
+        used_formats = [path.suffix.replace(".", "")]
+    else:
+        used_formats = formats
+
+    if "xlsx" in used_formats:
+        xlsx_path = path if path_has_suffix else path.with_suffix(".xlsx")
+        with _pd.ExcelWriter(xlsx_path) as writer:
+            if isinstance(x, _pd.DataFrame):
+                x.to_excel(writer, sheet_name="Foglio 1", index=index)
+            elif isinstance(x, dict):
+                for k, v in x.items():
+                    # preprocess the key of the dict, it must be an accepted excel
+                    # sheetname. Trim it to the first x characters
+                    k = _fix_columns(k)[:31]
+                    v.to_excel(writer, sheet_name=k, index=index)
+
+    if "csv" in used_formats:
+        if isinstance(x, _pd.DataFrame):
+            x.to_csv(path if path_has_suffix else path.with_suffix(".csv"), index=index)
+        elif isinstance(x, dict):
+            # use dict key as postfix
+            for k, v in x.items():
+                csv_path = path.parent / (str(path.stem) + f"_{k}.csv")
+                v.to_csv(csv_path, index=index)
+
+    if "pkl" in used_formats:
+        if isinstance(x, _pd.DataFrame):
+            x.to_pickle(path if path_has_suffix else path.with_suffix(".pkl"), index=index)
+        elif isinstance(x, dict):
+            # use dict key as postfix
+            for k, v in x.items():
+                pkl_path = path.parent / (str(path.stem) + f"_{k}.pkl")
+                v.to_pickle(pkl_path)
+        
+    if "R" in used_formats:
+        if isinstance(x, _pd.DataFrame):
+            _rdf(x, path if path_has_suffix else path.with_suffix(".R"))
+        elif isinstance(x, dict):
+            # use dict key as postfix
+            for k, v in x.items():
+                R_path = path.parent / (str(path.stem) + f"_{k}.R")
+                _rdf(v, R_path)
+
+
+
+# ------------------------------------
+# LaTeX stuff
+# ------------------------------------
+
+# Thanks PyLaTeX guys
+_latex_special_chars = {
+    '&': r'\&',
+    '%': r'\%',
+    '$': r'\$',
+    '#': r'\#',
+    '_': r'\_',
+    '{': r'\{',
+    '}': r'\}',
+    '~': r'\textasciitilde{}',
+    '^': r'\^{}',
+    '\\': r'\textbackslash{}',
+    '\n': '\\newline%\n',
+    '-': r'{-}',
+    '\xA0': '~',  # Non-breaking space
+    '[': r'{[}',
+    ']': r'{]}',
+}
+
+
+def _latex_escape(s):
+    """
+    latex_escape from PyLaTeX
+
+    s: a str or something coercible to it
+    >>> print(latex_escape("asd_foo_bar"))
+    """
+    string = str(s)
+    return ''.join(_latex_special_chars.get(c, c) for c in string)
+
+
+def latex_table(
+    tab,
+    label: str = "",
+    caption: str = "",
+    position: str | None = None,
+    float_format: str = "%.1f",
+    column_format: str | None = None,
+):
+    """Print a table (a pd.DataFrame or inheriting object with
+    to_latex method) with sensible defaults.
+
+    tab: a pd.DataFrame or other object with .to_latex method
+    label (str): posta dopo "fig:" in LaTeX
+    caption (str): caption tabella LaTeX
+    position (str): lettere posizionamento tabella (ad esempio https://stackoverflow.com/questions/1673942)
+    """
+    if (label == "") or (not isinstance(label, str)):
+        raise ValueError("Please provide a label for the table.")
+    caption = (
+        label.capitalize().replace("_", " ") if caption == "" else caption
+    )
+    latex_caption = _latex_escape(caption)
+    latex_label = 'tab:' + label
+    if isinstance(tab, _pd.DataFrame):
+        tab.columns.name = None
+    if (column_format == None) and isinstance(tab, _pd.DataFrame):
+        ncols = tab.shape[1]
+        column_format = "".join(["l"] + ["r"] * ncols)
+    # per avere il centering è necessario impostare lo stile
+    # https://pandas.pydata.org/docs/reference/api/pandas.io.formats.style.Styler.to_latex.html
+    content = tab.to_latex(
+        # fissi
+        na_rep="",
+        index=True,
+        index_names=False,
+        escape=True,
+        # position_float='centering', # one day. maybe.
+        # variabili
+        label=latex_label,
+        caption=latex_caption,
+        position=position,
+        float_format=float_format,
+        column_format=column_format,
+    )
+    print(content)
+
 
 
 def export_tables(tabs_dict):
@@ -436,7 +437,7 @@ def export_tables(tabs_dict):
     # latex
     labels = []
     for caption, tab in tabs_dict.items():
-        lab = fix_columns(caption)
+        lab = _fix_columns(caption)
         labels.append(lab)
         latex_table(tab, label = lab, caption = caption)
     # return latex references

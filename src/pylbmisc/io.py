@@ -82,11 +82,10 @@ def export_figure(
 # ------------------------------------
 # Dataset Import/export routines
 # ------------------------------------
-def import_data(
-    fpaths: str | _Path | _Sequence[str | _Path],
-    csv_kwargs: dict = {},
-    excel_kwargs: dict = {},
-) -> dict[str, _pd.DataFrame]:
+def import_data(fpaths: str | _Path | _Sequence[str | _Path],
+                csv_kwargs: dict = {},
+                excel_kwargs: dict = {},
+                rm_common_prefix: bool = True) -> dict[str, _pd.DataFrame]:
     '''Import data from one or several filepaths (supported formats: .csv
     .xls .xlsx .zip) and return a dict of DataFrame
     '''
@@ -145,6 +144,10 @@ def import_data(
             raise Warning(msg)
 
     if len(rval):
+        if rm_common_prefix:
+            keys = list(rval.keys())
+            common_prefix = _os.path.commonprefix(keys)
+            rval = {k.removeprefix(common_prefix) : rval[k] for k in rval.keys()}
         return rval
     else:
         raise ValueError("No data to be imported.")

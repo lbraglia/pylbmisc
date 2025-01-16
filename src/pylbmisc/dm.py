@@ -48,7 +48,7 @@ def dump_unique_values(dfs, fpath = "data/uniq_"):
         outfile = fpath + df_lab + ".txt"
         with open(outfile, "w") as f:
             for col in df:
-                print(f"DataFrame: {df_lab}, Column: '{col}', Dtype: {df[col].dtype} Unique values:", file = f)
+                print(f"DataFrame: '{df_lab}', Column: '{col}', Dtype: {df[col].dtype}, Unique values:", file = f)
                 _pprint(df[col].unique().tolist(), stream = f)
                 print(file = f)
 

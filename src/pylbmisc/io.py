@@ -3,7 +3,7 @@ import pandas as _pd
 import tempfile as _tempfile
 import zipfile as _zipfile
 
-from .dm import fix_columns as _fix_columns
+from .dm import fix_varnames as _fix_varnames
 
 from pathlib import Path as _Path
 from typing import Sequence as _Sequence
@@ -310,7 +310,7 @@ def export_data(
                 for k, v in x.items():
                     # preprocess the key of the dict, it must be an accepted excel
                     # sheetname. Trim it to the first x characters
-                    k = _fix_columns(k)[:31]
+                    k = _fix_varnames(k)[:31]
                     v.to_excel(writer, sheet_name=k, index=index)
 
     if "csv" in used_formats:
@@ -443,7 +443,7 @@ def export_tables(tabs_dict):
     # latex
     labels = []
     for caption, tab in tabs_dict.items():
-        lab = _fix_columns(caption)
+        lab = _fix_varnames(caption)
         labels.append(lab)
         latex_table(tab, label = lab, caption = caption)
     # return latex references

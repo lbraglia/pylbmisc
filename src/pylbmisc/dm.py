@@ -240,25 +240,23 @@ def _add_x_if_first_is_digit(s):
         return s
 
 
-def fix_columns(x: str | list | _pd.DataFrame):
+def fix_varnames(x: str | list | _pd.DataFrame):
     """The good-old R preprocess_varnames
 
-    >>> fix_columns("  asd 98n2 3")
-    >>> fix_columns([" 98n2 3", " L< KIAFJ8 0_________"])
-    >>> fix_columns(["asd", "foo0", "asd"])
-    >>> df.columns = fix_columns(shitty_df)
+    >>> fix_varnames("  asd 98n2 3")
+    >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
+    >>> fix_varnames(["asd", "foo0", "asd"])
     """
     if isinstance(x, str):
         original = [x]
     elif isinstance(x, list):
         original = x
-    elif isinstance(x, _pd.DataFrame):
-        original = list(x.columns.values)
     else:
-        raise ValueError("Only str, list and pd.DataFrame are allowed.")
-    # let's go functional: s is a str, the following are to be applied
+        raise ValueError("Only str and list are allowed, see sanitize_varnames for DataFrame or dict of DataFrames.")
+    # let's go functional: s is (should be) a str, the following are to be applied
     # in order
     funcs = [
+        lambda s: str(s),
         lambda s: s.lower().strip(),
         lambda s: _replace_unwanted_chars(s),
         lambda s: _remove_duplicated_underscore(s),
@@ -292,6 +290,35 @@ def fix_columns(x: str | list | _pd.DataFrame):
     #     rename_dict.update({o: m})
     # if it was a string that was passed, return a string, not a list
     return uniq if not isinstance(x, str) else uniq[0]
+
+
+def sanitize_varnames(x, return_tfd = True):
+    if isinstance(x, _pd.DataFrame):
+        from_name = list(x.columns.values)
+        to_name = fix_varnames(from_name)
+        df = x.copy()
+        df.columns = to_name
+        tf = {t : f for t, f in zip(to_name, from_name)}
+        if return_tfd:
+            return df, tf
+        else:
+            return df
+    elif isinstance(x, dict):
+        dfs = {}
+        tfs = {}
+        for k, v in x.items():
+            from_name = list(v.columns.values)
+            to_name = fix_varnames(from_name)
+            df = v.copy()
+            df.columns = to_name
+            tf = {t : f for t, f in zip(to_name, from_name)}
+            dfs[k] = df
+            tfs[k] = tf
+        if return_tfd:
+            return dfs, tfs
+        else:
+            return dfs
+
 
 
 # -------------------------------------------------------------------------

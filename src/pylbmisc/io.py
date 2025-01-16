@@ -163,11 +163,11 @@ def export_figure(
 
 
 # ------------------------------------
-# Data Import/export (from/to csv/xls)
+# Data Import/export
 # ------------------------------------
 
 
-def data_import(
+def import_data(
     fpaths: str | _Path | _Sequence[str | _Path],
     csv_kwargs: dict = {},
     excel_kwargs: dict = {},
@@ -217,7 +217,7 @@ def data_import(
                     zipped_fpaths = [
                         _os.path.join(tempdir, f) for f in _os.listdir(tempdir)
                     ]
-                    zipped_data = data_import(zipped_fpaths)
+                    zipped_data = import_data(zipped_fpaths)
             # prepend zip name to fname (as keys) and update results
             zipped_data = {
                 "{0}_{1}".format(fname, k): v for k, v in zipped_data.items()
@@ -235,7 +235,7 @@ def data_import(
         raise ValueError("No data to be imported.")
 
 
-def data_export(
+def export_data(
     x: _pd.DataFrame | dict[str, _pd.DataFrame], path: str | _Path, index=True
 ) -> None:
     """export a DataFrame or a dict of DataFrames as csv/xlsx
@@ -432,7 +432,7 @@ def export_tables(tabs_dict):
     
     """
     # excel
-    data_export(tabs_dict, "outputs/tables.xlsx")
+    export_data(tabs_dict, "outputs/tables.xlsx")
     # latex
     labels = []
     for caption, tab in tabs_dict.items():

@@ -95,7 +95,7 @@ def latex_table(
 # ------------------------------------
 
 
-def fig_dump(
+def export_figure(
     fig,
     label: str = "",
     caption: str = "",

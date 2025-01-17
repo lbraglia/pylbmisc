@@ -12,6 +12,17 @@ import tempfile as _tempfile
 from pprint import pprint as _pprint
 
 # -------------------------------------------------------------------------
+# regular expressions used
+# -------------------------------------------------------------------------
+
+_mail_re = _re.compile(r"[^@]+@[^@]+\.[^@]+")
+_fc_re = _re.compile(
+    r"[A-Za-z]{6}[0-9]{2}[A-Za-z]{1}[0-9]{2}[A-Za-z]{1}[0-9]{3}[A-Za-z]{1}"
+)
+_tel_re = _re.compile(r"(.+)?0[0-9]{1,3}[\. /\-]?[0-9]{6,7}")
+_mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
+
+# -------------------------------------------------------------------------
 # Utilities
 # -------------------------------------------------------------------------
 
@@ -73,9 +84,8 @@ def _columns_match(df_columns, searched):
 
 
 # Mail: https://stackoverflow.com/questions/8022530/ for mail regex
-_mail_re = _re.compile(r"[^@]+@[^@]+\.[^@]+")
-is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
 
+is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
 
 def _has_emails(x):
     if _pd.api.types.is_string_dtype(x):
@@ -86,9 +96,6 @@ def _has_emails(x):
 
 
 # Fiscal code
-_fc_re = _re.compile(
-    r"[A-Za-z]{6}[0-9]{2}[A-Za-z]{1}[0-9]{2}[A-Za-z]{1}[0-9]{3}[A-Za-z]{1}"
-)
 is_fiscal_code = _np.vectorize(lambda x: bool(_fc_re.match(x)))
 
 
@@ -101,7 +108,6 @@ def _has_fiscal_codes(x):
 
 
 # Telephone number:
-_tel_re = _re.compile(r"(.+)?0[0-9]{1,3}[\. /\-]?[0-9]{6,7}")
 is_telephone_number = _np.vectorize(lambda x: bool(_tel_re.match(x)))
 
 
@@ -114,7 +120,6 @@ def _has_telephone_numbers(x):
 
 
 # Mobile number
-_mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
 is_mobile_number = _np.vectorize(lambda x: bool(_mobile_re.match(x)))
 
 
@@ -399,6 +404,24 @@ def to_date(x: _pd.Series):
     >>> to_date(pd.Series(["2020-01-02", "2021-01-01", "2022-01-02"] * 2))
     """
     return to_datetime(x).dt.floor("D")
+
+
+_dates_re = _re.compile("[^/\d-]") # keep only numbers, - and /, and just hope for the best
+
+def _extract_dates_worker(x):
+    if isinstance(x, str): # handle missing values (sono float)
+        polished = _dates_re.sub("", x)
+        return _pd.to_datetime(polished)
+    else:
+        return _np.nan
+
+def extract_dates(x):
+    """Try to extract dates from shitty strings and convert them to proper
+
+    >>> extract_dates(pd.Series(["2020-01-02", "01/01/1956", "asdasd 12-01-02"] * 2))
+    """
+    return x.apply(_extract_dates_worker)
+
 
 
 def to_categorical(

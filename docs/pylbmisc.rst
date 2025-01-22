@@ -9,6 +9,7 @@ Subpackages
 
    pylbmisc.experiments
    pylbmisc.scripts
+   pylbmisc.tmpl
 
 Submodules
 ----------

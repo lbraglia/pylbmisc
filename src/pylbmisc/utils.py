@@ -1,3 +1,5 @@
+"""Miscellaneous utilities"""
+
 import argparse as _argparse
 import re as _re
 import readline as _readline

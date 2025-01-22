@@ -1,3 +1,5 @@
+"""Some iterators remembering R"""
+
 from typing import Any as _Any
 from typing import Iterator as _Iterator
 

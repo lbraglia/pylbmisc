@@ -1,3 +1,5 @@
+"""Statistical utilities/routines"""
+
 import pandas as _pd
 import numpy as _np
 from .utils import match_arg as _match_arg

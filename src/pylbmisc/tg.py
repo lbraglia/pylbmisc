@@ -1,3 +1,5 @@
+"""Telegram related utilities"""
+
 import os as _os
 import json as _json
 import pandas as _pd

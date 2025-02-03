@@ -60,7 +60,11 @@ def dump_unique_values(dfs, fpath = "data/uniq_"):
         with open(outfile, "w") as f:
             for col in df:
                 print(f"DataFrame: '{df_lab}', Column: '{col}', Dtype: {df[col].dtype}, Unique values:", file = f)
-                _pprint(df[col].unique().tolist(), stream = f)
+                # non sortati perché ci sono problemi se i dati sono metà
+                # numerici e meta stringa
+                # _pprint(_np.sort(df[col].unique()).tolist(), stream = f, compact = True)
+                # _pprint(df[col].sort_values().unique().tolist(), stream = f, compact = True)
+                _pprint(df[col].unique().tolist(), stream = f, compact = True)
                 print(file = f)
 
 

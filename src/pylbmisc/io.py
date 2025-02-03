@@ -145,13 +145,19 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
             )
             raise Warning(msg)
 
-    if len(rval):
+    if len(rval) == 1:
+        # a single dataset: return the data directly
+        for v in rval.values():
+            return(v)
+    elif len(rval) > 1:
+        # multiple dataset return the dict and remove common name prefix
         if rm_common_prefix:
             keys = list(rval.keys())
             common_prefix = _os.path.commonprefix(keys)
             rval = {k.removeprefix(common_prefix) : rval[k] for k in rval.keys()}
         return rval
     else:
+        # no dataset imported
         raise ValueError("No data to be imported.")
 
 

@@ -15,6 +15,9 @@ from pprint import pprint as _pprint
 # regular expressions used
 # -------------------------------------------------------------------------
 
+# Searching by regex in data
+# https://stackoverflow.com/questions/51170763 for general setup
+# Mail: https://stackoverflow.com/questions/8022530/ for mail regex
 _mail_re = _re.compile(r"[^@]+@[^@]+\.[^@]+")
 _fc_re = _re.compile(
     r"[A-Za-z]{6}[0-9]{2}[A-Za-z]{1}[0-9]{2}[A-Za-z]{1}[0-9]{3}[A-Za-z]{1}"
@@ -62,7 +65,6 @@ def dump_unique_values(dfs, fpath = "data/uniq_"):
                 # Header
                 print(f"DataFrame: '{df_lab}', Column: '{col}', Dtype: {df[col].dtype}, Unique values:", file = f)
                 # Dati: non sortati perché ci sono problemi se i dati sono metà numerici e meta stringa
-                # _pprint(_np.sort(df[col].unique()).tolist(), stream = f, compact = True)
                 # _pprint(df[col].sort_values().unique().tolist(), stream = f, compact = True)
                 _pprint(df[col].unique().tolist(), stream = f, compact = True)
                 print(file = f)
@@ -83,16 +85,26 @@ def _columns_match(df_columns, searched):
     return perfect_match
 
 
-# Searching by regex in data
-# https://stackoverflow.com/questions/51170763 for general setup
-
-
-# Mail: https://stackoverflow.com/questions/8022530/ for mail regex
 
 is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
 
+
+
+def _is_string(x: _pd.Series):
+    """
+    Check if a Series is a string (including data with np.nan) differently from
+    pandas.api.types.is_string_dtype
+
+    >>> x = pd.Series(["a", np.nan])
+    >>> pd.api.types.is_string_dtype(x)
+    >>> _is_string(x)
+    """
+    return x.dtype == 'O'
+
+
+
 def _has_emails(x):
-    if _pd.api.types.is_string_dtype(x):
+    if _is_string(x):
         check = is_email(x)
         return _np.any(check)
     else:
@@ -104,7 +116,7 @@ is_fiscal_code = _np.vectorize(lambda x: bool(_fc_re.match(x)))
 
 
 def _has_fiscal_codes(x):
-    if _pd.api.types.is_string_dtype(x):
+    if _is_string(x):
         check = is_fiscal_code(x)
         return _np.any(check)
     else:
@@ -116,7 +128,7 @@ is_telephone_number = _np.vectorize(lambda x: bool(_tel_re.match(x)))
 
 
 def _has_telephone_numbers(x):
-    if _pd.api.types.is_string_dtype(x):
+    if _is_string(x):
         check = is_telephone_number(x)
         return _np.any(check)
     else:
@@ -128,7 +140,7 @@ is_mobile_number = _np.vectorize(lambda x: bool(_mobile_re.match(x)))
 
 
 def _has_mobile_numbers(x):
-    if _pd.api.types.is_string_dtype(x):
+    if _is_string(x):
         check = is_mobile_number(x)
         return _np.any(check)
     else:
@@ -201,19 +213,17 @@ def pii_find(x: _pd.DataFrame):
         if pii_sum:
             probable_pii.append(var)
             if is_surname:
-                print("{} matches 'surname'/'cognome'.".format(var))
+                print(f"{var} matches 'surname'/'cognome'.")
             if is_name:
-                print("{} matches 'name'/'nome'.".format(var))
+                print(f"{var} matches 'name'/'nome'.")
             if has_mail:
-                print("{} probably contains emails.".format(var))
+                print(f"{var} probably contains emails.")
             if has_fc:
-                print("{} probably contains fiscal codes.".format(var))
+                print(f"{var} probably contains fiscal codes.")
             if has_telephone:
-                print("{} probably contains telephone numbers.".format(var))
+                print(f"{var} probably contains telephone numbers.")
             if has_mobile:
-                print(
-                    "{} probably contains mobile phones numbers.".format(var)
-                )
+                print(f"{var} probably contains mobile phones numbers.")
     return probable_pii
 
 
@@ -341,9 +351,10 @@ def _verboser(f):
         coerced = f(x)
         report = _pd.DataFrame({"original": x, "coerced": coerced})
         # meh non son sicuro qua sotto
-        new_na = _pd.isna(report).apply(sum, axis=1) == 1
+        # new_na = ~_p.isna(report).apply(sum, axis=1) == 1
+        new_na = ~_pd.isna(x) & _pd.isna(coerced)
         if _np.any(new_na):
-            print("Coercion introduced missing values:")
+            print("Please check if the following coercions are ok:")
             print(report[new_na])
         return coerced
 
@@ -351,18 +362,26 @@ def _verboser(f):
 
 
 # --------------- coercion workers ----------------------------------------
+
 def to_bool(x: _pd.Series):
-    """Coerce to boolean a pd.Series using astype
+    """Coerce to boolean a pd.Series (numeric) using astype keeping NAs as NAs
 
     >>> to_bool(pd.Series([1,0,1,0]))
-    >>> to_bool(pd.Series(["","yes","no","boh"]))
+    >>> to_bool(pd.Series([1,0.,1,0.]))
+    >>> to_bool(pd.Series([1,0,1,0, np.nan]))
     """
-    return x.astype("bool", copy=True)
+    nas = _pd.isna(x)
+    rval = x.astype("boolean", copy = True)
+    rval[nas] = _pd.NA
+    return rval
 
 
 def _replace_comma(x: _pd.Series):
-    if _pd.api.types.is_string_dtype(x):
-        return x.str.replace(",", ".")
+    if _is_string(x):
+        nas = x.isin(["", _pd.NA, _np.nan])
+        rval = x.astype('str').str.replace(",", ".")
+        rval[nas] = _pd.NA
+        return rval
     else:
         return x
 
@@ -377,7 +396,7 @@ def to_integer(x: _pd.Series):
     """
     s = x.copy()
     s = _replace_comma(s)
-    return _pd.to_numeric(s, errors='coerce', downcast='integer')
+    return _pd.to_numeric(s, errors='coerce', downcast='integer').astype('Int64')
 
 
 def to_numeric(x: _pd.Series):
@@ -419,6 +438,7 @@ def _extract_dates_worker(x):
     else:
         return _np.nan
 
+
 def extract_dates(x):
     """Try to extract dates from shitty strings and convert them to proper
 
@@ -427,22 +447,25 @@ def extract_dates(x):
     return x.apply(_extract_dates_worker)
 
 
-
 def to_categorical(
     x: _pd.Series, categories: list[str] = None, lowcase: bool = False
 ):
-    """Coerce to categorical a pd.Series of strings, with blank values as missing
+    """Coerce to categorical a pd.Series, with blank values as missing
 
     >>> to_categorical(pd.Series([1, 2., 1., 2, 3]))
+    >>> to_categorical(pd.Series([1, 2., 1., 2, 3, np.nan]))
     >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", ""]))
+    >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", "", np.nan]))
+    >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", ""]), lowcase = True)
     """
     # copy the series
     s = x.copy()
     # string preprocessing
-    if _pd.api.types.is_string_dtype(s):
-        # string: rm spaces
+    if _is_string(s):
+        # string: rm spaces and uniform NAs
         s = s.str.strip()
-        s[s == ""] = _pd.NA
+        nas = s.isin(["", _np.nan])
+        s[nas] = _pd.NA
         # string: lowercase
         if lowcase:
             s = s.str.lower()
@@ -453,23 +476,23 @@ def to_categorical(
 
 
 def to_noyes(x: _pd.Series):
-    """Coerce to no/yes a (string or numerical) pd.Series
+    """Coerce to no/yes a string pd.Series
 
     >>> to_noyes(pd.Series(["","yes","no","boh", "si"]))
-    >>> to_noyes(pd.Series([0.,1.,2.,1.])) # using to_bool so if != 0 it's yes
+    >>> to_noyes(pd.Series(["","yes","no","boh", "si", np.nan]))
     """
-    s = x.copy()
-    # string preprocessing
-    if _pd.api.types.is_string_dtype(s):
-        # take the first letter that can be n(o), s(i) or y(es)
-        l0 = s.copy().str.strip().str.lower().str[0]
-        l0[l0 == 's'] = 'y'
-        l0 = l0.replace({"0": "n", "1": "y"})  # for strings 0/1
-    else:
-        l0 = to_bool(s).map({False: 'n', True: 'y'})
-    return to_categorical(
-        l0.map({"n": "no", "y": "yes"}), categories=['no', 'yes']
-    )
+
+    if not _is_string(x):
+        raise Exception("to_noyes only for strings vectors")
+
+    l0 = x.copy().str.strip().str.lower().str[0]
+    l0[l0 == 's'] = 'y'
+    l0 = l0.replace({"0": "n", "1": "y"})  # for strings 0/1
+    rval = to_categorical(l0.map({"n": "no", "y": "yes"}),
+                          categories=['no', 'yes'])
+    return rval
+
+
 
 
 def to_sex(x: _pd.Series):
@@ -477,15 +500,15 @@ def to_sex(x: _pd.Series):
 
     >>> to_sex(pd.Series(["","m","f"," m", "Fm"]))
     """
-    if _pd.api.types.is_string_dtype(x):
-        s = x.copy()
-        # take the first letter (Mm/Ff)
-        l0 = s.str.strip().str.lower().str[0]
-        return to_categorical(
-            l0.map({"m": "male", "f": "female"}), categories=['male', 'female']
-        )
-    else:
-        raise ValueError("x must be a pd.Series of strings")
+    if not _is_string(x):
+        raise Exception("to_sex only for strings vectors")
+
+    # take the first letter (Mm/Ff)
+    l0 = x.copy().str.strip().str.lower().str[0]
+    rval = to_categorical(l0.map({"m": "male", "f": "female"}),
+                          categories=['male', 'female'])
+    return rval
+
 
 
 def to_recist(x: _pd.Series):
@@ -493,17 +516,16 @@ def to_recist(x: _pd.Series):
 
     >>> to_recist(pd.Series(["RC", "PD", "SD", "PR", "RP", "boh"]))
     """
-    if _pd.api.types.is_string_dtype(x):
-        s = x.copy()
-        # rm spaces and uppercase and take the first two letters
-        s = s.str.strip().str.upper().str[:2]
-        # uniform italian to english
-        ita2eng = {"RC": "CR", "RP": "PR"}
-        s = s.replace(ita2eng)
-        categs = ["CR", "PR", "SD", "PD"]
-        return to_categorical(s, categories=categs)
-    else:
-        raise ValueError("x must be a pd.Series of strings")
+    if not _is_string(x):
+        raise Exception("to_recist only for strings vectors")
+
+    # rm spaces and uppercase and take the first two letters
+    s = x.copy().str.strip().str.upper().str[:2]
+    # uniform italian to english
+    ita2eng = {"RC": "CR", "RP": "PR"}
+    s = s.replace(ita2eng)
+    categs = ["CR", "PR", "SD", "PD"]
+    return to_categorical(s, categories=categs)
 
 
 def to_other_specify(x: _pd.Series):
@@ -512,12 +534,11 @@ def to_other_specify(x: _pd.Series):
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_other_specify(x)
     """
-    s = x.copy().astype("str")
-    s = s.str.strip().str.lower()
-    s[s == ""] = _pd.NA
-    categs = list(
-        s.value_counts().index
-    )  # categs ordered by decreasing counts
+    nas = x.isin(["", _pd.NA, _np.nan])
+    s = x.copy().astype("str").str.strip().str.lower()
+    s[nas] = _pd.NA
+    # categs ordered by decreasing counts
+    categs = list(s.value_counts().index)
     return to_categorical(s, categories=categs)
 
 
@@ -544,35 +565,38 @@ class Coercer:
     >>> import pandas as pd
     >>> import numpy as np
     >>>
-    >>> df = pd.DataFrame({
-    >>>     "idx" :  [1., 2., 3., 4., 5., 6.],
-    >>>     "sex" :  ["m", "maschio", "f", "female", "m", "M"],
-    >>>     "now":   [str(dt.datetime.now())] * 6,
-    >>>     "date":  ["2020-01-02", "2021-01-01", "2022-01-02"] * 2,
-    >>>     "state": ["Ohio", "Ohio", "Ohio", "Nevada", "Nevada", "Nevada"],
-    >>>     "ohio" : [1, 1, 1, 0, 0, 0],
-    >>>     "year":  [str(y) for y in [2000, 2001, 2002, 2001, 2002, 2003]],
-    >>>     "pop":   [str(p) for p in [1.5, 1.7, 3.6, np.nan, 2.9, 3.2]],
-    >>>     "recist" : ["", "pd", "sd", "pr", "rc", "cr"],
-    >>>     "other" : ["b"]*3 + ["a"]*2 + ["c"]
+    >>> raw = pd.DataFrame({
+    >>>     "idx" :  [1., 2., 3., 4., 5., 6., "2,0", "", np.nan],
+    >>>     "sex" :  ["m", "maschio", "f", "female", "m", "M", "", "a", np.nan],
+    >>>     "now":   [str(dt.datetime.now())] * 6 + [np.nan, "", "a"],
+    >>>     "date":  ["2020-01-02", "2021-01-01", "2022-01-02"] * 2  + [np.nan, "", "a"],
+    >>>     "state": ["Ohio", "Ohio", "Ohio", "Nevada", "Nevada", "Nevada"] + [np.nan, "", "a"],
+    >>>     "ohio" : [1, 1, 1, 0, 0, 0] + [np.nan] * 3 ,
+    >>>     "year":  [str(y) for y in [2000, 2001, 2002, 2001, 2002, 2003]] + [np.nan, "", "a"],
+    >>>     "pop":   [str(p) for p in [1.5, 1.7, 3.6, np.nan, 2.9]]  + ["3,2", np.nan, "", "a"],
+    >>>     "recist" : ["", "pd", "sd", "pr", "rc", "cr"] + [np.nan, "", "a"],
+    >>>     "other" : ["b"]*3 + ["a"]*2 + ["c"] + [np.nan, "", "a"]
     >>> })
-    >>>
-    >>>
+    >>> 
     >>> directives_new = {
-    >>>     lb.dm.to_categorical: ["state"],
-    >>>     lb.dm.to_date: ["date"],
-    >>>     lb.dm.to_datetime : ["now"],
     >>>     lb.dm.to_integer: ["idx", "year"],
-    >>>     lb.dm.to_noyes: ["ohio"],
+    >>>     lb.dm.to_sex : ["sex"],
+    >>>     lb.dm.to_datetime : ["now"],
+    >>>     lb.dm.to_date: ["date"],
+    >>>     lb.dm.to_categorical: ["state"],
+    >>>     lb.dm.to_bool: ["ohio"],
     >>>     lb.dm.to_numeric: ["pop"],
-    >>>     lb.dm.to_other_specify: ["other"],
     >>>     lb.dm.to_recist: ["recist"],
-    >>>     lb.dm.to_sex : ["sex"]
+    >>>     lb.dm.to_other_specify: ["other"]
     >>> }
-    >>>
-    >>> coercer1 = lb.dm.Coercer(df, fvs_dict = directives_new)
-    >>> cleaned1 = coercer1.coerce()
-    >>>
+    >>> 
+    >>> cleaned1 = lb.dm.Coercer(raw, fvs_dict = directives_new).coerce()
+    >>> 
+    >>> raw
+    >>> cleaned1
+    >>> 
+    >>> # ------------------------------------------------
+    >>> # OLD API
     >>> # ------------------------------------------------
     >>>
     >>> directives_new2 = {
@@ -588,7 +612,7 @@ class Coercer:
     >>> }
     >>>
     >>>
-    >>> coercer2 = lb.dm.Coercer(df, fvs_dict = directives_new2)
+    >>> coercer2 = lb.dm.Coercer(raw, fvs_dict = directives_new2)
     >>> cleaned2 = coercer2.coerce()
     >>>
     >>>  #------------------------------------------------------
@@ -605,7 +629,7 @@ class Coercer:
     >>>     "other" : to_other_specify
     >>> }
     >>>
-    >>> coercer = Coercer(df, vf_dict = directives_old)
+    >>> coercer = Coercer(raw, vf_dict = directives_old)
     >>> coerced = coercer.coerce()
     """
 

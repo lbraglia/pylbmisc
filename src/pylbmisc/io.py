@@ -282,7 +282,7 @@ def export_data(
         x: _pd.DataFrame | dict[str, _pd.DataFrame],
         path: str | _Path,
         ext: str | list[str] = ["xlsx", "csv", "pkl", "R"],
-        index=True
+        index=False
 ) -> None:
     """Export a DataFrame or a dict of DataFrames as csv/xlsx
 
@@ -332,7 +332,7 @@ def export_data(
 
     if "pkl" in used_formats:
         if isinstance(x, _pd.DataFrame):
-            x.to_pickle(path if path_has_suffix else path.with_suffix(".pkl"), index=index)
+            x.to_pickle(path if path_has_suffix else path.with_suffix(".pkl"))
         elif isinstance(x, dict):
             # use dict key as postfix
             for k, v in x.items():

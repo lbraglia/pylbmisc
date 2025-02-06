@@ -467,14 +467,13 @@ def to_categorical(x: _pd.Series,
         # string preprocessing
         # rm spaces and uniform NAs
         x = x.str.strip()
-        # nas = s.isin(["", _np.nan, _pd.NA])
         nas = (x.isna()) | (x == "")
         x[nas] = _pd.NA
         if lowcase:
             x = x.str.lower()
             if categories != None:
                 categories = [c.lower() for c in categories]
-
+    
     # categorical making
     return _pd.Categorical(x, categories=categories)
 

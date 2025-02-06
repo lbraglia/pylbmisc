@@ -259,8 +259,9 @@ def _add_x_if_first_is_digit(s):
         return s
 
 
-def fix_varnames(x: str | list | _pd.DataFrame):
-    """The good-old R preprocess_varnames
+def fix_varnames(x: str | list):
+    """The good-old R preprocess_varnames, returns just the fixed strings. See
+    sanitize_varnames for DataFrame or dict of DataFrames
 
     >>> fix_varnames("  asd 98n2 3")
     >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
@@ -312,6 +313,8 @@ def fix_varnames(x: str | list | _pd.DataFrame):
 
 
 def sanitize_varnames(x, return_tfd = True):
+    """Fix a DataFrame or a dict of DataFrames names using fix_varnames to obtain
+    the cleaned ones."""
     if isinstance(x, _pd.DataFrame):
         from_name = list(x.columns.values)
         to_name = fix_varnames(from_name)
@@ -350,14 +353,11 @@ def _verboser(f):
     def transformer(x: _pd.Series):
         coerced = f(x)
         report = _pd.DataFrame({"original": x, "coerced": coerced})
-        # meh non son sicuro qua sotto
-        # new_na = ~_p.isna(report).apply(sum, axis=1) == 1
-        new_na = ~_pd.isna(x) & _pd.isna(coerced)
+        new_na = (~_pd.isna(x)) & (_pd.isna(coerced))
         if _np.any(new_na):
             print("Please check if the following coercions are ok:")
             print(report[new_na])
         return coerced
-
     return transformer
 
 
@@ -371,14 +371,15 @@ def to_bool(x: _pd.Series):
     >>> to_bool(pd.Series([1,0,1,0, np.nan]))
     """
     nas = _pd.isna(x)
-    rval = x.astype("boolean", copy = True)
+    rval = x.astype("boolean")
     rval[nas] = _pd.NA
     return rval
 
 
 def _replace_comma(x: _pd.Series):
     if _is_string(x):
-        nas = x.isin(["", _pd.NA, _np.nan])
+        # nas = x.isin(["", _pd.NA, _np.nan])
+        nas = (x.isna()) | (x == "")
         rval = x.astype('str').str.replace(",", ".")
         rval[nas] = _pd.NA
         return rval
@@ -392,29 +393,31 @@ def to_integer(x: _pd.Series):
     >>> to_integer(pd.Series([1, 2, 3]))
     >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6.]))
     >>> to_integer(pd.Series(["2001", "2011", "1999"]))
-    >>> to_integer(pd.Series(["1.1", "2,1", "asd"]))
+    >>> to_integer(pd.Series(["1.1", "1,99999", "foobar"])) # fails because of 1.99
     """
-    s = x.copy()
-    s = _replace_comma(s)
-    return _pd.to_numeric(s, errors='coerce', downcast='integer').astype('Int64')
+    s = _replace_comma(x)
+    # return _np.floor(_pd.to_numeric(s, errors='coerce')).astype('Int64')
+    # mi fido piu di quella di sotto anche se fallisce con i numeri con virgola
+    # (che ci può stare, per i quale bisogna usare np.floor)
+    return _pd.to_numeric(s, errors='coerce').astype('Int64')
 
 
 def to_numeric(x: _pd.Series):
     """Coerce a pd.Series using pd.to_numeric
 
-    >>> to_integer(pd.Series([1, 2, 3]))
-    >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6.]))
-    >>> to_integer(pd.Series(["2001", "2011", "1999"]))
-    >>> to_integer(pd.Series(["1.1", "2,1", "asd"]))
+    >>> to_numeric(pd.Series([1, 2, 3]))
+    >>> to_numeric(pd.Series([1., 2., 3., 4., 5., 6.]))
+    >>> to_numeric(pd.Series(["2001", "2011", "1999"]))
+    >>> to_numeric(pd.Series(["1.1", "2,1", "asd", ""]))
     """
-    s = x.copy()
-    s = _replace_comma(s)
-    return _pd.to_numeric(s, errors='coerce')
+    s = _replace_comma(x)
+    return _pd.to_numeric(s, errors='coerce').astype("Float64")
 
 
 def to_datetime(x: _pd.Series):
     """Coerce to a datetime a pd.Series
 
+    >>> import datetime as dt
     >>> to_datetime(pd.Series([str(dt.datetime.now())] * 6))
     """
     return _pd.to_datetime(x, errors='coerce')
@@ -423,6 +426,7 @@ def to_datetime(x: _pd.Series):
 def to_date(x: _pd.Series):
     """Coerce to a date a pd.Series
 
+    >>> import datetime as dt
     >>> to_date(pd.Series([str(dt.datetime.now())] * 6))
     >>> to_date(pd.Series(["2020-01-02", "2021-01-01", "2022-01-02"] * 2))
     """
@@ -436,7 +440,8 @@ def _extract_dates_worker(x):
         polished = _dates_re.sub("", x)
         return _pd.to_datetime(polished)
     else:
-        return _np.nan
+        # return _np.nan
+        return _pd.NA
 
 
 def extract_dates(x):
@@ -447,50 +452,52 @@ def extract_dates(x):
     return x.apply(_extract_dates_worker)
 
 
-def to_categorical(
-    x: _pd.Series, categories: list[str] = None, lowcase: bool = False
-):
+def to_categorical(x: _pd.Series,
+                   categories: list[str] = None,
+                   lowcase: bool = False):
     """Coerce to categorical a pd.Series, with blank values as missing
 
-    >>> to_categorical(pd.Series([1, 2., 1., 2, 3]))
+    >>> to_categorical(pd.Series([1, 2, 1, 2, 3]))
     >>> to_categorical(pd.Series([1, 2., 1., 2, 3, np.nan]))
-    >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", ""]))
     >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", "", np.nan]))
+    >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", "", np.nan]), categories=["aa", "AA"]  )
     >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", ""]), lowcase = True)
     """
-    # copy the series
-    s = x.copy()
-    # string preprocessing
-    if _is_string(s):
-        # string: rm spaces and uniform NAs
-        s = s.str.strip()
-        nas = s.isin(["", _np.nan])
-        s[nas] = _pd.NA
-        # string: lowercase
+    if _is_string(x):
+        # string preprocessing
+        # rm spaces and uniform NAs
+        x = x.str.strip()
+        # nas = s.isin(["", _np.nan, _pd.NA])
+        nas = (x.isna()) | (x == "")
+        x[nas] = _pd.NA
         if lowcase:
-            s = s.str.lower()
+            x = x.str.lower()
             if categories != None:
                 categories = [c.lower() for c in categories]
+
     # categorical making
-    return _pd.Categorical(s, categories=categories)
+    return _pd.Categorical(x, categories=categories)
 
 
 def to_noyes(x: _pd.Series):
     """Coerce to no/yes a string pd.Series
 
-    >>> to_noyes(pd.Series(["","yes","no","boh", "si"]))
     >>> to_noyes(pd.Series(["","yes","no","boh", "si", np.nan]))
+    >>> to_noyes(pd.Series([1,0,0, np.nan]))
+    >>> to_noyes(pd.Series([1.,0.,0., np.nan]))
     """
+    if _is_string(x):
+        # take only the first character and map to n/y
+        tmp = x.str.strip().str.lower().str[0]
+        tmp[tmp == 's'] = 'y'
+        tmp = tmp.replace({"0": "n", "1": "y"}) # 0/1 for strings
+    else:
+        # try to convert to boolean and map to n/y
+        tmp = to_bool(x).map({False: "n", True: "y"})
 
-    if not _is_string(x):
-        raise Exception("to_noyes only for strings vectors")
 
-    l0 = x.copy().str.strip().str.lower().str[0]
-    l0[l0 == 's'] = 'y'
-    l0 = l0.replace({"0": "n", "1": "y"})  # for strings 0/1
-    rval = to_categorical(l0.map({"n": "no", "y": "yes"}),
+    return to_categorical(tmp.map({"n": "no", "y": "yes"}),
                           categories=['no', 'yes'])
-    return rval
 
 
 
@@ -498,34 +505,32 @@ def to_noyes(x: _pd.Series):
 def to_sex(x: _pd.Series):
     """Coerce to male/female a pd.Series of strings (Mm/Ff)
 
-    >>> to_sex(pd.Series(["","m","f"," m", "Fm"]))
+    >>> to_sex(pd.Series(["","m","f"," m", "Fm", np.nan]))
     """
     if not _is_string(x):
         raise Exception("to_sex only for strings vectors")
 
     # take the first letter (Mm/Ff)
-    l0 = x.copy().str.strip().str.lower().str[0]
-    rval = to_categorical(l0.map({"m": "male", "f": "female"}),
-                          categories=['male', 'female'])
-    return rval
+    tmp = x.str.strip().str.lower().str[0]
+    tmp = tmp.map({"m": "male", "f": "female"})
+    return to_categorical(tmp, categories=['male', 'female'])
 
 
 
 def to_recist(x: _pd.Series):
     """Coerce to recist categories a pd.Series of strings
 
-    >>> to_recist(pd.Series(["RC", "PD", "SD", "PR", "RP", "boh"]))
+    >>> to_recist(pd.Series(["RC", "PD", "SD", "PR", "RP", "boh", np.nan]))
     """
     if not _is_string(x):
         raise Exception("to_recist only for strings vectors")
 
     # rm spaces and uppercase and take the first two letters
-    s = x.copy().str.strip().str.upper().str[:2]
+    tmp = x.str.strip().str.upper().str[:2]
     # uniform italian to english
     ita2eng = {"RC": "CR", "RP": "PR"}
-    s = s.replace(ita2eng)
-    categs = ["CR", "PR", "SD", "PD"]
-    return to_categorical(s, categories=categs)
+    return to_categorical(tmp.replace(ita2eng),
+                          categories=["CR", "PR", "SD", "PD"])
 
 
 def to_other_specify(x: _pd.Series):
@@ -534,12 +539,12 @@ def to_other_specify(x: _pd.Series):
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_other_specify(x)
     """
-    nas = x.isin(["", _pd.NA, _np.nan])
-    s = x.copy().astype("str").str.strip().str.lower()
-    s[nas] = _pd.NA
+    nas = (x.isna()) | (x == "")
+    tmp = x.copy().astype("str").str.strip().str.lower()
+    tmp[nas] = _pd.NA
     # categs ordered by decreasing counts
-    categs = list(s.value_counts().index)
-    return to_categorical(s, categories=categs)
+    categs = list(tmp.value_counts().index)
+    return to_categorical(tmp, categories=categs)
 
 
 def to_string(x: _pd.Series):
@@ -548,8 +553,7 @@ def to_string(x: _pd.Series):
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_string(x)
     """
-    s = x.copy()
-    return s.astype('string')
+    return x.astype('str')
 
 
 # --------------- coercion class ----------------------------------------

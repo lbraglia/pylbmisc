@@ -29,7 +29,6 @@ _mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
 # Utilities
 # -------------------------------------------------------------------------
 
-
 def view(df: _pd.DataFrame):
     """View a pd.DataFrame using LibreOffice."""
     tempfile = _tempfile.mkstemp(suffix='.xlsx')

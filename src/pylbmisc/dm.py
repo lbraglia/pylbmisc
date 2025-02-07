@@ -594,7 +594,7 @@ class Coercer:
     >>>     lb.dm.to_other_specify: ["other"]
     >>> }
     >>> 
-    >>> cleaned1 = lb.dm.Coercer(raw, fvs_dict = directives_new).coerce()
+    >>> cleaned1 = lb.dm.Coercer(raw, fv = directives_new).coerce()
     >>> 
     >>> raw
     >>> cleaned1
@@ -616,49 +616,28 @@ class Coercer:
     >>> }
     >>>
     >>>
-    >>> coercer2 = lb.dm.Coercer(raw, fvs_dict = directives_new2)
+    >>> coercer2 = lb.dm.Coercer(raw, fv = directives_new2)
     >>> cleaned2 = coercer2.coerce()
     >>>
-    >>>  #------------------------------------------------------
-    >>> directives_old = {
-    >>>     "idx": to_integer,
-    >>>     "sex": to_sex,
-    >>>     "now": to_datetime,
-    >>>     "date": to_date,
-    >>>     "state": to_categorical,
-    >>>     "ohio": to_noyes,
-    >>>     "year": to_integer,
-    >>>     "pop": to_numeric,
-    >>>     "recist" : to_recist,
-    >>>     "other" : to_other_specify
-    >>> }
-    >>>
-    >>> coercer = Coercer(raw, vf_dict = directives_old)
-    >>> coerced = coercer.coerce()
     """
 
     def __init__(
         self,
         df: _pd.DataFrame,
-        fvs_dict: dict | None = None,
-        vf_dict: dict | None = None,
+        fv: dict | None = None, # function: variables dict
         verbose: bool = True,
     ):
         self._df = df
         self._verbose = verbose
-        if fvs_dict == None and vf_dict == None:
-            raise ValueError("Both directives dict can't be None")
-        if isinstance(fvs_dict, dict) and isinstance(vf_dict, dict):
-            raise ValueError(
-                "Both directives dict are specified. Only one admitted."
-            )
-        if fvs_dict != None:
+        if fv == None:
+            raise ValueError("fv can't be None")
+        else:
             # Experimental below
             parent_frame = _inspect.currentframe().f_back
             # put it in the vf_dict format evaluating the f in
             # parent frame variable dict
             reversed = {}
-            for f, vars in fvs_dict.items():
+            for f, vars in fv.items():
                 # if f is a string change it to function taking from the enclosing
                 # environment
                 f = (
@@ -669,8 +648,6 @@ class Coercer:
                 for v in vars:
                     reversed.update({v: f})
             self._directives = reversed
-        if vf_dict != None:
-            self._directives = vf_dict
 
     def coerce(self, keep_only_coerced=False) -> _pd.DataFrame:
         # do not modify the input data

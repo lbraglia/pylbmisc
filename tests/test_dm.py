@@ -6,14 +6,20 @@ from pylbmisc.dm import to_bool, to_integer, to_numeric, to_datetime, to_date, t
 class TestDMFunctions(unittest.TestCase):
 
     def test_to_bool(self):
-        series = pd.Series([1, 0, 1, 0, np.nan])
+        series = pd.Series([1., 0, 1., 0, np.nan])
         expected = pd.Series([True, False, True, False, pd.NA], dtype="boolean")
         result = to_bool(series)
         pd.testing.assert_series_equal(result, expected)
 
-    def test_to_integer(self):
+    def test_to_integer_float(self):
         series = pd.Series([1.0, 2.0, 3.0, 4.0, np.nan])
         expected = pd.Series([1, 2, 3, 4, pd.NA], dtype="Int64")
+        result = to_integer(series)
+        pd.testing.assert_series_equal(result, expected)
+
+    def test_to_integer_string(self):
+        series = pd.Series(["2001", "2011", "1999", np.nan])
+        expected = pd.Series([2001, 2011, 1999, pd.NA], dtype="Int64")
         result = to_integer(series)
         pd.testing.assert_series_equal(result, expected)
 
@@ -36,38 +42,43 @@ class TestDMFunctions(unittest.TestCase):
         pd.testing.assert_series_equal(result, expected)
 
     def test_to_categorical(self):
-        series = pd.Series(["A", "B", "A", "C", ""])
-        expected = pd.Categorical(["A", "B", "A", "C", pd.NA])
+        series = pd.Series(["A", "B", "A", "C", "", np.nan])
+        expected = pd.Categorical(["A", "B", "A", "C", pd.NA, pd.NA])
         result = to_categorical(series)
-        pd.testing.assert_series_equal(result, expected)
+        # categorical in pandas seems to be extension arrays
+        # https://pandas.pydata.org/community/blog/extension-arrays.html
+        pd.testing.assert_extension_array_equal(result, expected)
 
     def test_to_noyes(self):
-        series = pd.Series(["yes", "no", "yes", "no", ""])
-        expected = pd.Categorical(["yes", "no", "yes", "no", pd.NA], categories=["no", "yes"])
+        series = pd.Series(["","yes","no","boh", "si", np.nan])
+        expected = pd.Categorical([pd.NA, "yes", "no", pd.NA, "yes", pd.NA], categories=["no", "yes"])
         result = to_noyes(series)
-        pd.testing.assert_series_equal(result, expected)
+        pd.testing.assert_extension_array_equal(result, expected)
 
     def test_to_sex(self):
-        series = pd.Series(["M", "F", "m", "f", ""])
-        expected = pd.Categorical(["male", "female", "male", "female", pd.NA], categories=["male", "female"])
+        series = pd.Series([""    ,"m","f"," m", "Fm", np.nan])
+        expected = pd.Categorical([pd.NA , "male", "female", "male", "female", pd.NA],
+                                  categories=["male", "female"])
         result = to_sex(series)
-        pd.testing.assert_series_equal(result, expected)
+        pd.testing.assert_extension_array_equal(result, expected)
 
     def test_to_recist(self):
-        series = pd.Series(["CR", "PR", "SD", "PD", ""])
-        expected = pd.Categorical(["CR", "PR", "SD", "PD", pd.NA], categories=["CR", "PR", "SD", "PD"])
+        series = pd.Series(["RC", "PD", "SD", "PR", "RP", "boh", np.nan])
+        expected = pd.Categorical(["CR", "PD", "SD", "PR", "PR", pd.NA, pd.NA],
+                                  categories=["CR", "PR", "SD", "PD"])
         result = to_recist(series)
-        pd.testing.assert_series_equal(result, expected)
+        pd.testing.assert_extension_array_equal(result, expected)
 
     def test_to_other_specify(self):
         series = pd.Series(["foo", "bar", "foo", "baz", ""])
-        expected = pd.Categorical(["foo", "bar", "foo", "baz", pd.NA], categories=["foo", "bar", "baz"])
+        expected = pd.Categorical(["foo", "bar", "foo", "baz", pd.NA],
+                                  categories=["foo", "bar", "baz"])
         result = to_other_specify(series)
-        pd.testing.assert_series_equal(result, expected)
+        pd.testing.assert_extension_array_equal(result, expected)
 
     def test_to_string(self):
-        series = pd.Series([1, 2, 3, 4, np.nan])
-        expected = pd.Series(["1", "2", "3", "4", "nan"])
+        series = pd.Series([1, 2, 3, 4, np.nan]).astype("Int32")
+        expected = pd.Series(["1", "2", "3", "4", pd.NA])
         result = to_string(series)
         pd.testing.assert_series_equal(result, expected)
 

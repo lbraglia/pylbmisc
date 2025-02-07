@@ -390,9 +390,8 @@ def _replace_comma(x: _pd.Series):
 def to_integer(x: _pd.Series):
     """Coerce a pd.Series to integer (if possible)
 
-    >>> to_integer(pd.Series([1, 2, 3]))
-    >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6.]))
-    >>> to_integer(pd.Series(["2001", "2011", "1999"]))
+    >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6., np.nan]))
+    >>> to_integer(pd.Series(["2001", "2011", "1999", ""]))
     >>> to_integer(pd.Series(["1.1", "1,99999", "foobar"])) # fails because of 1.99
     """
     s = _replace_comma(x)
@@ -433,7 +432,7 @@ def to_date(x: _pd.Series):
     return to_datetime(x).dt.floor("D")
 
 
-_dates_re = _re.compile("[^/\d-]") # keep only numbers, - and /, and just hope for the best
+_dates_re = _re.compile(r"[^/\d-]") # keep only numbers, - and /, and just hope for the best
 
 def _extract_dates_worker(x):
     if isinstance(x, str): # handle missing values (sono float)
@@ -552,7 +551,10 @@ def to_string(x: _pd.Series):
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_string(x)
     """
-    return x.astype('str')
+    nas = x.isna()
+    rval = x.astype('str')
+    rval[nas] = _pd.NA
+    return rval
 
 
 # --------------- coercion class ----------------------------------------

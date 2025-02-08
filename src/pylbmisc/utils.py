@@ -231,10 +231,13 @@ def match_arg(arg, choices):
     >>> print(a)
     """
     res = [expanded for expanded in choices if expanded.startswith(arg)]
+    choices_str = ", ".join(choices)
     l = len(res)
     if l == 0:
-        raise ValueError("Parameter ", arg, "must be one of ", choices)
+        msg = f"Parameter {arg} must be one of: {choices_str}"
+        raise ValueError(msg)
     elif l > 1:
-        raise ValueError(arg, "matches multiple choices from ", choices)
+        msg = f"Parameter {arg} matches multiple choices from: {choices_str}"
+        raise ValueError(msg)
     else:
         return res[0]

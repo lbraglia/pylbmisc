@@ -70,11 +70,13 @@ def p_adjust(p, method="holm"):
     elif isinstance(p, _np.ndarray):
         x = p
     else:
-        raise ValueError("x must be list, series or array")
+        msg = "x must be list, series or array"
+        raise ValueError(msg)
 
     # checking content type
     if not _np.issubdtype(x.dtype, _np.floating):
-        raise ValueError("p-values must be a float.")
+        msg = "p-values must be a float."
+        raise ValueError(msg)
 
     # checking method requested
     allowed_methods = ["none", "bonferroni", "holm"]
@@ -111,7 +113,8 @@ def p_adjust(p, method="holm"):
             else:
                 p_adj[prog_id] = _np.nan
     else:
-        raise ValueError("method uncorrectly specified")
+        msg = "method uncorrectly specified"
+        raise ValueError(msg)
 
     # exiting
     return p_adj

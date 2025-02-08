@@ -114,8 +114,8 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
             if dfname not in rval.keys():  # check for duplicates
                 rval[dfname] = data
             else:
-                msg = "{0} is duplicated, skipping to avoid overwriting"
-                raise Warning(msg.format(dfname))
+                msg = f"{dfname} is duplicated, skipping to avoid overwriting"
+                raise Warning(msg)
         elif fext in {'.xls', '.xlsx'}:
             sheets = _pd.read_excel(
                 fpath, None, **excel_kwargs
@@ -140,9 +140,7 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
             }
             rval.update(zipped_data)
         else:
-            msg = "File format not supported for {0}. Ignoring it.".format(
-                fext
-            )
+            msg = f"File format not supported for {fext}. Ignoring it."
             raise Warning(msg)
 
     if len(rval) == 1:
@@ -157,8 +155,8 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
             rval = {k.removeprefix(common_prefix) : rval[k] for k in rval.keys()}
         return rval
     else:
-        # no dataset imported
-        raise ValueError("No data to be imported.")
+        msg = "No data to be imported."
+        raise ValueError(msg)
 
 
 
@@ -263,9 +261,7 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
         elif _pd.api.types.is_object_dtype(x):
             r_code.append(_rdf_object(x, var))
         else:
-            msg = "{}: il tipo {} non è ancora gestito.".format(
-                var, str(x.dtype)
-            )
+            msg = f"{var}: il tipo {str(x.dtype)} non è ancora gestito."
             raise ValueError(msg)
         is_last = var == df.columns[-1]
         if not is_last:
@@ -297,7 +293,8 @@ def export_data(
     """
 
     if not (isinstance(x, _pd.DataFrame) or isinstance(x, dict)):
-        raise ValueError("x deve essere un pd.DataFrame o un dict di pd.DataFrame")
+        msg = "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
+        raise ValueError(msg)
 
     if isinstance(ext, str): #uniforma
         ext = [ext]
@@ -402,7 +399,8 @@ def latex_table(
     position (str): lettere posizionamento tabella (ad esempio https://stackoverflow.com/questions/1673942)
     """
     if (label == "") or (not isinstance(label, str)):
-        raise ValueError("Please provide a label for the table.")
+        msg = "Please provide a label for the table."
+        raise ValueError(msg)
     caption = (
         label.capitalize().replace("_", " ") if caption == "" else caption
     )

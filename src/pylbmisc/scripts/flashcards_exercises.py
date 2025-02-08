@@ -291,7 +291,8 @@ def flashcards():
     infile_ext = infile.suffix
     outfile = Path(args.outfile).resolve()
     if not infile.exists():
-        raise FileNotFoundError(str(infile) + " does not exists.")
+        msg = str(infile) + " does not exists."
+        raise FileNotFoundError(msg)
     fc = Flashcards(infile)
     fc.export(outfile, infile_ext)
 
@@ -374,9 +375,8 @@ class Database(object):
             biblio_dirs = ["~/src/other/exercises/biblio"]
         paths += biblio_dirs
         if not paths:
-            raise Exception(
-                "Cosa strana che non vi sian elementi qui ne da paths ne da list"
-            )
+            msg = "Cosa strana che non vi sian elementi qui ne da paths ne da list"
+            raise Exception(msg)
         # now start parsing recursively: if file, parse it; if dir: go recursive
         for p in paths:
             p = Path(p).expanduser()
@@ -564,7 +564,8 @@ class Worksheet(object):
             else:
                 print(f, ' does not exists. Skipping\n')
         if not anydb:
-            raise Exception("No useful db files were provided")
+            msg = "No useful db files were provided"
+            raise Exception(msg)
         return self
 
     def to_tex(
@@ -681,11 +682,11 @@ def exercises_db():
     outfile = args['outfile']
     # se sono entrambi a none c'è qualcosa che non torna
     if (paths is None) and (lists is None):
-        raise Exception("uno tra --paths e --lists deve essere specificato")
+        msg = "uno tra --paths e --lists deve essere specificato"
+        raise Exception(msg)
     if outfile is None:
-        raise Exception(
-            "Bisogna specificare  il file sqlite3 su cui esportare mediante --outfile"
-        )
+        msg = "Bisogna specificare  il file sqlite3 su cui esportare mediante --outfile"
+        raise Exception(msg)
     # da qui in poi dovrebbe essere a posto
     if isinstance(paths, str):
         paths = paths.split(',')

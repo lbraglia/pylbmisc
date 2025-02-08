@@ -49,5 +49,6 @@ def winston_sends():
     elif to_type == 'group':
         to_id = group_id(to_label)
     else:
-        raise ValueError("Currently only user::* and group::* parsed.")
+        msg = "Currently only user::* and group::* parsed."
+        raise ValueError(msg)
     asyncio.run(main(what, to_id))

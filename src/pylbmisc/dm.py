@@ -168,7 +168,8 @@ def pii_find(x: _pd.DataFrame):
     """
 
     if not isinstance(x, _pd.DataFrame):
-        raise ValueError("x must be a pd.DataFrame")
+        msg = "x must be a pd.DataFrame"
+        raise ValueError(msg)
 
     col = list(x.columns.values)
 
@@ -272,7 +273,8 @@ def fix_varnames(x: str | list):
     elif isinstance(x, list):
         original = x
     else:
-        raise ValueError("Only str and list are allowed, see sanitize_varnames for DataFrame or dict of DataFrames.")
+        msg = "Only str and list are allowed, see sanitize_varnames for DataFrame or dict of DataFrames."
+        raise ValueError(msg)
     # let's go functional: s is (should be) a str, the following are to be applied
     # in order
     funcs = [
@@ -506,7 +508,8 @@ def to_sex(x: _pd.Series):
     >>> to_sex(pd.Series(["","m","f"," m", "Fm", np.nan]))
     """
     if not _is_string(x):
-        raise Exception("to_sex only for strings vectors")
+        msg = "to_sex only for strings vectors"
+        raise Exception(msg)
 
     # take the first letter (Mm/Ff)
     tmp = x.str.strip().str.lower().str[0]
@@ -521,7 +524,8 @@ def to_recist(x: _pd.Series):
     >>> to_recist(pd.Series(["RC", "PD", "SD", "PR", "RP", "boh", np.nan]))
     """
     if not _is_string(x):
-        raise Exception("to_recist only for strings vectors")
+        msg = "to_recist only for strings vectors"
+        raise Exception(msg)
 
     # rm spaces and uppercase and take the first two letters
     tmp = x.str.strip().str.upper().str[:2]
@@ -631,7 +635,8 @@ class Coercer:
         self._df = df
         self._verbose = verbose
         if fv == None:
-            raise ValueError("fv can't be None")
+            msg = "fv can't be None"
+            raise ValueError(msg)
         else:
             # Experimental below
             parent_frame = _inspect.currentframe().f_back
@@ -665,7 +670,8 @@ class Coercer:
         _pd.set_option("display.max_rows", None)
         for var, fun in directives.items():
             if var not in df.columns:
-                raise ValueError("{} not in df.columns, aborting.".format(var))
+                msg = f"{var} not in df.columns, aborting."
+                raise ValueError(msg)
             if verbose:
                 print("Processing {}.".format(var))
             df[var] = fun(df[var])

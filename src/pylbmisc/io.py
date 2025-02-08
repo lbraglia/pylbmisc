@@ -121,7 +121,7 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
                 fpath, None, **excel_kwargs
             )  # import all the sheets as a dict of DataFrame
             sheets = {
-                "{0}_{1}".format(fname, k): v for k, v in sheets.items()
+                f"{fname}_{k}": v for k, v in sheets.items()
             }  # add xlsx to sheet names
             rval.update(sheets)
         elif (
@@ -136,7 +136,7 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
                     zipped_data = import_data(zipped_fpaths)
             # prepend zip name to fname (as keys) and update results
             zipped_data = {
-                "{0}_{1}".format(fname, k): v for k, v in zipped_data.items()
+                "f{fname}_{k}": v for k, v in zipped_data.items()
             }
             rval.update(zipped_data)
         else:
@@ -168,7 +168,7 @@ def _rdf_integer(x: _pd.Series, xn: str):
         index=False,
         header=False,
     ).replace("\n", ", ")
-    rval = "{} = c({})".format(xn, data_str)
+    rval = f"{xn} = c({data_str})"
     return rval
 
 # placeholder

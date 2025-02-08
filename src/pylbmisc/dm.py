@@ -302,7 +302,7 @@ def fix_varnames(x: str | list):
                 uniq.append(v)
             else:
                 seen[v] += 1
-                uniq.append("{}_{}".format(v, seen[v]))
+                uniq.append(f"{v}_{seen[v]}")
     else:
         uniq = mod
     # se ci sono doppi nei nomi di partenza meglio evitare i dict se no i
@@ -673,7 +673,7 @@ class Coercer:
                 msg = f"{var} not in df.columns, aborting."
                 raise ValueError(msg)
             if verbose:
-                print("Processing {}.".format(var))
+                print(f"Processing {var}.")
             df[var] = fun(df[var])
         _pd.set_option("display.max_rows", old_nrows)
         # return results

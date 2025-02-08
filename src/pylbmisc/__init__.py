@@ -2,13 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from pylbmisc import dm
-from pylbmisc import io
-from pylbmisc import iter
-from pylbmisc import stats
-from pylbmisc import tg
-from pylbmisc import tmpl
-from pylbmisc import utils
+from pylbmisc import dm, io, iter, stats, tg, tmpl, utils
 
-# make flake happy
 __all__ = ["dm", "io", "iter", "stats", "tg", "tmpl", "utils"]

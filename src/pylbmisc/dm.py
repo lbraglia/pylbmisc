@@ -31,7 +31,7 @@ _mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
 
 def view(df: _pd.DataFrame):
     """View a pd.DataFrame using LibreOffice."""
-    tempfile = _tempfile.mkstemp(suffix='.xlsx')
+    tempfile = _tempfile.mkstemp(suffix=".xlsx")
     fname = tempfile[1]
     df.to_excel(fname)
     _subprocess.Popen(["libreoffice", fname])
@@ -44,7 +44,7 @@ def table2df(df: _pd.DataFrame):
     """
     x = df.copy()
     x = x.stack().reset_index()
-    return x.rename(columns={0: 'x'})
+    return x.rename(columns={0: "x"})
 
 
 def dump_unique_values(dfs, fpath = "data/uniq_"):
@@ -98,7 +98,7 @@ def _is_string(x: _pd.Series):
     >>> pd.api.types.is_string_dtype(x)
     >>> _is_string(x)
     """
-    return x.dtype == 'O'
+    return x.dtype == "O"
 
 
 
@@ -244,11 +244,11 @@ def _replace_unwanted_chars(s):
 
 
 def _remove_duplicated_underscore(s):
-    return _re.sub('_+', '_', s)
+    return _re.sub("_+", "_", s)
 
 
 def _remove_external_underscore(s):
-    return _re.sub('^_', '', _re.sub("_$", "", s))
+    return _re.sub("^_", "", _re.sub("_$", "", s))
 
 
 def _add_x_if_first_is_digit(s):
@@ -379,7 +379,7 @@ def _replace_comma(x: _pd.Series):
     if _is_string(x):
         # nas = x.isin(["", _pd.NA, _np.nan])
         nas = (x.isna()) | (x == "")
-        rval = x.astype('str').str.replace(",", ".")
+        rval = x.astype("str").str.replace(",", ".")
         rval[nas] = _pd.NA
         return rval
     else:
@@ -397,7 +397,7 @@ def to_integer(x: _pd.Series):
     # return _np.floor(_pd.to_numeric(s, errors='coerce')).astype('Int64')
     # mi fido piu di quella di sotto anche se fallisce con i numeri con virgola
     # (che ci può stare, per i quale bisogna usare np.floor)
-    return _pd.to_numeric(s, errors='coerce').astype('Int64')
+    return _pd.to_numeric(s, errors="coerce").astype("Int64")
 
 
 def to_numeric(x: _pd.Series):
@@ -409,7 +409,7 @@ def to_numeric(x: _pd.Series):
     >>> to_numeric(pd.Series(["1.1", "2,1", "asd", ""]))
     """
     s = _replace_comma(x)
-    return _pd.to_numeric(s, errors='coerce').astype("Float64")
+    return _pd.to_numeric(s, errors="coerce").astype("Float64")
 
 
 def to_datetime(x: _pd.Series):
@@ -418,7 +418,7 @@ def to_datetime(x: _pd.Series):
     >>> import datetime as dt
     >>> to_datetime(pd.Series([str(dt.datetime.now())] * 6))
     """
-    return _pd.to_datetime(x, errors='coerce')
+    return _pd.to_datetime(x, errors="coerce")
 
 
 def to_date(x: _pd.Series):
@@ -486,7 +486,7 @@ def to_noyes(x: _pd.Series):
     if _is_string(x):
         # take only the first character and map to n/y
         tmp = x.str.strip().str.lower().str[0]
-        tmp[tmp == 's'] = 'y'
+        tmp[tmp == "s"] = "y"
         tmp = tmp.replace({"0": "n", "1": "y"}) # 0/1 for strings
     else:
         # try to convert to boolean and map to n/y
@@ -494,7 +494,7 @@ def to_noyes(x: _pd.Series):
 
 
     return to_categorical(tmp.map({"n": "no", "y": "yes"}),
-                          categories=['no', 'yes'])
+                          categories=["no", "yes"])
 
 
 
@@ -510,7 +510,7 @@ def to_sex(x: _pd.Series):
     # take the first letter (Mm/Ff)
     tmp = x.str.strip().str.lower().str[0]
     tmp = tmp.map({"m": "male", "f": "female"})
-    return to_categorical(tmp, categories=['male', 'female'])
+    return to_categorical(tmp, categories=["male", "female"])
 
 
 
@@ -551,7 +551,7 @@ def to_string(x: _pd.Series):
     >>> to_string(x)
     """
     nas = x.isna()
-    rval = x.astype('str')
+    rval = x.astype("str")
     rval[nas] = _pd.NA
     return rval
 
@@ -661,14 +661,14 @@ class Coercer:
         # apply the coercers, but first modify the pd printing options temporarily to
         # handle long reporting of changes
         old_nrows = _pd.get_option("display.max_rows")
-        _pd.set_option('display.max_rows', None)
+        _pd.set_option("display.max_rows", None)
         for var, fun in directives.items():
             if var not in df.columns:
                 raise ValueError("{} not in df.columns, aborting.".format(var))
             if verbose:
                 print("Processing {}.".format(var))
             df[var] = fun(df[var])
-        _pd.set_option('display.max_rows', old_nrows)
+        _pd.set_option("display.max_rows", old_nrows)
         # return results
         if keep_only_coerced:
             vars = list(directives.keys())

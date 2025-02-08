@@ -49,14 +49,15 @@ def table2df(df: _pd.DataFrame):
 
 def dump_unique_values(dfs, fpath = "data/uniq_"):
     """Save unique value of a (dict of) dataframe for inspection and monitor during time."""
-    
+
     if not (isinstance(dfs, _pd.DataFrame) or isinstance(dfs, dict)):
-        raise ValueError("x deve essere un pd.DataFrame o un dict di pd.DataFrame")
+        msg = "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
+        raise ValueError(msg)
 
     # normalize single dataframe
     if isinstance(dfs, _pd.DataFrame):
         dfs = {"df": dfs}
-    
+
     for df_lab, df in dfs.items():
         outfile = fpath + df_lab + ".txt"
         with open(outfile, "w") as f:
@@ -471,7 +472,7 @@ def to_categorical(x: _pd.Series,
             x = x.str.lower()
             if categories != None:
                 categories = [c.lower() for c in categories]
-    
+
     # categorical making
     return _pd.Categorical(x, categories=categories)
 

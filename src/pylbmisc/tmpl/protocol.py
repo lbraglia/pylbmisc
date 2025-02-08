@@ -1333,7 +1333,7 @@ group similar items (see
                 &
                   {\em SPIRIT guidance: Trial identifier and registry name.
                   If not yet registered, name of intended registry.
-                  
+
                   Item 2b is met if the register used for registration
                   collects all items from the World Health Organization
                   Trial Registration Data Set.}\\
@@ -1751,7 +1751,7 @@ subheadings:
 \subsection{Acknowledgements}
 
 {\em
-  
+
 \emph{Trials} guidance: Please acknowledge anyone who contributed
 towards the article who does not meet the criteria for authorship
 including anyone who provided professional writing services or

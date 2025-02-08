@@ -338,7 +338,7 @@ def export_data(
             for k, v in x.items():
                 pkl_path = path.parent / (str(path.stem) + f"_{k}.pkl")
                 v.to_pickle(pkl_path)
-        
+
     if "R" in used_formats:
         if isinstance(x, _pd.DataFrame):
             _rdf(x, path if path_has_suffix else path.with_suffix(".R"))
@@ -443,8 +443,7 @@ def export_tables(tabs_dict):
        "Analisi 1"  : analysis1_df,
        "Analisi 2"  : analysis2_df
     }
-    export_tables(exported)
-    
+    export_tables(exported)    
     """
     # excel
     export_data(tabs_dict, "outputs/tables.xlsx")

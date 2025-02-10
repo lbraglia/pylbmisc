@@ -45,6 +45,14 @@ pylbmisc.stats module
    :undoc-members:
    :show-inheritance:
 
+pylbmisc.surv module
+--------------------
+
+.. automodule:: pylbmisc.surv
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.tg module
 ------------------
 

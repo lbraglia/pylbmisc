@@ -220,15 +220,13 @@ def _rdf_object(x: _pd.Series, xn: str):
 def _rdf_bool(x: _pd.Series, xn: str):
     ft = {True: "TRUE", False: "FALSE"}
     data_str = (
-        x.map(ft)
-        .to_string(
+        x.map(ft).to_string(
             na_rep="NA",
             index=False,
             header=False,
-        )
-        .replace("\n", ", ")
+        ).replace("\n", ", ")
     )
-    rval = "{} = c({})".format(xn, data_str)
+    rval = f"{xn} = c({data_str})"
     return rval
 
 # Thigs yet TODO
@@ -248,14 +246,14 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
     r_code.append("{} <- data.frame(".format(dfname))
     for var in df.columns:
         x = df[var]
-        if _pd.api.types.is_integer_dtype(x):
+        if _pd.api.types.is_bool_dtype(x):
+            r_code.append(_rdf_bool(x, var))
+        elif _pd.api.types.is_integer_dtype(x):
             r_code.append(_rdf_integer(x, var))
         elif _pd.api.types.is_numeric_dtype(x):
             r_code.append(_rdf_numeric(x, var))
         elif _pd.api.types.is_categorical_dtype(x):
             r_code.append(_rdf_factor(x, var))
-        elif _pd.api.types.is_bool_dtype(x):
-            r_code.append(_rdf_bool(x, var))
         elif _pd.api.types.is_datetime64_any_dtype(x):
             r_code.append(_rdf_datetime(x, var))
         elif _pd.api.types.is_object_dtype(x):

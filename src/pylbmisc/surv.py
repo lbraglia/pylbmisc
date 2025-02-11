@@ -27,7 +27,7 @@ def km(time, status, group = None,
        xticks = None,
        ci_alpha = 0.3,
        quantiles = [0.5],
-       add_logrank = True):
+       plot_logrank = True):
     """Kaplan-Meier estimates and logrank test
 
 Parameters
@@ -48,7 +48,8 @@ Parameters
         plot_at_risk = bool(counts)
     if group is None: #----------------------single curve -----------------------------
         kmf = _KaplanMeierFitter()
-        fit = kmf.fit(time, status)
+        df = _pd.DataFrame({"time": time, "status": status}).dropna() # handle
+        fit = kmf.fit(df["time"], df["status"])
         estimates, quants = _estquant(fit, quantiles)
         if plot:
             ax = fit.plot_survival_function(loc = xticks, ci_alpha = ci_alpha)
@@ -81,10 +82,11 @@ Parameters
         fits = {}               # fits
         estimates = {}          # survival estimates
         quants = []             # quantiles
+        df = _pd.DataFrame({"time": time, "status": status, "group": group}).dropna() # handle
         for categ in categs:
             kmf = _KaplanMeierFitter(label = ylab)
-            mask = group == categ
-            fits[categ] = f = kmf.fit(time[mask], status[mask], label = categ)
+            mask = df["group"] == categ
+            fits[categ] = f = kmf.fit(df.loc[mask, "time"], df.loc[mask, "status"], label = categ)
             e, q = _estquant(f, quantiles)
             estimates[categ] = e
             q.insert(0, "Group", categ)
@@ -94,13 +96,7 @@ Parameters
                                            loc = xticks,
                                            ci_alpha = ci_alpha)
         quants = _pd.concat(quants)
-        if add_logrank:
-            lr = _multivariate_logrank_test(time, group, status)
-            lr_string = (f"logr: {lr.test_statistic:.3f}, "
-                         f"df: {lr.degrees_of_freedom}, "
-                         f"p: {_p_format(lr.p_value)}")
-        else:
-            logr = None
+        lr = _multivariate_logrank_test(df["time"], df["group"], df["status"])
         if plot:
             ax.set_ylabel(ylab)
             ax.set_xlabel(xlab)
@@ -109,7 +105,10 @@ Parameters
                                    rows_to_show = counts,
                                    ax = ax, fig = fig)
                 _plt.tight_layout()
-            if add_logrank:
+            if plot_logrank:
+                lr_string = (f"logr: {lr.test_statistic:.3f}, "
+                             f"df: {lr.degrees_of_freedom}, "
+                             f"p: {_p_format(lr.p_value)}")
                 ax.set_title(lr_string)
             fig.show()
         return {

@@ -5,6 +5,8 @@ from lifelines import KaplanMeierFitter as _KaplanMeierFitter
 from lifelines.plotting import add_at_risk_counts as _add_at_risk_counts
 from lifelines.statistics import multivariate_logrank_test as _multivariate_logrank_test
 from lifelines.utils import qth_survival_times as _qth_survival_times
+from warnings import warn as _warn
+
 
 def _estquant(fit, quantiles):
     "Return estimates and quantiles of survival function with confidence intervals"
@@ -83,7 +85,14 @@ Parameters
         estimates = {}          # survival estimates
         quants = []             # quantiles
         df = _pd.DataFrame({"time": time, "status": status, "group": group}).dropna() # handle
-        for categ in categs:
+        df["group"] = df.group.cat.remove_unused_categories()
+        new_categs = df.group.cat.categories.to_list()
+        if len(new_categs) < len(categs):
+            removed_categ = set(categs) - set(new_categs)
+            removed_categ_str = ", ".join(removed_categ)
+            msg = f"Some categories were removed due to missingness: {removed_categ_str}."
+            _warn(msg)
+        for categ in new_categs:
             kmf = _KaplanMeierFitter(label = ylab)
             mask = df["group"] == categ
             fits[categ] = f = kmf.fit(df.loc[mask, "time"], df.loc[mask, "status"], label = categ)

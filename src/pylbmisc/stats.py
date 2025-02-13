@@ -22,7 +22,7 @@ def _pformat_worker(p):
     elif p == 1:
         return "0.999"
     else:
-        return "%.3f" % p
+        return f"{p:.3f}" 
 
 
 def p_star(p):

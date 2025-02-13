@@ -109,6 +109,9 @@ Parameters
         if plot:
             ax.set_ylabel(ylab)
             ax.set_xlabel(xlab)
+            lgnd = ax.legend(loc = "upper right")
+            # lgnd.set_visible(False)
+
             if plot_at_risk:
                 _add_at_risk_counts(*list(fits.values()),
                                    rows_to_show = counts,

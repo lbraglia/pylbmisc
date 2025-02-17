@@ -1,8 +1,10 @@
 """Miscellaneous utilities"""
 
+import pandas as _pd
 import argparse as _argparse
 import re as _re
 import readline as _readline
+import itertools as _itertools
 
 from typing import Sequence as _Sequence
 from .iter import unique as _unique
@@ -241,3 +243,18 @@ def match_arg(arg, choices):
         raise ValueError(msg)
     else:
         return res[0]
+
+
+def expand_grid(dictionary):
+    # https://stackoverflow.com/questions/12130883
+    """Replacement for R's expand.grid
+
+    Examples
+    --------
+    stratas =  {"centres": ["ausl re", "ausl mo"],
+                "agecl": ["<18", "18-65", ">65"],
+                "foo": ["1"]}
+    lb.utils.expand_grid(stratas)
+    """
+    rows = [row for row in _itertools.product(*dictionary.values())]
+    return _pd.DataFrame(rows, columns=dictionary.keys())

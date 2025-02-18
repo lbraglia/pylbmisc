@@ -37,6 +37,14 @@ pylbmisc.iter module
    :undoc-members:
    :show-inheritance:
 
+pylbmisc.rand module
+--------------------
+
+.. automodule:: pylbmisc.rand
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.stats module
 ---------------------
 

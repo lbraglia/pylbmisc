@@ -152,32 +152,26 @@ def line_to_numbers(x: str) -> list[int]:
 def menu(
     choices: _Sequence[str],
     title: str | None = None,
-    multiple: bool = False,
-    repeated: bool = False,
+    allow_repetition: bool = False,
     strict: bool = True,
 ) -> _Sequence[str]:
     """
     CLI menu for user single/multiple choices
 
-    Returns either:
-    - a single choice
-    - a list of selected choiches
-    - None if nothing was choosed
-
-    TODO: add a default options
+    params:
+    choices: list of string
+    title: a string to pretty print a title
+    allow_repetition: accept multiple selected items
+    strict: ensure all the selection number are among the available ones (or
+    take the consistent otherwise)
     """
     available_ind = [i + 1 for i in range(len(choices))]
     avail_with_0 = [0] + available_ind
-    the_menu = "\n".join(
-        [str(i) + '. ' + str(c) for i, c in zip(available_ind, choices)]
-    )
-    if multiple:
-        select_msg = "Selection (values as '1, 2-3, 6') or 0 to exit: "
-    else:
-        select_msg = "Selection (0 to exit): "
+    the_menu = "\n".join([str(i) + '. ' + str(c) for i, c in zip(available_ind, choices)])
     if title:
         ascii_header(title)
     print(the_menu, '\n')
+    select_msg = "Selection (values as '1, 2-3, 6') or 0 to exit: "
     ind = line_to_numbers(input(select_msg))
     # normalize to list (for single selections, for now)
     if not isinstance(ind, list):
@@ -202,11 +196,10 @@ def menu(
             )
             ind = allowed
     # make unique if not allowed repetitions
-    if not repeated:
+    if not allow_repetition:
         ind = list(_unique(ind))
-    # obtain the selection
+    # obtain the selection: return always a list should simplify the code
     rval = [choices[i - 1] for i in ind if i != 0]
-    # return always a list should simplify the code
     return rval
 
 

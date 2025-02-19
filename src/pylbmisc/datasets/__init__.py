@@ -14,7 +14,7 @@ def list():
 
 
 def load(fname, **kwargs):
-    """Load a dataset from pylbmisc
+    """Load a dataset from pylbmisc.
 
     Parameters
     fname : string (eg "frei.csv")

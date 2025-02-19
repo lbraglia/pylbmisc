@@ -1,0 +1,133 @@
+
+R version 4.3.0 (2023-04-21) -- "Already Tomorrow"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R è un software libero ed è rilasciato SENZA ALCUNA GARANZIA.
+Siamo ben lieti se potrai redistribuirlo, ma sotto certe condizioni.
+Scrivi 'license()' o 'licence()' per maggiori dettagli.
+
+R è un progetto collaborativo con molti contributi esterni.
+Scrivi 'contributors()' per maggiori informazioni e 'citation()'
+per sapere come citare R o i pacchetti nelle pubblicazioni.
+
+Scrivi 'demo()' per una dimostrazione, 'help()' per la guida
+oppure 'help.start()' per la guida nel browser HTML.
+Scrivi 'q()' per uscire da R.
+
+[Caricato workspace precedentemente salvato]
+
+> library(lbdatasets)
+
+Caricamento pacchetto: ‘lbdatasets’
+
+Il seguente oggetto è mascherato da ‘package:survival’:
+
+    ovarian
+
+> 
+> lapply(ls("package:lbdatasets"), function(x){
+    dataset = sprintf("lbdatasets::%s", x)
+    file = sprintf("%s.csv", x)
+    write.csv(eval(parse(text = dataset)), file = file, row.names = FALSE)
+  })
+[[1]]
+NULL
+
+[[2]]
+NULL
+
+[[3]]
+NULL
+
+[[4]]
+NULL
+
+[[5]]
+NULL
+
+[[6]]
+NULL
+
+[[7]]
+NULL
+
+[[8]]
+NULL
+
+[[9]]
+NULL
+
+[[10]]
+NULL
+
+[[11]]
+NULL
+
+[[12]]
+NULL
+
+[[13]]
+NULL
+
+[[14]]
+NULL
+
+[[15]]
+NULL
+
+[[16]]
+NULL
+
+[[17]]
+NULL
+
+[[18]]
+NULL
+
+[[19]]
+NULL
+
+[[20]]
+NULL
+
+[[21]]
+NULL
+
+[[22]]
+NULL
+
+[[23]]
+NULL
+
+[[24]]
+NULL
+
+[[25]]
+NULL
+
+[[26]]
+NULL
+
+[[27]]
+NULL
+
+[[28]]
+NULL
+
+[[29]]
+NULL
+
+[[30]]
+NULL
+
+[[31]]
+NULL
+
+[[32]]
+NULL
+
+> 
+> proc.time()
+   utente   sistema trascorso 
+    1.055     0.085     1.131 

@@ -2,6 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from pylbmisc import dm, io, iter, rand, stats, surv, tg, tmpl, utils
+from pylbmisc import datasets, dm, io, iter, rand, stats, surv, tg, tmpl, utils
 
-__all__ = ["dm", "io", "iter", "rand", "stats", "surv", "tg", "tmpl", "utils"]
+__all__ = ["datasets", "dm", "io", "iter", "rand", "stats", "surv", "tg", "tmpl", "utils"]

@@ -9,7 +9,7 @@ _dataset_dir = _resources.files("pylbmisc") / "datasets"
 def list():
     """List available datasets."""
     files = sorted(_dataset_dir.rglob("*.csv"))
-    fnames = [str(f.relative_to(_dataset_dir)) for f in files]
+    fnames = [str(f.name) for f in files]
     return fnames
 
 

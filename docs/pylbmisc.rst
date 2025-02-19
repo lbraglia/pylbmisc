@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   pylbmisc.datasets
    pylbmisc.scripts
    pylbmisc.tmpl
 

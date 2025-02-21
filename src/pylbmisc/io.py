@@ -1,4 +1,6 @@
-"""Import/export handy utilities."""
+"""
+Data, figures/tables IO handy utilities.
+"""
 
 import os as _os
 import pandas as _pd

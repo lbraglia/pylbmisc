@@ -1,3 +1,8 @@
+"""
+Survival analysis function and utilities.
+"""
+
+
 import numpy as _np
 import pandas as _pd
 import matplotlib.pyplot as _plt

@@ -1,4 +1,8 @@
-"""Miscellaneous utilities"""
+"""Miscellaneous utilities
+
+This module has utilities for everyday work such UI/UX (argument parsing,
+interactive ascii menu) and some R utilities (match_arg, expand_grid)
+"""
 
 import pandas as _pd
 import argparse as _argparse

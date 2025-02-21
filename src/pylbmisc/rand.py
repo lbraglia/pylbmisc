@@ -1,4 +1,9 @@
-"""Class for blocked stratified randomization lists"""
+"""
+Class and utilities for randomization
+
+The main class is List which produces a blocked randomizzation list with
+optional stratification by several factors.
+"""
 
 # randomized list
 

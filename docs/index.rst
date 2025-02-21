@@ -1,1 +1,1 @@
-.. include:: modules.rst
+.. autofunction:: pylbmisc.surv.km

@@ -58,7 +58,7 @@ pylbmisc.surv module
 --------------------
 
 .. automodule:: pylbmisc.surv
-   :members: km
+   :members:
    :undoc-members:
    :show-inheritance:
 

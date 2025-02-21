@@ -1,13 +1,16 @@
 pylbmisc
 ======================
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
 
-
 API
 ==================
+.. automodule:: pylbmisc.surv
+   :members:
+
 .. automodule:: pylbmisc.dm
    :members:
 

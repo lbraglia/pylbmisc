@@ -95,6 +95,8 @@ def _is_string(x: _pd.Series):
     Check if a Series is a string (including data with np.nan) differently from
     pandas.api.types.is_string_dtype
 
+    Examples
+    --------
     >>> x = pd.Series(["a", np.nan])
     >>> pd.api.types.is_string_dtype(x)
     >>> _is_string(x)
@@ -151,6 +153,8 @@ def pii_find(x: _pd.DataFrame):
     """Find columns with probable piis (Personally Identifiable
     Informations) and return the colnames for further processing.
 
+    Examples
+    --------
     >>> df = pd.DataFrame({
     >>>     "id" : [1,2,3],
     >>>     "cognome": ["brazorv", "gigetti", "ginetti"],
@@ -264,6 +268,8 @@ def fix_varnames(x: str | list):
     """The good-old R preprocess_varnames, returns just the fixed strings. See
     sanitize_varnames for DataFrame or dict of DataFrames
 
+    Examples
+    --------
     >>> fix_varnames("  asd 98n2 3")
     >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
     >>> fix_varnames(["asd", "foo0", "asd"])
@@ -368,6 +374,8 @@ def _verboser(f):
 def to_bool(x: _pd.Series):
     """Coerce to boolean a pd.Series (numeric) using astype keeping NAs as NAs
 
+    Examples
+    --------
     >>> to_bool(pd.Series([1,0,1,0]))
     >>> to_bool(pd.Series([1,0.,1,0.]))
     >>> to_bool(pd.Series([1,0,1,0, np.nan]))
@@ -392,6 +400,8 @@ def _replace_comma(x: _pd.Series):
 def to_integer(x: _pd.Series):
     """Coerce a pd.Series to integer (if possible)
 
+    Examples
+    --------
     >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6., np.nan]))
     >>> to_integer(pd.Series(["2001", "2011", "1999", ""]))
     >>> to_integer(pd.Series(["1.1", "1,99999", "foobar"])) # fails because of 1.99
@@ -538,6 +548,8 @@ def to_recist(x: _pd.Series):
 def to_other_specify(x: _pd.Series):
     """Try to polish a bit a free-text variable and create a categorical one
 
+    Examples
+    --------
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_other_specify(x)
     """
@@ -552,6 +564,8 @@ def to_other_specify(x: _pd.Series):
 def to_string(x: _pd.Series):
     """Coerce the pd.Series passed to a string Series
 
+    Examples
+    --------
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_string(x)
     """
@@ -570,10 +584,15 @@ class Coercer:
     and return it.  If verbose print a report of the introduced
     missing values with the coercion for check
 
-    >>> from pylbmisc.dm import *
+    Examples
+    --------
+    >>> import pylbmisc as lb
     >>> import pandas as pd
     >>> import numpy as np
     >>>
+    >>> # ------------------------------------------------
+    >>> # Function as key
+    >>> # ------------------------------------------------
     >>> raw = pd.DataFrame({
     >>>     "idx" :  [1., 2., 3., 4., 5., 6., "2,0", "", np.nan],
     >>>     "sex" :  ["m", "maschio", "f", "female", "m", "M", "", "a", np.nan],
@@ -587,7 +606,7 @@ class Coercer:
     >>>     "other" : ["b"]*3 + ["a"]*2 + ["c"] + [np.nan, "", "a"]
     >>> })
     >>> 
-    >>> directives_new = {
+    >>> directives = {
     >>>     lb.dm.to_integer: ["idx", "year"],
     >>>     lb.dm.to_sex : ["sex"],
     >>>     lb.dm.to_datetime : ["now"],
@@ -599,16 +618,16 @@ class Coercer:
     >>>     lb.dm.to_other_specify: ["other"]
     >>> }
     >>> 
-    >>> cleaned1 = lb.dm.Coercer(raw, fv = directives_new).coerce()
+    >>> cleaned1 = lb.dm.Coercer(raw, fv = directives).coerce()
     >>> 
     >>> raw
     >>> cleaned1
     >>> 
     >>> # ------------------------------------------------
-    >>> # OLD API
+    >>> # String as key
     >>> # ------------------------------------------------
     >>>
-    >>> directives_new2 = {
+    >>> directives2 = {
     >>>     "lb.dm.to_categorical": ["state"],
     >>>     "lb.dm.to_date": ["date"],
     >>>     "lb.dm.to_datetime" : ["now"],
@@ -621,9 +640,8 @@ class Coercer:
     >>> }
     >>>
     >>>
-    >>> coercer2 = lb.dm.Coercer(raw, fv = directives_new2)
+    >>> coercer2 = lb.dm.Coercer(raw, fv = directives2)
     >>> cleaned2 = coercer2.coerce()
-    >>>
     """
 
     def __init__(

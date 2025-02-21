@@ -37,20 +37,37 @@ def km(time, status, group = None,
        ci_alpha = 0.3,
        quantiles = [0.5],
        plot_logrank = True):
-    """Kaplan-Meier estimates and logrank test
+    """Kaplan-Meier estimates and logrank test.
 
-Parameters
-----------    
+    Does the Kaplan
+
+    Parameters
+    ----------
     time: time
+        the time
     status: dichotomic
+        the event indicator
     group: categorical variable
+        a grouping variable used to create different survival groups/function
     ylab: ylab
+        as in R
     xlab: xlab
-    counts: a list containing ["At risk", "Events", "Censored"]
-    xticks: slice used for plotting (loc) eg slice(5) plots up to time = 5
-    ci_alpha: confidence interval alpha shading (set to 0 for no CI)
-    quantiles: list[float] a list of quantiles by default [0.5], eg the median
-    add_logrank: bool = True
+        as in R
+    counts: list
+         containing ["At risk", "Events", "Censored"]
+    xticks: a slice
+         slice used for plotting (loc) eg slice(5) plots up to time = 5
+    ci_alpha: percentage
+         shading (alpha) for confidence interval  (set to 0 for no CI)
+    quantiles: list[float]
+         a list of quantiles of survival function to be returned (by default median)
+    plot_logrank: bool
+         add logrank to the plot
+
+    Returns
+    -------
+    dict
+        dict with some results
     """
     if plot:
         fig, ax = _plt.subplots()

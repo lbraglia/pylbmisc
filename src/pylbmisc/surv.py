@@ -1,4 +1,6 @@
 """
+surv
+========================================
 Survival analysis function and utilities.
 """
 
@@ -40,6 +42,7 @@ def km(time, status, group = None,
        plot_logrank = True):
     """Kaplan-Meier estimates and logrank test.
 
+    :meta public:
    
     Does the Kaplan-Meier
        
@@ -71,7 +74,6 @@ def km(time, status, group = None,
     dict
         dict with some results
 
-    :meta public:
     """
     if plot:
         fig, ax = _plt.subplots()

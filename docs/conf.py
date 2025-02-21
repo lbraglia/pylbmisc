@@ -7,7 +7,7 @@ from datetime import date
 
 project = 'pylbmisc'
 author = 'Luca Braglia'
-copyright = f'2023-{date.today.year}, {author}'
+copyright = f'2023-{date.today().year}, {author}'
 version = lb.__version__ # short version
 release = version        # long version
 # -- General configuration ---------------------------------------------------

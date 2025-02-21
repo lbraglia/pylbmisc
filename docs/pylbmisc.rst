@@ -62,6 +62,9 @@ pylbmisc.surv module
    :undoc-members:
    :show-inheritance:
 
+
+.. autofunction:: pylbmisc.surv.km
+
 pylbmisc.tg module
 ------------------
 

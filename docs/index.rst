@@ -1,1 +1,1 @@
-.. include:: module
+pylbmisc.rst

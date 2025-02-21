@@ -20,14 +20,6 @@ pylbmisc.scripts.flashcards\_exercises module
    :undoc-members:
    :show-inheritance:
 
-pylbmisc.scripts.winston\_sends module
---------------------------------------
-
-.. automodule:: pylbmisc.scripts.winston_sends
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

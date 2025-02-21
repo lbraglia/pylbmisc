@@ -153,6 +153,11 @@ def pii_find(x: _pd.DataFrame):
     """Find columns with probable piis (Personally Identifiable
     Informations) and return the colnames for further processing.
 
+    Parameters
+    ----------
+    x: DataFrame
+        The DataFrame to check
+
     Examples
     --------
     >>> df = pd.DataFrame({
@@ -268,6 +273,11 @@ def fix_varnames(x: str | list):
     """The good-old R preprocess_varnames, returns just the fixed strings. See
     sanitize_varnames for DataFrame or dict of DataFrames
 
+    Parameters
+    ----------
+    x: str or list of strings
+        string or list of strig to be fixed
+
     Examples
     --------
     >>> fix_varnames("  asd 98n2 3")
@@ -374,6 +384,11 @@ def _verboser(f):
 def to_bool(x: _pd.Series):
     """Coerce to boolean a pd.Series (numeric) using astype keeping NAs as NAs
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
     Examples
     --------
     >>> to_bool(pd.Series([1,0,1,0]))
@@ -400,6 +415,11 @@ def _replace_comma(x: _pd.Series):
 def to_integer(x: _pd.Series):
     """Coerce a pd.Series to integer (if possible)
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
     Examples
     --------
     >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6., np.nan]))
@@ -416,6 +436,13 @@ def to_integer(x: _pd.Series):
 def to_numeric(x: _pd.Series):
     """Coerce a pd.Series using pd.to_numeric
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
+    Examples
+    --------
     >>> to_numeric(pd.Series([1, 2, 3]))
     >>> to_numeric(pd.Series([1., 2., 3., 4., 5., 6.]))
     >>> to_numeric(pd.Series(["2001", "2011", "1999"]))
@@ -428,6 +455,13 @@ def to_numeric(x: _pd.Series):
 def to_datetime(x: _pd.Series):
     """Coerce to a datetime a pd.Series
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
+    Examples
+    --------
     >>> import datetime as dt
     >>> to_datetime(pd.Series([str(dt.datetime.now())] * 6))
     """
@@ -437,6 +471,13 @@ def to_datetime(x: _pd.Series):
 def to_date(x: _pd.Series):
     """Coerce to a date a pd.Series
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
+    Examples
+    --------
     >>> import datetime as dt
     >>> to_date(pd.Series([str(dt.datetime.now())] * 6))
     >>> to_date(pd.Series(["2020-01-02", "2021-01-01", "2022-01-02"] * 2))
@@ -455,9 +496,16 @@ def _extract_dates_worker(x):
         return _pd.NA
 
 
-def extract_dates(x):
+def extract_dates(x: _pd.Series):
     """Try to extract dates from shitty strings and convert them to proper
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be used
+
+    Examples
+    --------
     >>> extract_dates(pd.Series(["2020-01-02", "01/01/1956", "asdasd 12-01-02"] * 2))
     """
     return x.apply(_extract_dates_worker)
@@ -468,6 +516,13 @@ def to_categorical(x: _pd.Series,
                    lowcase: bool = False):
     """Coerce to categorical a pd.Series, with blank values as missing
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
+    Examples
+    --------
     >>> to_categorical(pd.Series([1, 2, 1, 2, 3]))
     >>> to_categorical(pd.Series([1, 2., 1., 2, 3, np.nan]))
     >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", "", np.nan]))
@@ -492,6 +547,13 @@ def to_categorical(x: _pd.Series,
 def to_noyes(x: _pd.Series):
     """Coerce to no/yes a string pd.Series
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
+    Examples
+    --------
     >>> to_noyes(pd.Series(["","yes","no","boh", "si", np.nan]))
     >>> to_noyes(pd.Series([1,0,0, np.nan]))
     >>> to_noyes(pd.Series([1.,0.,0., np.nan]))
@@ -515,6 +577,13 @@ def to_noyes(x: _pd.Series):
 def to_sex(x: _pd.Series):
     """Coerce to male/female a pd.Series of strings (Mm/Ff)
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
+    Examples
+    --------
     >>> to_sex(pd.Series(["","m","f"," m", "Fm", np.nan]))
     """
     if not _is_string(x):
@@ -531,6 +600,13 @@ def to_sex(x: _pd.Series):
 def to_recist(x: _pd.Series):
     """Coerce to recist categories a pd.Series of strings
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
+    Examples
+    --------
     >>> to_recist(pd.Series(["RC", "PD", "SD", "PR", "RP", "boh", np.nan]))
     """
     if not _is_string(x):
@@ -548,6 +624,11 @@ def to_recist(x: _pd.Series):
 def to_other_specify(x: _pd.Series):
     """Try to polish a bit a free-text variable and create a categorical one
 
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
+
     Examples
     --------
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
@@ -563,6 +644,11 @@ def to_other_specify(x: _pd.Series):
 
 def to_string(x: _pd.Series):
     """Coerce the pd.Series passed to a string Series
+
+    Parameters
+    ----------
+    x: Series
+        The Series to be coerced
 
     Examples
     --------
@@ -583,6 +669,14 @@ class Coercer:
     as value) it applies all the function on a copy of the DataFrame
     and return it.  If verbose print a report of the introduced
     missing values with the coercion for check
+
+    Parameters
+    ----------
+    df: DataFrame
+        The DataFrame to be coerced
+    fv: dict
+        function-variable dict: key can be a function or a string containing name of the function, variables is a list of strings with name of variables to apply the function to
+
 
     Examples
     --------

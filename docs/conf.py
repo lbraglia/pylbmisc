@@ -1,19 +1,21 @@
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
+import pylbmisc as lb
+from datetime import date
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'pylbmisc'
-copyright = '2025, Luca Braglia'
 author = 'Luca Braglia'
-
+copyright = f'2023-{date.today.year}, {author}'
+version = lb.__version__ # short version
+release = version        # long version
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon"]
-
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -37,3 +39,15 @@ html_static_path = ['_static']
 # napoleon_preprocess_types = False
 # napoleon_type_aliases = None
 # napoleon_attr_annotations = True
+
+
+# autodoc configuration:
+# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
+autoclass_content = "both"  # include both class docstring and __init__
+autodoc_default_flags = [
+    # Make sure that any autodoc declarations show the right members
+    "members",
+    "inherited-members",
+    "show-inheritance",
+]
+autosummary_generate = True

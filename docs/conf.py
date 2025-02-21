@@ -25,10 +25,6 @@ autosummary_generate = True  # Turn on sphinx.ext.autosummary
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'alabaster'
-html_static_path = ['_static']
-
-
-autodoc_member_order = 'alphabetical'
 
 # Napoleon settings (below the defaults)
 # napoleon_google_docstring = True

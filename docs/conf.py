@@ -1,11 +1,11 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 from datetime import date
-import sys
-import os
+# import sys
+# import os
 
-sys.path.insert(0, os.path.abspath("."))
+# sys.path.insert(0, os.path.abspath("."))
 
-import pylbmisc as lb
+# import pylbmisc as lb
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -13,8 +13,8 @@ import pylbmisc as lb
 project = 'pylbmisc'
 author = 'Luca Braglia'
 copyright = f'2023-{date.today().year}, {author}'
-version = lb.__version__ # short version
-release = version        # long version
+# version = lb.__version__ # short version
+# release = version        # long version
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 

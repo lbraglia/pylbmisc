@@ -1,10 +1,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 from datetime import date
 import sys
-import os
-sys.path.insert(0, os.path.abspath("../src/pylbmisc"))
+from pathlib import Path
 
-# import pylbmisc as lb
+sys.path.insert(0, str(Path('..', 'src').resolve()))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information

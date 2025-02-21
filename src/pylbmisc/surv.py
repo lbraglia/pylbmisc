@@ -2,7 +2,6 @@
 Survival analysis function and utilities.
 """
 
-
 import numpy as _np
 import pandas as _pd
 import matplotlib.pyplot as _plt
@@ -15,9 +14,6 @@ from pylbmisc.dm import to_date as _to_date
 from pylbmisc.dm import to_integer as _to_integer
 from pylbmisc.stats import p_format as _p_format
 from warnings import warn as _warn
-
-
-
 
 
 def _estquant(fit, quantiles):
@@ -44,8 +40,9 @@ def km(time, status, group = None,
        plot_logrank = True):
     """Kaplan-Meier estimates and logrank test.
 
-    Does the Kaplan
-
+   
+    Does the Kaplan-Meier
+       
     Parameters
     ----------
     time: time
@@ -73,6 +70,8 @@ def km(time, status, group = None,
     -------
     dict
         dict with some results
+
+    :meta public:
     """
     if plot:
         fig, ax = _plt.subplots()

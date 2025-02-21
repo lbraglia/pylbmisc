@@ -1,8 +1,3 @@
-.. pylbmisc documentation master file, created by
-   sphinx-quickstart on Thu Feb 20 11:53:12 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 pylbmisc
 ======================
 .. toctree::
@@ -10,8 +5,17 @@ pylbmisc
    :caption: Contents:
 
 
-Indices and tables
+
+API
 ==================
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: pylbmisc.dm
+   :members:
+
+.. automodule:: pylbmisc.io
+   :members:
+
+.. automodule:: pylbmisc.iter
+   :members:
+
+.. automodule:: pylbmisc.rand
+   :members:

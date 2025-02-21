@@ -19,41 +19,30 @@ _readline.parse_and_bind('set editing-mode emacs')
 def argparser(opts):
     '''Helper function for argument parsing.
 
-    Example usage:
-    --------------
-    import pylbmisc as lb # third party
-    # from ..utils import argparser # in scripts directory
+Example usage:
+--------------
+import pylbmisc as lb # third party
+# from ..utils import argparser # in scripts directory
 
-    opts = (
-        # (param, help, default, type)
-        # --dirs
-        (
-            'dirs',
-            'str: comma separated list of exercise source directories',
-            '~/src/pypkg/exercises/db',
-            str,
-        ),
-        # --lists
-        (
-            'lists',
-            'str: comma separated list of file with lists of source dir',
-            None,
-            str,
-        ),
-        # --outfile
-        ('outfile', 'str:  sqlite3 db to save', '~/.exercises.db', str),
-    )
+opts = (
+    # (param, help, default, type)
+    # --dirs
+    ('dirs', 'str: comma separated list of exercise source directories','~/src/pypkg/exercises/db', str),
+    # --lists
+    ('lists', 'str: comma separated list of file with lists of source dir', None, str),
+    # --outfile
+    ('outfile', 'str:  sqlite3 db to save', '~/.exercises.db', str))
 
-    args = lb.utils.argparser(opts)
-    dirs = args['dirs']
-    dirs = dirs.split(',')
-    lists = args['lists']
-    lists = lists.split(',')
-    outfile = args['outfile']
-    print({"dirs": dirs, "lists": lists, "outfile": outfile})
-    return 0
+args = lb.utils.argparser(opts)
+dirs = args['dirs']
+dirs = dirs.split(',')
+lists = args['lists']
+lists = lists.split(',')
+outfile = args['outfile']
+print({"dirs": dirs, "lists": lists, "outfile": outfile})
+return 0
 
-    '''
+'''
     parser = _argparse.ArgumentParser()
     # defaults = {}
     for i in opts:
@@ -246,12 +235,11 @@ def expand_grid(dictionary):
     # https://stackoverflow.com/questions/12130883
     """Replacement for R's expand.grid
 
-    Examples
-    --------
-    stratas =  {"centres": ["ausl re", "ausl mo"],
-                "agecl": ["<18", "18-65", ">65"],
-                "foo": ["1"]}
-    lb.utils.expand_grid(stratas)
+Examples
+--------
+stratas =  {"centres": ["ausl re", "ausl mo"],"agecl": ["<18", "18-65", ">65"],"foo": ["1"]}
+lb.utils.expand_grid(stratas)
+
     """
     rows = [row for row in _itertools.product(*dictionary.values())]
     return _pd.DataFrame(rows, columns=dictionary.keys())

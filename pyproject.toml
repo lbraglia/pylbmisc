@@ -35,7 +35,6 @@ compile_book = "pylbmisc.scripts.compile_latex:book"
 flashcards = "pylbmisc.scripts.flashcards_exercises:flashcards"
 exercises_db = "pylbmisc.scripts.flashcards_exercises:exercises_db"
 exercises_ws = "pylbmisc.scripts.flashcards_exercises:exercises_ws"
-winston_sends = "pylbmisc.scripts.winston_sends:winston_sends"
 
 
 [tool.hatch.version]

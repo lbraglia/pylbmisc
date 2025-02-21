@@ -434,14 +434,11 @@ def latex_table(
 def export_tables(tabs_dict):
     """Latex print and excel Export a dict of tables (caption as key)
 
-    Example usage:
-    --------------
-    exported = {
-       "Descrittive": desc_df,
-       "Analisi 1"  : analysis1_df,
-       "Analisi 2"  : analysis2_df
-    }
-    export_tables(exported)    
+    Example
+    -------
+    exported = {"Descrittive": desc_df, "Analisi 1"  : analysis1_df, "Analisi 2"  : analysis2_df}
+    export_tables(exported)
+
     """
     # excel
     export_data(tabs_dict, "outputs/tables.xlsx")

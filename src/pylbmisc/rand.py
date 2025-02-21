@@ -5,8 +5,6 @@ The main class is List which produces a blocked randomizzation list with
 optional stratification by several factors.
 """
 
-# randomized list
-
 from pylbmisc.utils import expand_grid as _expand_grid
 import numpy as _np
 import pandas as _pd
@@ -24,9 +22,7 @@ class List():
     # i centri debbono essere il PRIMO criterio di stratificazione altrimenti
     # l'aggiunta di centri in corso dello studio può incasinare la
     # randomizzazione (delle liste gia fatte)
-    strata = {"centres": ["ausl_re", "ausl_mo"],
-              "agecl": ["<18", "18-65", ">65"]}
-
+    strata = {"centres": ["ausl_re", "ausl_mo"], "agecl": ["<18", "18-65", ">65"]}
     a = lb.rand.List(seed=354, n = 100, strata=strata)
     a.stats()
     a.to_txt() # <- in "/tmp"

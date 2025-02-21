@@ -9,21 +9,21 @@ pylbmisc.scripts.compile\_latex module
 
 .. automodule:: pylbmisc.scripts.compile_latex
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 pylbmisc.scripts.flashcards\_exercises module
 ---------------------------------------------
 
 .. automodule:: pylbmisc.scripts.flashcards_exercises
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: pylbmisc.scripts
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

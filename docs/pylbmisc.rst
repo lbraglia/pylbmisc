@@ -19,69 +19,69 @@ pylbmisc.dm module
 
 .. automodule:: pylbmisc.dm
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pylbmisc.io module
 ------------------
 
 .. automodule:: pylbmisc.io
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pylbmisc.iter module
 --------------------
 
 .. automodule:: pylbmisc.iter
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pylbmisc.rand module
 --------------------
 
 .. automodule:: pylbmisc.rand
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pylbmisc.stats module
 ---------------------
 
 .. automodule:: pylbmisc.stats
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pylbmisc.surv module
 --------------------
 
 .. automodule:: pylbmisc.surv
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pylbmisc.tg module
 ------------------
 
 .. automodule:: pylbmisc.tg
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pylbmisc.utils module
 ---------------------
 
 .. automodule:: pylbmisc.utils
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: pylbmisc
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

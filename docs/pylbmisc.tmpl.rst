@@ -9,13 +9,13 @@ pylbmisc.tmpl.protocol module
 
 .. automodule:: pylbmisc.tmpl.protocol
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: pylbmisc.tmpl
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

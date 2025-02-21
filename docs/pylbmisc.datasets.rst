@@ -6,5 +6,5 @@ Module contents
 
 .. automodule:: pylbmisc.datasets
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

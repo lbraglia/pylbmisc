@@ -43,15 +43,3 @@ html_static_path = ['_static']
 # napoleon_preprocess_types = False
 # napoleon_type_aliases = None
 # napoleon_attr_annotations = True
-
-
-# autodoc configuration:
-# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
-autoclass_content = "both"  # include both class docstring and __init__
-autodoc_default_flags = [
-    # Make sure that any autodoc declarations show the right members
-    "members",
-    # "inherited-members",
-    # "show-inheritance",
-]
-autosummary_generate = True

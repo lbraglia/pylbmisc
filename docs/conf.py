@@ -1,6 +1,10 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
-import pylbmisc as lb
 from datetime import date
+import sys
+
+sys.path.insert(0, os.path.abspath("."))
+
+import pylbmisc as lb
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information

@@ -25,30 +25,46 @@ _fc_re = _re.compile(
 _tel_re = _re.compile(r"(.+)?0[0-9]{1,3}[\. /\-]?[0-9]{6,7}")
 _mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
 
+
 # -------------------------------------------------------------------------
 # Utilities
 # -------------------------------------------------------------------------
+def view(df: _pd.DataFrame = None) -> None:
+    """View a pd.DataFrame using LibreOffice.
 
-def view(df: _pd.DataFrame):
-    """View a pd.DataFrame using LibreOffice."""
+    Parameters
+    ----------
+    df: dataframe
+        the dataframe to be visualized
+    """
+    if not isinstance(df, _pd.DataFrame):
+        msg = "Only dataframes are visualized."
+        raise Exception(msg)
     tempfile = _tempfile.mkstemp(suffix=".xlsx")
     fname = tempfile[1]
     df.to_excel(fname)
     _subprocess.Popen(["libreoffice", fname])
+    return None
 
 
-def table2df(df: _pd.DataFrame):
+def table2df(df: _pd.DataFrame = None) -> _pd.DataFrame:
     """Transform a pd.DataFrame representing a two-way table (es
     crosstable, correlation matrix, p.val matrix) in a
     pd.DataFrame with long format.
     """
+    if not isinstance(df, _pd.DataFrame):
+        msg = "Only dataframes are processed."
+        raise Exception(msg)
     x = df.copy()
     x = x.stack().reset_index()
     return x.rename(columns={0: "x"})
 
 
-def dump_unique_values(dfs, fpath = "data/uniq_"):
-    """Save unique value of a (dict of) dataframe for inspection and monitor during time."""
+def dump_unique_values(dfs, fpath="data/uniq_"):
+    """Save unique value of a (dict of) dataframe for inspection and monitor
+    during time.
+
+    """
 
     if not (isinstance(dfs, _pd.DataFrame) or isinstance(dfs, dict)):
         msg = "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
@@ -63,11 +79,17 @@ def dump_unique_values(dfs, fpath = "data/uniq_"):
         with open(outfile, "w") as f:
             for col in df:
                 # Header
-                print(f"DataFrame: '{df_lab}', Column: '{col}', Dtype: {df[col].dtype}, Unique values:", file = f)
-                # Dati: non sortati perché ci sono problemi se i dati sono metà numerici e meta stringa
-                # _pprint(df[col].sort_values().unique().tolist(), stream = f, compact = True)
-                _pprint(df[col].unique().tolist(), stream = f, compact = True)
-                print(file = f)
+                print(f"DataFrame: '{df_lab}' "
+                      f"Column: '{col}', "
+                      f"Dtype: {df[col].dtype}, "
+                      f"Unique values:",
+                      file=f)
+                # Dati: non sortati perché ci sono problemi se i dati sono metà
+                # numerici e meta stringa
+                # _pprint(df[col].sort_values().unique().tolist(), stream = f,
+                # compact=True)
+                _pprint(df[col].unique().tolist(), stream=f, compact=True)
+                print(file=f)
 
 
 # -------------------------------------------------------------------------
@@ -85,9 +107,7 @@ def _columns_match(df_columns, searched):
     return perfect_match
 
 
-
 is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
-
 
 
 def _is_string(x: _pd.Series):
@@ -102,7 +122,6 @@ def _is_string(x: _pd.Series):
     >>> _is_string(x)
     """
     return x.dtype == "O"
-
 
 
 def _has_emails(x):
@@ -269,9 +288,9 @@ def _add_x_if_first_is_digit(s):
         return s
 
 
-def fix_varnames(x: str | list):
+def fix_varnames(x: str | list[str]):
     """The good-old R preprocess_varnames, returns just the fixed strings. See
-    sanitize_varnames for DataFrame or dict of DataFrames
+    sanitize_varnames for DataFrame or dict of DataFrames.
 
     Parameters
     ----------
@@ -330,9 +349,20 @@ def fix_varnames(x: str | list):
     return uniq if not isinstance(x, str) else uniq[0]
 
 
-def sanitize_varnames(x, return_tfd = True):
-    """Fix a DataFrame or a dict of DataFrames names using fix_varnames to obtain
-    the cleaned ones."""
+def sanitize_varnames(x: _pd.DataFrame | dict[str, _pd.DataFrame],
+                      return_tfd: bool = True):
+    """Fix a DataFrame or a dict of DataFrames names using fix_varnames to
+    obtain the cleaned ones.
+
+    Parameters
+    ----------
+    x: dataframe or dict of dataframes
+       the data to be fixed
+    return_tfd: bool
+       wheter to return or not (default return) the original and processed
+    strings as dict
+
+    """
     if isinstance(x, _pd.DataFrame):
         from_name = list(x.columns.values)
         to_name = fix_varnames(from_name)
@@ -351,7 +381,7 @@ def sanitize_varnames(x, return_tfd = True):
             to_name = fix_varnames(from_name)
             df = v.copy()
             df.columns = to_name
-            tf = {t : f for t, f in zip(to_name, from_name)}
+            tf = {t: f for t, f in zip(to_name, from_name)}
             dfs[k] = df
             tfs[k] = tf
         if return_tfd:
@@ -364,8 +394,6 @@ def sanitize_varnames(x, return_tfd = True):
 # -------------------------------------------------------------------------
 # Coercion stuff below
 # -------------------------------------------------------------------------
-
-
 # decorators
 def _verboser(f):
     def transformer(x: _pd.Series):

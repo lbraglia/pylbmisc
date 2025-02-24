@@ -119,7 +119,7 @@ def _columns_match(df_columns, searched):
 is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
 
 
-def _is_string(x: _pd.Series):
+def _is_string(x: _pd.Series) -> bool:
     """
     Check if a Series is a string (including data with np.nan) differently from
     pandas.api.types.is_string_dtype
@@ -133,7 +133,7 @@ def _is_string(x: _pd.Series):
     return x.dtype == "O"
 
 
-def _has_emails(x):
+def _has_emails(x: _pd.Series) -> bool:
     if _is_string(x):
         check = is_email(x)
         return _np.any(check)
@@ -145,7 +145,7 @@ def _has_emails(x):
 is_fiscal_code = _np.vectorize(lambda x: bool(_fc_re.match(x)))
 
 
-def _has_fiscal_codes(x):
+def _has_fiscal_codes(x: _pd.Series) -> bool:
     if _is_string(x):
         check = is_fiscal_code(x)
         return _np.any(check)
@@ -157,7 +157,7 @@ def _has_fiscal_codes(x):
 is_telephone_number = _np.vectorize(lambda x: bool(_tel_re.match(x)))
 
 
-def _has_telephone_numbers(x):
+def _has_telephone_numbers(x: _pd.Series) -> bool:
     if _is_string(x):
         check = is_telephone_number(x)
         return _np.any(check)
@@ -169,7 +169,7 @@ def _has_telephone_numbers(x):
 is_mobile_number = _np.vectorize(lambda x: bool(_mobile_re.match(x)))
 
 
-def _has_mobile_numbers(x):
+def _has_mobile_numbers(x: _pd.Series) -> bool:
     if _is_string(x):
         check = is_mobile_number(x)
         return _np.any(check)
@@ -177,7 +177,7 @@ def _has_mobile_numbers(x):
         return False
 
 
-def pii_find(x: _pd.DataFrame):
+def pii_find(x: _pd.DataFrame) -> list[str]:
     """Find columns with probable piis (Personally Identifiable
     Informations) and return the colnames for further processing.
 
@@ -186,6 +186,10 @@ def pii_find(x: _pd.DataFrame):
     x: DataFrame
         The DataFrame to check
 
+    Returns
+    -------
+    list of
+    
     Examples
     --------
     >>> df = pd.DataFrame({

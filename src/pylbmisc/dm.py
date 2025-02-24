@@ -10,6 +10,7 @@ import subprocess as _subprocess
 import tempfile as _tempfile
 
 from pprint import pprint as _pprint
+from pathlib import Path as _Path
 
 # -------------------------------------------------------------------------
 # regular expressions used
@@ -36,6 +37,10 @@ def view(df: _pd.DataFrame = None) -> None:
     ----------
     df: dataframe
         the dataframe to be visualized
+
+    Examples
+    --------
+    lb.dm.view(df)
     """
     if not isinstance(df, _pd.DataFrame):
         msg = "Only dataframes are visualized."
@@ -51,6 +56,11 @@ def table2df(df: _pd.DataFrame = None) -> _pd.DataFrame:
     """Transform a pd.DataFrame representing a two-way table (es
     crosstable, correlation matrix, p.val matrix) in a
     pd.DataFrame with long format.
+
+    Parameters
+    ----------
+    df: DataFrame
+       the crosstabulation to be put in long form
     """
     if not isinstance(df, _pd.DataFrame):
         msg = "Only dataframes are processed."
@@ -60,13 +70,12 @@ def table2df(df: _pd.DataFrame = None) -> _pd.DataFrame:
     return x.rename(columns={0: "x"})
 
 
-def dump_unique_values(dfs, fpath="data/uniq_"):
+def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
+                       fpath: str | _Path = "data/uniq_"):
     """Save unique value of a (dict of) dataframe for inspection and monitor
     during time.
-
     """
-
-    if not (isinstance(dfs, _pd.DataFrame) or isinstance(dfs, dict)):
+    if not isinstance(dfs, (_pd.DataFrame, dict)):
         msg = "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
         raise ValueError(msg)
 
@@ -75,8 +84,8 @@ def dump_unique_values(dfs, fpath="data/uniq_"):
         dfs = {"df": dfs}
 
     for df_lab, df in dfs.items():
-        outfile = fpath + df_lab + ".txt"
-        with open(outfile, "w") as f:
+        outfile = _Path(str(fpath) + df_lab + ".txt")
+        with outfile.open("w") as f:
             for col in df:
                 # Header
                 print(f"DataFrame: '{df_lab}' "

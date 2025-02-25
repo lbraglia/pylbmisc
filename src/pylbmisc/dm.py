@@ -706,8 +706,6 @@ def to_string(x: _pd.Series):
 class Coercer:
     """Coercer of a pandas DataFrame.
 
-    Asdomar
-
     Given directives as a dict (variable name as key, function/coercer
     as value) it applies all the function on a copy of the DataFrame
     and return it.  If verbose print a report of the introduced

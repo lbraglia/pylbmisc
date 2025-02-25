@@ -22,6 +22,14 @@ pylbmisc.dm module
    :undoc-members:
    :show-inheritance:
 
+pylbmisc.fig module
+-------------------
+
+.. automodule:: pylbmisc.fig
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pylbmisc.io module
 ------------------
 

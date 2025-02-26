@@ -1,17 +1,20 @@
 """Miscellaneous utilities
 
 This module has utilities for everyday work such UI/UX (argument parsing,
-interactive ascii menu) and some R utilities (match_arg, expand_grid)
+interactive ascii menu) and some R utilities (match_arg, expand_grid, dput)
 """
 
-import pandas as _pd
 import argparse as _argparse
+import itertools as _itertools
+import numpy as _np
+import pandas as _pd
 import re as _re
 import readline as _readline
-import itertools as _itertools
+import types as _types
 
-from typing import Sequence as _Sequence
 from .iter import unique as _unique
+from inspect import getsource as _getsource
+from typing import Sequence as _Sequence
 
 _readline.parse_and_bind('set editing-mode emacs')
 
@@ -243,3 +246,77 @@ lb.utils.expand_grid(stratas)
     """
     rows = [row for row in _itertools.product(*dictionary.values())]
     return _pd.DataFrame(rows, columns=dictionary.keys())
+
+
+def dput(x) -> None:
+    """Try to print the ASCII representation of a certain object
+
+    Parameters
+    ----------
+    x : anything
+        data to be printed
+
+    Examples
+    --------
+    import pylbmisc as lb
+    from pylbmisc.utils import dput
+
+    List = [1, 2, 3]
+    dput(List)
+
+    Dict = {"a": 1, "b": 2}
+    dput(Dict)
+
+    nparray = _np.array([1, 2, 3])
+    dput(nparray)
+
+    series = _pd.Series([1, 2, 3])
+    dput(series)
+
+    df = lb.datasets.load("aidssi.csv")
+    dput(df)
+
+    def function() -> None:
+        pass
+    dput(function)
+
+    """
+    if isinstance(x, _types.FunctionType):  # special cases: don't use repr
+        print(_getsource(x))
+    elif isinstance(x, _pd.DataFrame):
+        print(x.to_dict())
+    elif isinstance(x, _pd.Series):
+        list_rep = repr(x.to_list())
+        print(f"pd.Series({list_rep})")
+    elif isinstance(x, _np.ndarray):
+        list_rep = repr(nparray.tolist())
+        print(f"np.array({list_rep})")
+    elif hasattr(x, "__repr__"):  # default case: use repr if available
+        print(repr(x))
+    else:                         # remaining cases: throw error otherwise
+        raise NotImplementedError
+    return None
+
+
+if __name__ == '__main__':
+    import pylbmisc as lb
+
+    List = [1, 2, 3]
+    dput(List)
+
+    Dict = {"a": 1, "b": 2}
+    dput(Dict)
+
+    nparray = _np.array([1, 2, 3])
+    dput(nparray)
+
+    series = _pd.Series([1, 2, 3])
+    dput(series)
+
+    def function() -> None:
+        pass
+    dput(function)
+
+    df = lb.datasets.load("aidssi.csv")
+    dput(df)
+

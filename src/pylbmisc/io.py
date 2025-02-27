@@ -16,30 +16,32 @@ from typing import Sequence as _Sequence
 # ------------------------------------
 # Figure and images stuff
 # ------------------------------------
-def export_figure(
-    fig,
-    label: str = "",
-    caption: str = "",
-    fdir: str = "outputs",
-    fname: str = "",
-    scale: float = 1,
-):
+def export_figure(fig,
+                  label: str = "",
+                  caption: str = "",
+                  fdir: str = "outputs",
+                  fname: str = "",
+                  scale: float = 1
+                  ) -> None:
     """Dump a figure (save to file, include in LaTeX)
 
     Save to png, eps and pdf and include in Latex an image;
     intended to be used inside pythontex pycode.
 
-    Args:
-       fig (matplotlib.figure.Figure): the fig
-       label (str): posta dopo "fig:" in LaTeX
-       caption (str): caption LaTeX, se mancante viene riadattata label
-       fdir (str): directory dove salvare, se mancante si usa /tmp
-       fname (str): basename del file da salvare, se mancante si prova
-          a riusare label oppure a creare un file temporaneo
-       scale (float): scale di includegraphics di LaTeX
-
-    Returns:
-       None: nothing interesting here
+    Parameters
+    ----------
+    fig: matplotlib.figure.Figure
+        the fig
+    label: str
+        posta dopo "fig:" in LaTeX
+    caption: str
+        caption LaTeX, se mancante viene riadattata label
+    fdir: str
+        directory dove salvare, se mancante si usa /tmp
+    fname: str
+        basename del file da salvare, se mancante si prova a riusare label oppure a creare un file temporaneo
+    scale: float
+        scale di includegraphics di LaTeX
     """
     # fdir not existing, using /tmp
     if not _os.path.isdir(fdir):
@@ -81,6 +83,7 @@ def export_figure(
         "label": latex_label,
     }
     print(latex % subs)
+    return None
 
 
 # ------------------------------------
@@ -90,8 +93,25 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
                 csv_kwargs: dict = {},
                 excel_kwargs: dict = {},
                 rm_common_prefix: bool = True) -> dict[str, _pd.DataFrame]:
-    '''Import data from one or several filepaths (supported formats: .csv
-    .xls .xlsx .zip) and return a dict of DataFrame
+    '''Import data
+
+    Can be used to import data from one or several filepaths
+
+    Parameters
+    ----------
+    fpaths:
+        file paths (supported formats: .csv .xls .xlsx .zip)
+    csv_kwargs:
+        parameter passed to read_csv
+    excel_kwargs:
+        parameter passed to read_excel
+    rm_common_prefix:
+        if dataset share the same common prefix, remove it
+
+    Returns
+    -------
+    A dict of DataFrame
+
     '''
     # import ipdb
     # ipdb.set_trace()
@@ -161,7 +181,6 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
         raise ValueError(msg)
 
 
-
 # _rdf: pd.DataFrame to R data.frame converter (a-la dput)
 # --------------------------------------------------------
 def _rdf_integer(x: _pd.Series, xn: str):
@@ -173,8 +192,10 @@ def _rdf_integer(x: _pd.Series, xn: str):
     rval = f"{xn} = c({data_str})"
     return rval
 
+
 # placeholder
 _rdf_numeric = _rdf_integer
+
 
 def _rdf_factor(x: _pd.Series, xn: str):
     # to be safe it's seems to be better rather than
@@ -207,6 +228,7 @@ def _rdf_factor(x: _pd.Series, xn: str):
     )
     return rval
 
+
 def _rdf_object(x: _pd.Series, xn: str):
     data_l = x.to_list()
     data_l2 = []
@@ -218,6 +240,7 @@ def _rdf_object(x: _pd.Series, xn: str):
     data_str = ', '.join(data_l2)
     rval = "{} = c({})".format(xn, data_str)
     return rval
+
 
 def _rdf_bool(x: _pd.Series, xn: str):
     ft = {True: "TRUE", False: "FALSE"}
@@ -231,12 +254,15 @@ def _rdf_bool(x: _pd.Series, xn: str):
     rval = f"{xn} = c({data_str})"
     return rval
 
+
 # Thigs yet TODO
 def _rdf_NA(x: _pd.Series, xn: str):
     rval = "{} = NA".format(xn)
     return rval
 
+
 _rdf_datetime = _rdf_NA
+
 
 def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
     """
@@ -273,23 +299,26 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
         f.writelines(r_code)
 
 
-
-def export_data(
-        x: _pd.DataFrame | dict[str, _pd.DataFrame],
-        path: str | _Path,
-        ext: str | list[str] = ["xlsx", "csv", "pkl", "R"],
-        index=False
-) -> None:
+def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
+                path: str | _Path,
+                ext: str | list[str] = ["xlsx", "csv", "pkl", "R"],
+                index=False
+                ) -> None:
     """Export a DataFrame or a dict of DataFrames as csv/xlsx
 
     In case of a dict is used and a csv path is given, the path is
     suffixed with dict names
 
-    x: dict of pandas.DataFrame
-    fpath: file path, if extension is provided it will overwrite formats
-    otherwise formats is considered
-    ext: str or list of string with file extensions
-    index: bool add index in exporting (typically True for results, False for data)
+    Parameters
+    ----------
+    x:
+        dict of pandas.DataFrame
+    fpath:
+        file path, if extension is provided it will overwrite formats otherwise formats is considered
+    ext:
+        str or list of string with file extensions
+    index:
+        bool add index in exporting (typically True for results, False for data)
     """
 
     if not (isinstance(x, _pd.DataFrame) or isinstance(x, dict)):
@@ -346,11 +375,9 @@ def export_data(
                 _rdf(v, R_path)
 
 
-
 # ------------------------------------
 # LaTeX stuff
 # ------------------------------------
-
 # Thanks PyLaTeX guys
 _latex_special_chars = {
     '&': r'\&',
@@ -390,13 +417,22 @@ def latex_table(
     float_format: str = "%.1f",
     column_format: str | None = None,
 ):
-    """Print a table (a pd.DataFrame or inheriting object with
-    to_latex method) with sensible defaults.
+    """Print a LaTeX table
 
-    tab: a pd.DataFrame or other object with .to_latex method
-    label (str): posta dopo "fig:" in LaTeX
-    caption (str): caption tabella LaTeX
-    position (str): lettere posizionamento tabella (ad esempio https://stackoverflow.com/questions/1673942)
+    Print a pd.DataFrame or inheriting object with to_latex method with
+    sensible defaults.
+
+    Parameters
+    ----------
+    tab:
+        something with .to_latex method
+    label: str
+        posta dopo "fig:" in LaTeX
+    caption: str
+        caption tabella LaTeX
+    position: str
+        lettere posizionamento tabella (ad esempio https://stackoverflow.com/questions/1673942)
+
     """
     if (label == "") or (not isinstance(label, str)):
         msg = "Please provide a label for the table."
@@ -430,18 +466,26 @@ def latex_table(
     print(content)
 
 
-
-def export_tables(tabs_dict):
+def export_tables(tabs_dict: dict[str, _pd.DataFrame],
+                  outfile: str | _Path = "outputs/tables.xlsx"):
     """Latex print and excel Export a dict of tables (caption as key)
 
-    Example
-    -------
-    exported = {"Descrittive": desc_df, "Analisi 1"  : analysis1_df, "Analisi 2"  : analysis2_df}
-    export_tables(exported)
+    Parameters
+    ----------
+    tabs_dict:
+       dict of DataFrame to be exported
+    outfile:
+       path to the excel file for export
+
+    Examples
+    --------
+    >>> exported = {"Descrittive": desc_df, "Analisi 1"  : analysis1_df,
+                    "Analisi 2"  : analysis2_df}
+    >>> export_tables(exported)
 
     """
     # excel
-    export_data(tabs_dict, "outputs/tables.xlsx")
+    export_data(tabs_dict, outfile)
     # latex
     labels = []
     for caption, tab in tabs_dict.items():

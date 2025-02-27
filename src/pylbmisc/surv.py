@@ -209,48 +209,52 @@ def tteep(start_date = None,
           # comprisk=True
           ):
     """This function calculates common oncology time to event end-points
-(Overall Survival, Progression Free Survival, Time to Relapse).
+    (Overall Survival, Progression Free Survival, Time to Relapse).
 
-Overall survival (OS) is computed as time from {start_date} to
-{death_date}. Time of patients who did not experienced the event (with
-missing {death_date}) is censored at the time of last follow up
-({last_fup}).
+    Overall survival (OS) is computed as time from {start_date} to
+    {death_date}. Time of patients who did not experienced the event (with missing
+    {death_date}) is censored at the time of last follow up ({last_fup}).
 
-Progression free survival (PFS) is calculated as time from {start_date}
-to {prog_date} or {death_date}, whichever comes first. Time of
-patients who did not experienced any event (missing both {prog_date} and
-{death_date}) is censored at the time of last follow up ({last_fup}).
+    Progression free survival (PFS) is calculated as time from {start_date}
+    to {prog_date} or {death_date}, whichever comes first. Time of
+    patients who did not experienced any event (missing both {prog_date} and
+    {death_date}) is censored at the time of last follow up ({last_fup}).
 
-Time to progression (TTP) is computed as time from {start_date} to
-{prog_date}. Time of patients who did not experienced the event
-(missing {prog_date}) is censored at the time of last follow up
-({last_fup}) or death ({death_date}) whichever comes first.
+    Time to progression (TTP) is computed as time from {start_date} to
+    {prog_date}. Time of patients who did not experienced the event
+    (missing {prog_date}) is censored at the time of last follow up
+    ({last_fup}) or death ({death_date}) whichever comes first.
 
-Params
-------
-start_date Date: starting follow up date
-prog_date Date: progression date
-death_date Date: death date
-last_fup Date: last follow up date
-ep character: which end points to calculate, default to ["os","pfs","ttp"]
+    Parameters
+    ----------
+    start_date: Date
+        starting follow up date
+    prog_date: Date
+        progression date
+    death_date: Date
+        death date
+    last_fup: Date
+        last follow up date
+    ep:
+        which end points to calculate, default to ["os","pfs","ttp"]
 
-Examples
---------
-# date input
-df = pd.DataFrame({
-"start_date" : lb.dm.to_date(pd.Series(["1900-01-01", "1900-01-01", "1900-01-01", "1900-01-01",        pd.NA, "1900-01-01", "1900-04-01", pd.NA])),
-"prog_date"  : lb.dm.to_date(pd.Series(["1900-03-01", "1900-03-01",        pd.NA,        pd.NA,        pd.NA,        pd.NA, "1900-02-01", pd.NA])),
-"death_date" : lb.dm.to_date(pd.Series(["1900-06-01",        pd.NA, "1900-06-01",        pd.NA,        pd.NA,        pd.NA, "1900-06-01", pd.NA])),
-"last_fup"   : lb.dm.to_date(pd.Series(["1900-06-01", "1900-12-31", "1900-06-01", "1900-12-31", "1900-12-31",        pd.NA, "1900-06-01", pd.NA]))
-})
-print(df)
-tteep(df.start_date, df.prog_date, df.death_date, df.last_fup)
+    Examples
+    --------
+    >>> # date input
+    >>> df = pd.DataFrame({"start_date" : lb.dm.to_date(pd.Series(["1900-01-01", "1900-01-01", "1900-01-01", "1900-01-01",        pd.NA, "1900-01-01", "1900-04-01", pd.NA])),
+                          "prog_date"  : lb.dm.to_date(pd.Series(["1900-03-01", "1900-03-01",        pd.NA,        pd.NA,        pd.NA,        pd.NA, "1900-02-01", pd.NA])),
+                          "death_date" : lb.dm.to_date(pd.Series(["1900-06-01",        pd.NA, "1900-06-01",        pd.NA,        pd.NA,        pd.NA, "1900-06-01", pd.NA])),
+                          "last_fup"   : lb.dm.to_date(pd.Series(["1900-06-01", "1900-12-31", "1900-06-01", "1900-12-31", "1900-12-31",        pd.NA, "1900-06-01", pd.NA]))
+             })
+    >>> print(df)
+    >>> tteep(df.start_date, df.prog_date, df.death_date, df.last_fup)
 
-Reference
-----------
-Guidance for Industry, Clinical Trial Endpoints for the approval of cancer
-drugs and biologics, FDA, May 2007
-"""
+    Reference
+    ----------
+    Guidance for Industry, Clinical Trial Endpoints for the approval of cancer
+    drugs and biologics, FDA, May 2007
+
+    """
     
     _date_check(x = start_date, name = "start_date", can_be_none = False)
     _date_check(x = last_fup, name = "last_fup", can_be_none = False)

@@ -11,6 +11,7 @@ import tempfile as _tempfile
 
 from pprint import pprint as _pprint
 from pathlib import Path as _Path
+from typing import Optional as _Optional
 
 # -------------------------------------------------------------------------
 # regular expressions used
@@ -35,12 +36,12 @@ def view(df: _pd.DataFrame = None) -> None:
 
     Parameters
     ----------
-    df: dataframe
+    df:
         the dataframe to be visualized
 
     Examples
     --------
-    lb.dm.view(df)
+    >>> lb.dm.view(df)
     """
     if not isinstance(df, _pd.DataFrame):
         msg = "Only dataframes are visualized."
@@ -183,13 +184,13 @@ def pii_find(x: _pd.DataFrame) -> list[str]:
 
     Parameters
     ----------
-    x: DataFrame
+    x:
         The DataFrame to check
 
     Returns
     -------
-    list of
-    
+    List of variable names with probable PII
+
     Examples
     --------
     >>> df = pd.DataFrame({
@@ -528,6 +529,7 @@ def to_date(x: _pd.Series):
 
 _dates_re = _re.compile(r"[^/\d-]") # keep only numbers, - and /, and just hope for the best
 
+
 def _extract_dates_worker(x):
     if isinstance(x, str): # handle missing values (sono float)
         polished = _dates_re.sub("", x)
@@ -713,11 +715,12 @@ class Coercer:
 
     Parameters
     ----------
-    df: DataFrame
+    df:
         The DataFrame to be coerced
-    fv: dict
+    fv:
         function-variable dict: key can be a function or a string containing name of the function, variables is a list of strings with name of variables to apply the function to
-
+    verbose:
+        be verbose about operations applied
 
     Examples
     --------
@@ -809,12 +812,18 @@ class Coercer:
             self._directives = reversed
 
     def coerce(self, keep_only_coerced=False) -> _pd.DataFrame:
+        """Method to apply programmed coercions
+
+        Parameters
+        ----------
+        keep_only_coerced:
+            if True keep only variables in fv dictionary, after coercion
+        """
         # do not modify the input data
         df = self._df.copy()
         directives = self._directives
-        verbose = self._verbose
         # make verbose all the functions by decorating them
-        if verbose:
+        if self._verbose:
             for var in directives.keys():
                 directives[var] = _verboser(directives[var])
         # apply the coercers, but first modify the pd printing options temporarily to
@@ -825,7 +834,7 @@ class Coercer:
             if var not in df.columns:
                 msg = f"{var} not in df.columns, aborting."
                 raise ValueError(msg)
-            if verbose:
+            if self._verbose:
                 print(f"Processing {var}.")
             df[var] = fun(df[var])
         _pd.set_option("display.max_rows", old_nrows)

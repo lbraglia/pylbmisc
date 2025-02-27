@@ -12,40 +12,38 @@ import re as _re
 import readline as _readline
 import types as _types
 
-from .iter import unique as _unique
+from pylbmisc.iter import unique as _unique
 from inspect import getsource as _getsource
 from typing import Sequence as _Sequence
 
-_readline.parse_and_bind('set editing-mode emacs')
+_readline.parse_and_bind("set editing-mode emacs")
 
 
 def argparser(opts):
-    '''Helper function for argument parsing.
+    """Helper function for argument parsing.
 
-Example usage:
---------------
-import pylbmisc as lb # third party
-# from ..utils import argparser # in scripts directory
-
-opts = (
-    # (param, help, default, type)
-    # --dirs
-    ('dirs', 'str: comma separated list of exercise source directories','~/src/pypkg/exercises/db', str),
-    # --lists
-    ('lists', 'str: comma separated list of file with lists of source dir', None, str),
-    # --outfile
-    ('outfile', 'str:  sqlite3 db to save', '~/.exercises.db', str))
-
-args = lb.utils.argparser(opts)
-dirs = args['dirs']
-dirs = dirs.split(',')
-lists = args['lists']
-lists = lists.split(',')
-outfile = args['outfile']
-print({"dirs": dirs, "lists": lists, "outfile": outfile})
-return 0
-
-'''
+    Examples
+    --------
+    >>> import pylbmisc as lb # third party
+    >>> # from ..utils import argparser # in scripts directory
+    >>>
+    >>> opts = (
+    >>>   # (param, help, default, type)
+    >>>   # --dirs
+    >>>   ("dirs", "str: comma separated list of exercise source directories","~/src/pypkg/exercises/db", str),
+    >>>   # --lists
+    >>>   ("lists", "str: comma separated list of file with lists of source dir", None, str),
+    >>>   # --outfile
+    >>>   ("outfile", "str:  sqlite3 db to save", "~/.exercises.db", str))
+    >>>
+    >>> args = lb.utils.argparser(opts)
+    >>> dirs = args["dirs"]
+    >>> dirs = dirs.split(",")
+    >>> lists = args["lists"]
+    >>> lists = lists.split(",")
+    >>> outfile = args["outfile"]
+    >>> print({"dirs": dirs, "lists": lists, "outfile": outfile})
+    """
     parser = _argparse.ArgumentParser()
     # defaults = {}
     for i in opts:
@@ -54,10 +52,10 @@ return 0
         optdefault = i[2]
         opttype = i[3]
         # create help string and add argument to parsing
-        help_string = '{0} (default: {1})'.format(
+        help_string = "{0} (default: {1})".format(
             optdescription, str(optdefault)
         )
-        parser.add_argument('--' + optname, help=help_string, type=str)
+        parser.add_argument("--" + optname, help=help_string, type=str)
     # do parsing
     args = vars(parser.parse_args())  # vars to change to a dict
     # defaults settings and types management
@@ -76,22 +74,22 @@ return 0
             # mv to character if not already (not if used optdefault)
             args[optname] = str(args[optname])
             true_values = (
-                'true',
-                'True',
-                'TRUE',
-                't',
-                'T',
-                '1',
-                'y',
-                'Y',
-                'yes',
-                'Yes',
-                'YES',
+                "true",
+                "True",
+                "TRUE",
+                "t",
+                "T",
+                "1",
+                "y",
+                "Y",
+                "yes",
+                "Yes",
+                "YES",
             )
             if args[optname] in true_values:
-                args[optname] = 'True'
+                args[optname] = "True"
             else:
-                args[optname] = ''
+                args[optname] = ""
         # converti il tipo a quello specificato, a meno che non sia None se no lascialo così
         if args[optname] is not None:
             args[optname] = opttype(args[optname])
@@ -99,13 +97,17 @@ return 0
 
 
 def line_to_numbers(x: str) -> list[int]:
-    '''transform a string of positive numbers "1 2-3, 4, 6-10" into a
+    """transform a string of positive numbers "1 2-3, 4, 6-10" into a
     list [1,2,3,4,6,7,8,9,10]
-    '''
+
+    Examples
+    --------
+    >>> line_to_numbers("1, 2-5")
+    """
     # replace comma with white chars
     x = x.replace(",", " ")
     # keep only digits, - and white spaces
-    x = _re.sub(r'[^\d\- ]', '', x)
+    x = _re.sub(r"[^\d\- ]", "", x)
     # split by whitespaces
     spl = x.split(" ")
     # change ranges to proper
@@ -145,28 +147,31 @@ def line_to_numbers(x: str) -> list[int]:
     return res
 
 
-def menu(
-    choices: _Sequence[str],
-    title: str | None = None,
-    allow_repetition: bool = False,
-    strict: bool = True,
-) -> _Sequence[str]:
+def menu(choices: _Sequence[str],
+         title: str | None = None,
+         allow_repetition: bool = False,
+         strict: bool = True,
+         ) -> _Sequence[str]:
     """
     CLI menu for user single/multiple choices
 
-    params:
+    Parameters
+    ----------
     choices: list of string
-    title: a string to pretty print a title
-    allow_repetition: accept multiple selected items
-    strict: ensure all the selection number are among the available ones (or
-    take the consistent otherwise)
+         printed choices
+    title: str
+         a pretty printed title
+    allow_repetition: bool
+         multiple selected items
+    strict: bool
+         all the selection number are among the available ones (or take the consistent otherwise)
     """
     available_ind = [i + 1 for i in range(len(choices))]
     avail_with_0 = [0] + available_ind
-    the_menu = "\n".join([str(i) + '. ' + str(c) for i, c in zip(available_ind, choices)])
+    the_menu = "\n".join([str(i) + ". " + str(c) for i, c in zip(available_ind, choices)])
     if title:
         ascii_header(title)
-    print(the_menu, '\n')
+    print(the_menu, "\n")
     select_msg = "Selection (values as '1, 2-3, 6') or 0 to exit: "
     ind = line_to_numbers(input(select_msg))
     # normalize to list (for single selections, for now)
@@ -200,18 +205,24 @@ def menu(
 
 
 def ascii_header(x: str) -> None:
-    '''
+    """
     Create an ascii header given a string as title.
-    '''
+
+    Examples
+    --------
+    >>> ascii_header("Title")
+    """
     header = "=" * len(x)
     print(header)
     print(x)
-    print(header, '\n')
+    print(header, "\n")
 
 
 def match_arg(arg, choices):
     """R's match.arg equivalent for programming function for interactive use
 
+    Examples
+    --------
     >>> # questo ritorna errore perché matcha troppo
     >>> user_input = "foo"
     >>> a = match_arg(user_input, ["foobar", "foos", "asdomar"])
@@ -238,11 +249,12 @@ def expand_grid(dictionary):
     # https://stackoverflow.com/questions/12130883
     """Replacement for R's expand.grid
 
-Examples
---------
-stratas =  {"centres": ["ausl re", "ausl mo"],"agecl": ["<18", "18-65", ">65"],"foo": ["1"]}
-lb.utils.expand_grid(stratas)
-
+    Examples
+    --------
+    >>> stratas =  {"centres": ["ausl re", "ausl mo"],
+                    "agecl": ["<18", "18-65", ">65"],
+                    "foo": ["1"]}
+    >>> lb.utils.expand_grid(stratas)
     """
     rows = [row for row in _itertools.product(*dictionary.values())]
     return _pd.DataFrame(rows, columns=dictionary.keys())
@@ -258,22 +270,17 @@ def dput(x) -> None:
 
     Examples
     --------
-    import pylbmisc as lb
     from pylbmisc.utils import dput
-
+    import pylbmisc as lb
     List = [1, 2, 3]
     dput(List)
-
     Dict = {"a": 1, "b": 2}
     dput(Dict)
-
     nparray = _np.array([1, 2, 3])
     dput(nparray)
-
     series = _pd.Series([1, 2, 3])
     dput(series)
-
-    df = lb.datasets.load("aidssi.csv")
+    df = lb.datasets.load()
     dput(df)
 
     def function() -> None:
@@ -284,7 +291,8 @@ def dput(x) -> None:
     if isinstance(x, _types.FunctionType):  # special cases: don't use repr
         print(_getsource(x))
     elif isinstance(x, _pd.DataFrame):
-        print(x.to_dict())
+        dict_rep = repr(df.to_dict())
+        print(f"pd.DataFrame({dict_rep})")
     elif isinstance(x, _pd.Series):
         list_rep = repr(x.to_list())
         print(f"pd.Series({list_rep})")
@@ -298,25 +306,19 @@ def dput(x) -> None:
     return None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import pylbmisc as lb
-
     List = [1, 2, 3]
     dput(List)
-
     Dict = {"a": 1, "b": 2}
     dput(Dict)
-
     nparray = _np.array([1, 2, 3])
     dput(nparray)
-
     series = _pd.Series([1, 2, 3])
     dput(series)
 
     def function() -> None:
         pass
     dput(function)
-
-    df = lb.datasets.load("aidssi.csv")
+    df = lb.datasets.load()
     dput(df)
-

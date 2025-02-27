@@ -74,7 +74,7 @@ def table2df(df: _pd.DataFrame) -> _pd.DataFrame:
     foo      4    3
     >>> tab = pd.crosstab(a,b)
     >>> table2df(tab)
-    row_0 col_0  x
+      row_0 col_0  x
     0   bar   one  3
     1   bar   two  1
     2   foo   one  4
@@ -702,7 +702,7 @@ def extract_dates(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> extract_dates(pd.Series(["2020-01-02", "01/01/1956", "asdasd 12-01-02"] * 2))
+    >>> extract_dates(["2020-01-02", "01/01/1956", "asdasd 12-01-02"] * 2)
     0   2020-01-02
     1   1956-01-01
     2   2002-12-01
@@ -875,8 +875,7 @@ def to_other_specify(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
-    >>> to_other_specify(x)
+    >>> to_other_specify(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     ['asd', 'asd', NaN, 'prova', 'ciao', '3', 'bar', 'bar', 'bar', 'bar']
     Categories (5, object): ['bar', 'asd', 'prova', 'ciao', '3']
     """
@@ -904,8 +903,12 @@ def to_string(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
-    >>> to_string(x)
+    >>> to_string([1,2,3])
+    0    1
+    1    2
+    2    3
+    dtype: object
+
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -949,7 +952,6 @@ class Coercer:
     >>> raw = pd.DataFrame({
     ...     "idx" :  [1., 2., 3., 4., 5., 6., "2,0", "", np.nan],
     ...     "sex" :  ["m", "maschio", "f", "female", "m", "M", "", "a", np.nan],
-    ...     "now":   [str(dt.datetime.now())] * 6 + [np.nan, "", "a"],
     ...     "date":  ["2020-01-02", "2021-01-01", "2022-01-02"] * 2  + [np.nan, "", "a"],
     ...     "state": ["Ohio", "Ohio", "Ohio", "Nevada", "Nevada", "Nevada"] + [np.nan, "", "a"],
     ...     "ohio" : [1, 1, 1, 0, 0, 0] + [np.nan] * 3 ,
@@ -961,7 +963,6 @@ class Coercer:
     >>> directives = {
     ...     lb.dm.to_integer: ["idx", "year"],
     ...     lb.dm.to_sex : ["sex"],
-    ...     lb.dm.to_datetime : ["now"],
     ...     lb.dm.to_date: ["date"],
     ...     lb.dm.to_categorical: ["state"],
     ...     lb.dm.to_bool: ["ohio"],
@@ -972,27 +973,27 @@ class Coercer:
     >>>
     >>> cleaned1 = lb.dm.Coercer(raw, fv = directives, verbose = False).coerce()
     >>> raw
-       idx      sex                         now        date   state  ohio  year  pop recist other
-    0  1.0        m  2025-02-27 17:09:48.602618  2020-01-02    Ohio   1.0  2000  1.5            b
-    1  2.0  maschio  2025-02-27 17:09:48.602618  2021-01-01    Ohio   1.0  2001  1.7     pd     b
-    2  3.0        f  2025-02-27 17:09:48.602618  2022-01-02    Ohio   1.0  2002  3.6     sd     b
-    3  4.0   female  2025-02-27 17:09:48.602618  2020-01-02  Nevada   0.0  2001  nan     pr     a
-    4  5.0        m  2025-02-27 17:09:48.602618  2021-01-01  Nevada   0.0  2002  2.9     rc     a
-    5  6.0        M  2025-02-27 17:09:48.602618  2022-01-02  Nevada   0.0  2003  3,2     cr     c
-    6  2,0                                  NaN         NaN     NaN   NaN   NaN  NaN    NaN   NaN
-    7             a                                                   NaN                        
-    8  NaN      NaN                           a           a       a   NaN     a    a      a     a
+       idx      sex        date   state  ohio  year  pop recist other
+    0  1.0        m  2020-01-02    Ohio   1.0  2000  1.5            b
+    1  2.0  maschio  2021-01-01    Ohio   1.0  2001  1.7     pd     b
+    2  3.0        f  2022-01-02    Ohio   1.0  2002  3.6     sd     b
+    3  4.0   female  2020-01-02  Nevada   0.0  2001  nan     pr     a
+    4  5.0        m  2021-01-01  Nevada   0.0  2002  2.9     rc     a
+    5  6.0        M  2022-01-02  Nevada   0.0  2003  3,2     cr     c
+    6  2,0                  NaN     NaN   NaN   NaN  NaN    NaN   NaN
+    7             a                       NaN                        
+    8  NaN      NaN           a       a   NaN     a    a      a     a
     >>> cleaned1
-        idx     sex                        now       date   state   ohio  year   pop recist other
-    0     1    male 2025-02-27 17:09:48.602618 2020-01-02    Ohio   True  2000   1.5    NaN     b
-    1     2    male 2025-02-27 17:09:48.602618 2021-01-01    Ohio   True  2001   1.7     PD     b
-    2     3  female 2025-02-27 17:09:48.602618 2022-01-02    Ohio   True  2002   3.6     SD     b
-    3     4  female 2025-02-27 17:09:48.602618 2020-01-02  Nevada  False  2001  <NA>     PR     a
-    4     5    male 2025-02-27 17:09:48.602618 2021-01-01  Nevada  False  2002   2.9     CR     a
-    5     6    male 2025-02-27 17:09:48.602618 2022-01-02  Nevada  False  2003   3.2     CR     c
-    6     2     NaN                        NaT        NaT     NaN   <NA>  <NA>  <NA>    NaN   NaN
-    7  <NA>     NaN                        NaT        NaT     NaN   <NA>  <NA>  <NA>    NaN   NaN
-    8  <NA>     NaN                        NaT        NaT       a   <NA>  <NA>  <NA>    NaN     a
+        idx     sex       date   state   ohio  year   pop recist other
+    0     1    male 2020-01-02    Ohio   True  2000   1.5    NaN     b
+    1     2    male 2021-01-01    Ohio   True  2001   1.7     PD     b
+    2     3  female 2022-01-02    Ohio   True  2002   3.6     SD     b
+    3     4  female 2020-01-02  Nevada  False  2001  <NA>     PR     a
+    4     5    male 2021-01-01  Nevada  False  2002   2.9     CR     a
+    5     6    male 2022-01-02  Nevada  False  2003   3.2     CR     c
+    6     2     NaN        NaT     NaN   <NA>  <NA>  <NA>    NaN   NaN
+    7  <NA>     NaN        NaT     NaN   <NA>  <NA>  <NA>    NaN   NaN
+    8  <NA>     NaN        NaT       a   <NA>  <NA>  <NA>    NaN     a
     >>>
     >>> # ------------------------------------------------
     >>> # It's possilbe to specify string as key as well
@@ -1001,7 +1002,6 @@ class Coercer:
     >>> directives2 = {
     ...     "lb.dm.to_categorical": ["state"],
     ...     "lb.dm.to_date": ["date"],
-    ...     "lb.dm.to_datetime" : ["now"],
     ...     "lb.dm.to_integer": ["idx", "year"],
     ...     "lb.dm.to_noyes": ["ohio"],
     ...     "lb.dm.to_numeric": ["pop"],

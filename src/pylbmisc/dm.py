@@ -231,7 +231,7 @@ def pii_find(x: _pd.DataFrame) -> list[str]:
 
     Returns
     -------
-    List of variable names with probable PII
+    A Python list of variable names with probable PII
 
     Examples
     --------
@@ -414,9 +414,9 @@ def sanitize_varnames(x: _pd.DataFrame | dict[str, _pd.DataFrame],
     ----------
     x:
        the data to be fixed
-    return_tfd: bool
+    return_tfd:
        wheter to return or not (default return) the original and processed
-    strings as dict
+       strings as dict
 
     """
     if isinstance(x, _pd.DataFrame):
@@ -465,7 +465,7 @@ def _verboser(f):
 
 # --------------- coercion workers ----------------------------------------
 
-def to_bool(x) -> _pd.Series:
+def to_bool(x=None) -> _pd.Series:
     """Coerce to a boolean pd.Series
 
     Parameters
@@ -479,6 +479,9 @@ def to_bool(x) -> _pd.Series:
     >>> to_bool(pd.Series([1,0.,1,0.]))
     >>> to_bool(pd.Series([1,0,1,0, np.nan]))
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     nas = _pd.isna(x)
@@ -498,7 +501,7 @@ def _replace_comma(x: _pd.Series):
         return x
 
 
-def to_integer(x):
+def to_integer(x=None):
     """Coerce a pd.Series to integer (if possible)
 
     Parameters
@@ -512,6 +515,9 @@ def to_integer(x):
     >>> to_integer(pd.Series(["2001", "2011", "1999", ""]))
     >>> to_integer(pd.Series(["1.1", "1,99999", "foobar"])) # fails because of 1.99
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     s = _replace_comma(x)
@@ -521,7 +527,7 @@ def to_integer(x):
     return _pd.to_numeric(s, errors="coerce").astype("Int64")
 
 
-def to_numeric(x) -> _pd.Series:
+def to_numeric(x=None) -> _pd.Series:
     """Coerce a pd.Series using pd.to_numeric
 
     Parameters
@@ -536,13 +542,16 @@ def to_numeric(x) -> _pd.Series:
     >>> to_numeric(pd.Series(["2001", "2011", "1999"]))
     >>> to_numeric(pd.Series(["1.1", "2,1", "asd", ""]))
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     s = _replace_comma(x)
     return _pd.to_numeric(s, errors="coerce").astype("Float64")
 
 
-def to_datetime(x) -> _pd.Series:
+def to_datetime(x=None) -> _pd.Series:
     """Coerce to a datetime a pd.Series
 
     Parameters
@@ -555,12 +564,15 @@ def to_datetime(x) -> _pd.Series:
     >>> import datetime as dt
     >>> to_datetime(pd.Series([str(dt.datetime.now())] * 6))
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     return _pd.to_datetime(x, errors="coerce")
 
 
-def to_date(x) -> _pd.Series:
+def to_date(x=None) -> _pd.Series:
     """Coerce to a date a pd.Series
 
     Parameters
@@ -574,6 +586,9 @@ def to_date(x) -> _pd.Series:
     >>> to_date(pd.Series([str(dt.datetime.now())] * 6))
     >>> to_date(pd.Series(["2020-01-02", "2021-01-01", "2022-01-02"] * 2))
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     return to_datetime(x).dt.floor("D")
@@ -591,7 +606,7 @@ def _extract_dates_worker(x):
         return _pd.NA
 
 
-def extract_dates(x) -> _pd.Series:
+def extract_dates(x=None) -> _pd.Series:
     """Try to extract dates from shitty strings and convert them to proper
 
     Parameters
@@ -603,12 +618,15 @@ def extract_dates(x) -> _pd.Series:
     --------
     >>> extract_dates(pd.Series(["2020-01-02", "01/01/1956", "asdasd 12-01-02"] * 2))
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     return x.apply(_extract_dates_worker)
 
 
-def to_categorical(x,
+def to_categorical(x=None,
                    categories: list[str] = None,
                    lowcase: bool = False):
     """Coerce to categorical a pd.Series, with blank values as missing
@@ -626,6 +644,9 @@ def to_categorical(x,
     >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", "", np.nan]), categories=["aa", "AA"]  )
     >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", ""]), lowcase = True)
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     if _is_string(x):
@@ -643,7 +664,7 @@ def to_categorical(x,
     return _pd.Categorical(x, categories=categories)
 
 
-def to_noyes(x) -> _pd.Series:
+def to_noyes(x=None) -> _pd.Series:
     """Coerce to no/yes a string pd.Series
 
     Parameters
@@ -657,9 +678,11 @@ def to_noyes(x) -> _pd.Series:
     >>> to_noyes(pd.Series([1,0,0, np.nan]))
     >>> to_noyes(pd.Series([1.,0.,0., np.nan]))
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
-
     if _is_string(x):
         # take only the first character and map to n/y
         tmp = x.str.strip().str.lower().str[0]
@@ -673,7 +696,7 @@ def to_noyes(x) -> _pd.Series:
                           categories=["no", "yes"])
 
 
-def to_sex(x) -> _pd.Series:
+def to_sex(x=None) -> _pd.Series:
     """Coerce to male/female a pd.Series of strings (Mm/Ff)
 
     Parameters
@@ -685,9 +708,11 @@ def to_sex(x) -> _pd.Series:
     --------
     >>> to_sex(pd.Series(["","m","f"," m", "Fm", np.nan]))
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
-
     if not _is_string(x):
         msg = "to_sex only for strings vectors"
         raise Exception(msg)
@@ -698,8 +723,7 @@ def to_sex(x) -> _pd.Series:
     return to_categorical(tmp, categories=["male", "female"])
 
 
-
-def to_recist(x) -> _pd.Series:
+def to_recist(x=None) -> _pd.Series:
     """Coerce to recist categories a pd.Series of strings
 
     Parameters
@@ -711,9 +735,11 @@ def to_recist(x) -> _pd.Series:
     --------
     >>> to_recist(pd.Series(["RC", "PD", "SD", "PR", "RP", "boh", np.nan]))
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)    
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
-
     if not _is_string(x):
         msg = "to_recist only for strings vectors"
         raise Exception(msg)
@@ -726,7 +752,7 @@ def to_recist(x) -> _pd.Series:
                           categories=["CR", "PR", "SD", "PD"])
 
 
-def to_other_specify(x) -> _pd.Series:
+def to_other_specify(x=None) -> _pd.Series:
     """Try to polish a bit a free-text variable and create a categorical one
 
     Parameters
@@ -739,6 +765,9 @@ def to_other_specify(x) -> _pd.Series:
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_other_specify(x)
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
 
@@ -750,7 +779,7 @@ def to_other_specify(x) -> _pd.Series:
     return to_categorical(tmp, categories=categs)
 
 
-def to_string(x) -> _pd.Series:
+def to_string(x=None) -> _pd.Series:
     """Coerce the pd.Series passed to a string Series
 
     Parameters
@@ -763,6 +792,9 @@ def to_string(x) -> _pd.Series:
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_string(x)
     """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)   
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
 

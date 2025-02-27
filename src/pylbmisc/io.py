@@ -480,7 +480,7 @@ def export_tables(tabs_dict: dict[str, _pd.DataFrame],
     Examples
     --------
     >>> exported = {"Descrittive": desc_df, "Analisi 1"  : analysis1_df,
-                    "Analisi 2"  : analysis2_df}
+    >>>             "Analisi 2"  : analysis2_df}
     >>> export_tables(exported)
 
     """

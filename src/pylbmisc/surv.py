@@ -242,10 +242,10 @@ def tteep(start_date = None,
     --------
     >>> # date input
     >>> df = pd.DataFrame({"start_date" : lb.dm.to_date(pd.Series(["1900-01-01", "1900-01-01", "1900-01-01", "1900-01-01",        pd.NA, "1900-01-01", "1900-04-01", pd.NA])),
-                          "prog_date"  : lb.dm.to_date(pd.Series(["1900-03-01", "1900-03-01",        pd.NA,        pd.NA,        pd.NA,        pd.NA, "1900-02-01", pd.NA])),
-                          "death_date" : lb.dm.to_date(pd.Series(["1900-06-01",        pd.NA, "1900-06-01",        pd.NA,        pd.NA,        pd.NA, "1900-06-01", pd.NA])),
-                          "last_fup"   : lb.dm.to_date(pd.Series(["1900-06-01", "1900-12-31", "1900-06-01", "1900-12-31", "1900-12-31",        pd.NA, "1900-06-01", pd.NA]))
-             })
+    >>>                    "prog_date"  : lb.dm.to_date(pd.Series(["1900-03-01", "1900-03-01",        pd.NA,        pd.NA,        pd.NA,        pd.NA, "1900-02-01", pd.NA])),
+    >>>                    "death_date" : lb.dm.to_date(pd.Series(["1900-06-01",        pd.NA, "1900-06-01",        pd.NA,        pd.NA,        pd.NA, "1900-06-01", pd.NA])),
+    >>>                    "last_fup"   : lb.dm.to_date(pd.Series(["1900-06-01", "1900-12-31", "1900-06-01", "1900-12-31", "1900-12-31",        pd.NA, "1900-06-01", pd.NA]))
+    >>> })
     >>> print(df)
     >>> tteep(df.start_date, df.prog_date, df.death_date, df.last_fup)
 

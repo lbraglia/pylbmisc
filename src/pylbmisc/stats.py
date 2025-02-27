@@ -50,16 +50,19 @@ def p_adjust(p, method="holm"):
 
     See scipy.stats for FDR/BH methods
 
-    # without missing
-    # > wikipedia = c(0.01, 0.04, 0.03, 0.005)
-    # > p.adjust(wikipedia)
-    # [1] 0.03 0.06 0.06 0.02
+    Examples
+    --------
+    >>> # without missing
+    >>> # > wikipedia = c(0.01, 0.04, 0.03, 0.005)
+    >>> # > p.adjust(wikipedia)
+    >>> # [1] 0.03 0.06 0.06 0.02
     >>> wikipedia = [0.01, 0.04, 0.03, 0.005]
     >>> p_adjust(wikipedia)
-    # with missing
-    # > wikipedia_miss = c(0.01, NA, 0.04, 0.03, 0.005, NA)
-    # > p.adjust(wikipedia_miss)
-    # [1] 0.03   NA 0.06 0.06 0.02   NA
+    >>>
+    >>> # with missing
+    >>> # > wikipedia_miss = c(0.01, NA, 0.04, 0.03, 0.005, NA)
+    >>> # > p.adjust(wikipedia_miss)
+    >>> # [1] 0.03   NA 0.06 0.06 0.02   NA
     >>> wikipedia_miss = [0.01, np.nan, 0.04, 0.03, 0.005, np.nan]
     >>> p_adjust(wikipedia_miss)
     """

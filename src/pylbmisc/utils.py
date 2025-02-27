@@ -270,22 +270,22 @@ def dput(x) -> None:
 
     Examples
     --------
-    from pylbmisc.utils import dput
-    import pylbmisc as lb
-    List = [1, 2, 3]
-    dput(List)
-    Dict = {"a": 1, "b": 2}
-    dput(Dict)
-    nparray = _np.array([1, 2, 3])
-    dput(nparray)
-    series = _pd.Series([1, 2, 3])
-    dput(series)
-    df = lb.datasets.load()
-    dput(df)
-
-    def function() -> None:
-        pass
-    dput(function)
+    >>> from pylbmisc.utils import dput
+    >>> import pylbmisc as lb
+    >>> List = [1, 2, 3]
+    >>> dput(List)
+    >>> Dict = {"a": 1, "b": 2}
+    >>> dput(Dict)
+    >>> nparray = _np.array([1, 2, 3])
+    >>> dput(nparray)
+    >>> series = _pd.Series([1, 2, 3])
+    >>> dput(series)
+    >>> df = lb.datasets.load()
+    >>> dput(df)
+    >>> 
+    >>> def function() -> None:
+    >>>     pass
+    >>> dput(function)
 
     """
     if isinstance(x, _types.FunctionType):  # special cases: don't use repr

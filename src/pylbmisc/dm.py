@@ -812,8 +812,8 @@ class Coercer:
     as value) it applies all the function on a copy of the DataFrame
     and return it.  If verbose print a report of the introduced
     missing values with the coercion for check
-
-     Parameters
+    
+    Parameters
     ----------
     df:
         The DataFrame to be coerced

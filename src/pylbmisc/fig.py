@@ -5,7 +5,7 @@ from pathlib import Path as _Path
 from matplotlib.figure import Figure as _Figure
 from matplotlib.axes import Axes as _Axes
 from typing import Optional as _Optional
-
+from typing import Tuple as _Tuple
 
 def fun2d(f: _Callable = lambda x: x**2,
           xlim: list[int | float] = [-5, 5],
@@ -15,7 +15,7 @@ def fun2d(f: _Callable = lambda x: x**2,
           save: _Optional[str | _Path] = None,
           fig: _Optional[_Figure] = None,
           ax: _Optional[_Axes] = None
-          ) -> (_Figure, _Axes):
+          ) -> _Tuple[_Figure, _Axes]:
     """Plot a 2d function
 
     Parameters
@@ -71,7 +71,7 @@ def fun3d(f: _Callable = lambda x, y: x**2 + y**2,
           save: _Optional[str | _Path] = None,
           fig: _Optional[_Figure] = None,
           ax: _Optional[_Axes] = None
-          ) -> (_Figure, _Axes):
+          ) -> _Tuple[_Figure, _Axes]:
     """Plot a 2d function
 
     Parameters

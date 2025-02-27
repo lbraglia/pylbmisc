@@ -157,7 +157,7 @@ def _has_emails(x: _pd.Series) -> bool:
     """
     if _is_string(x):
         check = is_email(x)
-        return _np.any(check)
+        return bool(_np.any(check))
     else:
         return False
 
@@ -176,7 +176,7 @@ def _has_fiscal_codes(x: _pd.Series) -> bool:
     """
     if _is_string(x):
         check = is_fiscal_code(x)
-        return _np.any(check)
+        return bool(_np.any(check))
     else:
         return False
 
@@ -196,7 +196,7 @@ def _has_telephone_numbers(x: _pd.Series) -> bool:
     """
     if _is_string(x):
         check = is_telephone_number(x)
-        return _np.any(check)
+        return bool(_np.any(check))
     else:
         return False
 
@@ -215,7 +215,7 @@ def _has_mobile_numbers(x: _pd.Series) -> bool:
     """
     if _is_string(x):
         check = is_mobile_number(x)
-        return _np.any(check)
+        return bool(_np.any(check))
     else:
         return False
 
@@ -627,7 +627,7 @@ def extract_dates(x=None) -> _pd.Series:
 
 
 def to_categorical(x=None,
-                   categories: list[str] = None,
+                   categories: list[str] | None = None,
                    lowcase: bool = False):
     """Coerce to categorical a pd.Series, with blank values as missing
 
@@ -813,7 +813,7 @@ class Coercer:
     and return it.  If verbose print a report of the introduced
     missing values with the coercion for check
 
-    Parameters
+     Parameters
     ----------
     df:
         The DataFrame to be coerced
@@ -885,12 +885,12 @@ class Coercer:
     def __init__(
         self,
         df: _pd.DataFrame,
-        fv: dict | None = None, # function: variables dict
+        fv: dict,
         verbose: bool = True,
     ):
         self._df = df
         self._verbose = verbose
-        if fv == None:
+        if fv is None:
             msg = "fv can't be None"
             raise ValueError(msg)
         else:

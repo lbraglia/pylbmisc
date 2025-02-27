@@ -1,7 +1,5 @@
 import pandas as _pd
 from importlib import resources as _resources
-from pprint import pp as _pp
-# idea stolen from lifelines
 
 _dataset_dir = _resources.files("pylbmisc") / "datasets"
 

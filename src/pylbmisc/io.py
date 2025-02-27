@@ -7,7 +7,7 @@ import pandas as _pd
 import tempfile as _tempfile
 import zipfile as _zipfile
 
-from .dm import fix_varnames as _fix_varnames
+from pylbmisc.dm import fix_varnames as _fix_varnames
 
 from pathlib import Path as _Path
 from typing import Sequence as _Sequence
@@ -92,7 +92,7 @@ def export_figure(fig,
 def import_data(fpaths: str | _Path | _Sequence[str | _Path],
                 csv_kwargs: dict = {},
                 excel_kwargs: dict = {},
-                rm_common_prefix: bool = True) -> dict[str, _pd.DataFrame]:
+                rm_common_prefix: bool = True) -> _pd.DataFrame | dict[str, _pd.DataFrame]:
     '''Import data
 
     Can be used to import data from one or several filepaths
@@ -168,7 +168,7 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
     if len(rval) == 1:
         # a single dataset: return the data directly
         for v in rval.values():
-            return(v)
+            return v
     elif len(rval) > 1:
         # multiple dataset return the dict and remove common name prefix
         if rm_common_prefix:

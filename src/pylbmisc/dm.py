@@ -11,7 +11,7 @@ import tempfile as _tempfile
 
 from pprint import pprint as _pprint
 from pathlib import Path as _Path
-from typing import Optional as _Optional
+
 
 # -------------------------------------------------------------------------
 # regular expressions used
@@ -31,7 +31,7 @@ _mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
 # -------------------------------------------------------------------------
 # Utilities
 # -------------------------------------------------------------------------
-def view(df: _pd.DataFrame = None) -> None:
+def view(df: _pd.DataFrame) -> None:
     """View a pd.DataFrame using LibreOffice.
 
     Parameters
@@ -53,14 +53,14 @@ def view(df: _pd.DataFrame = None) -> None:
     return None
 
 
-def table2df(df: _pd.DataFrame = None) -> _pd.DataFrame:
+def table2df(df: _pd.DataFrame) -> _pd.DataFrame:
     """Transform a pd.DataFrame representing a two-way table (es
     crosstable, correlation matrix, p.val matrix) in a
     pd.DataFrame with long format.
 
     Parameters
     ----------
-    df: DataFrame
+    df:
        the crosstabulation to be put in long form
     """
     if not isinstance(df, _pd.DataFrame):
@@ -75,15 +75,20 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
                        fpath: str | _Path = "data/uniq_"):
     """Save unique value of a (dict of) dataframe for inspection and monitor
     during time.
+
+    Parameters
+    ----------
+    dfs:
+        dataframe or dict of dataframes to be dumped
+    fpath:
+        path root part where to save the unique values
     """
     if not isinstance(dfs, (_pd.DataFrame, dict)):
         msg = "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
         raise ValueError(msg)
-
     # normalize single dataframe
     if isinstance(dfs, _pd.DataFrame):
         dfs = {"df": dfs}
-
     for df_lab, df in dfs.items():
         outfile = _Path(str(fpath) + df_lab + ".txt")
         with outfile.open("w") as f:
@@ -121,20 +126,35 @@ is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
 
 
 def _is_string(x: _pd.Series) -> bool:
-    """
-    Check if a Series is a string (including data with np.nan) differently from
+    """Check the type of a Series to be composed of string.
+
+    It checks Series (including data with np.nan) differently from
     pandas.api.types.is_string_dtype
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
 
     Examples
     --------
     >>> x = pd.Series(["a", np.nan])
     >>> pd.api.types.is_string_dtype(x)
     >>> _is_string(x)
+
     """
     return x.dtype == "O"
 
 
 def _has_emails(x: _pd.Series) -> bool:
+    """ Check if a Series has e-mail address
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+
+    """
     if _is_string(x):
         check = is_email(x)
         return _np.any(check)
@@ -147,6 +167,13 @@ is_fiscal_code = _np.vectorize(lambda x: bool(_fc_re.match(x)))
 
 
 def _has_fiscal_codes(x: _pd.Series) -> bool:
+    """Check if a Series has fiscal codes
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+    """
     if _is_string(x):
         check = is_fiscal_code(x)
         return _np.any(check)
@@ -159,6 +186,14 @@ is_telephone_number = _np.vectorize(lambda x: bool(_tel_re.match(x)))
 
 
 def _has_telephone_numbers(x: _pd.Series) -> bool:
+    """Check if a Series has telephone numbers
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+
+    """
     if _is_string(x):
         check = is_telephone_number(x)
         return _np.any(check)
@@ -171,6 +206,13 @@ is_mobile_number = _np.vectorize(lambda x: bool(_mobile_re.match(x)))
 
 
 def _has_mobile_numbers(x: _pd.Series) -> bool:
+    """Check if a Series has mobile numbers
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+    """
     if _is_string(x):
         check = is_mobile_number(x)
         return _np.any(check)
@@ -308,7 +350,7 @@ def fix_varnames(x: str | list[str]):
 
     Parameters
     ----------
-    x: str or list of strings
+    x:
         string or list of strig to be fixed
 
     Examples
@@ -370,7 +412,7 @@ def sanitize_varnames(x: _pd.DataFrame | dict[str, _pd.DataFrame],
 
     Parameters
     ----------
-    x: dataframe or dict of dataframes
+    x:
        the data to be fixed
     return_tfd: bool
        wheter to return or not (default return) the original and processed
@@ -423,13 +465,13 @@ def _verboser(f):
 
 # --------------- coercion workers ----------------------------------------
 
-def to_bool(x: _pd.Series):
-    """Coerce to boolean a pd.Series (numeric) using astype keeping NAs as NAs
+def to_bool(x) -> _pd.Series:
+    """Coerce to a boolean pd.Series
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
@@ -437,6 +479,8 @@ def to_bool(x: _pd.Series):
     >>> to_bool(pd.Series([1,0.,1,0.]))
     >>> to_bool(pd.Series([1,0,1,0, np.nan]))
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
     nas = _pd.isna(x)
     rval = x.astype("boolean")
     rval[nas] = _pd.NA
@@ -454,13 +498,13 @@ def _replace_comma(x: _pd.Series):
         return x
 
 
-def to_integer(x: _pd.Series):
+def to_integer(x):
     """Coerce a pd.Series to integer (if possible)
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
@@ -468,6 +512,8 @@ def to_integer(x: _pd.Series):
     >>> to_integer(pd.Series(["2001", "2011", "1999", ""]))
     >>> to_integer(pd.Series(["1.1", "1,99999", "foobar"])) # fails because of 1.99
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
     s = _replace_comma(x)
     # return _np.floor(_pd.to_numeric(s, errors='coerce')).astype('Int64')
     # mi fido piu di quella di sotto anche se fallisce con i numeri con virgola
@@ -475,13 +521,13 @@ def to_integer(x: _pd.Series):
     return _pd.to_numeric(s, errors="coerce").astype("Int64")
 
 
-def to_numeric(x: _pd.Series):
+def to_numeric(x) -> _pd.Series:
     """Coerce a pd.Series using pd.to_numeric
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
@@ -490,33 +536,37 @@ def to_numeric(x: _pd.Series):
     >>> to_numeric(pd.Series(["2001", "2011", "1999"]))
     >>> to_numeric(pd.Series(["1.1", "2,1", "asd", ""]))
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
     s = _replace_comma(x)
     return _pd.to_numeric(s, errors="coerce").astype("Float64")
 
 
-def to_datetime(x: _pd.Series):
+def to_datetime(x) -> _pd.Series:
     """Coerce to a datetime a pd.Series
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
     >>> import datetime as dt
     >>> to_datetime(pd.Series([str(dt.datetime.now())] * 6))
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
     return _pd.to_datetime(x, errors="coerce")
 
 
-def to_date(x: _pd.Series):
+def to_date(x) -> _pd.Series:
     """Coerce to a date a pd.Series
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
@@ -524,6 +574,8 @@ def to_date(x: _pd.Series):
     >>> to_date(pd.Series([str(dt.datetime.now())] * 6))
     >>> to_date(pd.Series(["2020-01-02", "2021-01-01", "2022-01-02"] * 2))
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
     return to_datetime(x).dt.floor("D")
 
 
@@ -539,30 +591,32 @@ def _extract_dates_worker(x):
         return _pd.NA
 
 
-def extract_dates(x: _pd.Series):
+def extract_dates(x) -> _pd.Series:
     """Try to extract dates from shitty strings and convert them to proper
 
     Parameters
     ----------
-    x: Series
-        The Series to be used
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
     >>> extract_dates(pd.Series(["2020-01-02", "01/01/1956", "asdasd 12-01-02"] * 2))
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
     return x.apply(_extract_dates_worker)
 
 
-def to_categorical(x: _pd.Series,
+def to_categorical(x,
                    categories: list[str] = None,
                    lowcase: bool = False):
     """Coerce to categorical a pd.Series, with blank values as missing
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
@@ -572,6 +626,8 @@ def to_categorical(x: _pd.Series,
     >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", "", np.nan]), categories=["aa", "AA"]  )
     >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", ""]), lowcase = True)
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
     if _is_string(x):
         # string preprocessing
         # rm spaces and uniform NAs
@@ -587,13 +643,13 @@ def to_categorical(x: _pd.Series,
     return _pd.Categorical(x, categories=categories)
 
 
-def to_noyes(x: _pd.Series):
+def to_noyes(x) -> _pd.Series:
     """Coerce to no/yes a string pd.Series
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
@@ -601,6 +657,9 @@ def to_noyes(x: _pd.Series):
     >>> to_noyes(pd.Series([1,0,0, np.nan]))
     >>> to_noyes(pd.Series([1.,0.,0., np.nan]))
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
+
     if _is_string(x):
         # take only the first character and map to n/y
         tmp = x.str.strip().str.lower().str[0]
@@ -610,25 +669,25 @@ def to_noyes(x: _pd.Series):
         # try to convert to boolean and map to n/y
         tmp = to_bool(x).map({False: "n", True: "y"})
 
-
     return to_categorical(tmp.map({"n": "no", "y": "yes"}),
                           categories=["no", "yes"])
 
 
-
-
-def to_sex(x: _pd.Series):
+def to_sex(x) -> _pd.Series:
     """Coerce to male/female a pd.Series of strings (Mm/Ff)
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
     >>> to_sex(pd.Series(["","m","f"," m", "Fm", np.nan]))
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
+
     if not _is_string(x):
         msg = "to_sex only for strings vectors"
         raise Exception(msg)
@@ -640,18 +699,21 @@ def to_sex(x: _pd.Series):
 
 
 
-def to_recist(x: _pd.Series):
+def to_recist(x) -> _pd.Series:
     """Coerce to recist categories a pd.Series of strings
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
     >>> to_recist(pd.Series(["RC", "PD", "SD", "PR", "RP", "boh", np.nan]))
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
+
     if not _is_string(x):
         msg = "to_recist only for strings vectors"
         raise Exception(msg)
@@ -664,19 +726,22 @@ def to_recist(x: _pd.Series):
                           categories=["CR", "PR", "SD", "PD"])
 
 
-def to_other_specify(x: _pd.Series):
+def to_other_specify(x) -> _pd.Series:
     """Try to polish a bit a free-text variable and create a categorical one
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced 
 
     Examples
     --------
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_other_specify(x)
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
+
     nas = (x.isna()) | (x == "")
     tmp = x.copy().astype("str").str.strip().str.lower()
     tmp[nas] = _pd.NA
@@ -685,19 +750,22 @@ def to_other_specify(x: _pd.Series):
     return to_categorical(tmp, categories=categs)
 
 
-def to_string(x: _pd.Series):
+def to_string(x) -> _pd.Series:
     """Coerce the pd.Series passed to a string Series
 
     Parameters
     ----------
-    x: Series
-        The Series to be coerced
+    x: Series or something coercible to
+        data to be coerced
 
     Examples
     --------
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_string(x)
     """
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
+
     nas = x.isna()
     rval = x.astype("str")
     rval[nas] = _pd.NA
@@ -743,7 +811,7 @@ class Coercer:
     >>>     "recist" : ["", "pd", "sd", "pr", "rc", "cr"] + [np.nan, "", "a"],
     >>>     "other" : ["b"]*3 + ["a"]*2 + ["c"] + [np.nan, "", "a"]
     >>> })
-    >>> 
+    >>>
     >>> directives = {
     >>>     lb.dm.to_integer: ["idx", "year"],
     >>>     lb.dm.to_sex : ["sex"],
@@ -755,12 +823,12 @@ class Coercer:
     >>>     lb.dm.to_recist: ["recist"],
     >>>     lb.dm.to_other_specify: ["other"]
     >>> }
-    >>> 
+    >>>
     >>> cleaned1 = lb.dm.Coercer(raw, fv = directives).coerce()
-    >>> 
+    >>>
     >>> raw
     >>> cleaned1
-    >>> 
+    >>>
     >>> # ------------------------------------------------
     >>> # String as key
     >>> # ------------------------------------------------
@@ -811,12 +879,12 @@ class Coercer:
                     reversed.update({v: f})
             self._directives = reversed
 
-    def coerce(self, keep_only_coerced: bool = False) -> _pd.DataFrame:
+    def coerce(self, keep_coerced_only: bool = False) -> _pd.DataFrame:
         """Method to apply programmed coercions
 
         Parameters
         ----------
-        keep_only_coerced:
+        keep_coerced_only:
             if True keep only variables in fv dictionary, after coercion
         """
         # do not modify the input data
@@ -839,7 +907,7 @@ class Coercer:
             df[var] = fun(df[var])
         _pd.set_option("display.max_rows", old_nrows)
         # return results
-        if keep_only_coerced:
+        if keep_coerced_only:
             vars = list(directives.keys())
             df = df[vars]
         return df

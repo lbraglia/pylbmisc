@@ -811,7 +811,7 @@ class Coercer:
                     reversed.update({v: f})
             self._directives = reversed
 
-    def coerce(self, keep_only_coerced=False) -> _pd.DataFrame:
+    def coerce(self, keep_only_coerced: bool = False) -> _pd.DataFrame:
         """Method to apply programmed coercions
 
         Parameters

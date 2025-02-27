@@ -62,6 +62,23 @@ def table2df(df: _pd.DataFrame) -> _pd.DataFrame:
     ----------
     df:
        the crosstabulation to be put in long form
+
+    Examples
+    --------
+    >>> a = np.array(["foo", "foo", "foo", "foo", "bar", "bar", "bar", "bar", "foo", "foo", "foo"], dtype=object)
+    >>> b = np.array(["one", "one", "one", "two", "one", "one", "one", "two", "two", "two", "one"], dtype=object)
+    >>> pd.crosstab(a, b)
+    col_0  one  two
+    row_0
+    bar      3    1
+    foo      4    3
+    >>> tab = pd.crosstab(a,b)
+    >>> table2df(tab)
+    row_0 col_0  x
+    0   bar   one  3
+    1   bar   two  1
+    2   foo   one  4
+    3   foo   two  3
     """
     if not isinstance(df, _pd.DataFrame):
         msg = "Only dataframes are processed."
@@ -246,9 +263,21 @@ def pii_find(x: _pd.DataFrame) -> list[str]:
     >>>     })
     >>>
     >>> probable_piis = pii_find(df)
+    cognome matches 'surname'/'cognome'.
+    nome   matches 'name'/'nome'.
+    mail probably contains emails.
+    fc probably contains fiscal codes.
+    num probably contains telephone numbers.
+    cel probably contains mobile phones numbers.
+    >>> probable_piis
+    ['cognome', 'nome  ', 'mail', 'fc', 'num', 'cel']
     >>> if probable_piis:
-    >>>    df.drop(columns=probable_piis)
-
+    ...     df.drop(columns=probable_piis)
+    ... 
+    id
+    0   1
+    1   2
+    2   3
     """
 
     if not isinstance(x, _pd.DataFrame):
@@ -355,9 +384,12 @@ def fix_varnames(x: str | list[str]):
 
     Examples
     --------
-    >>> fix_varnames("  asd 98n2 3")
+    >>> fix_varnames("  asd 98n2 3")                       
+    'asd_98n2_3'
     >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
+    ['x98n2_3', 'l_kiafj8_0']
     >>> fix_varnames(["asd", "foo0", "asd"])
+    ['asd', 'foo0', 'asd_1']
     """
     if isinstance(x, str):
         original = [x]
@@ -475,9 +507,25 @@ def to_bool(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> to_bool(pd.Series([1,0,1,0]))
+    >>> to_bool([1,0,1,0])
+    0     True
+    1    False
+    2     True
+    3    False
+    dtype: boolean
     >>> to_bool(pd.Series([1,0.,1,0.]))
-    >>> to_bool(pd.Series([1,0,1,0, np.nan]))
+    0     True
+    1    False
+    2     True
+    3    False
+    dtype: boolean
+    >>> to_bool([1,0,1,0, np.nan])
+    0     True
+    1    False
+    2     True
+    3    False
+    4     <NA>
+    dtype: boolean
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -511,9 +559,22 @@ def to_integer(x=None):
 
     Examples
     --------
-    >>> to_integer(pd.Series([1., 2., 3., 4., 5., 6., np.nan]))
-    >>> to_integer(pd.Series(["2001", "2011", "1999", ""]))
-    >>> to_integer(pd.Series(["1.1", "1,99999", "foobar"])) # fails because of 1.99
+    >>> to_integer([1., 2., 3., 4., 5., 6., np.nan])
+    0       1
+    1       2
+    2       3
+    3       4
+    4       5
+    5       6
+    6    <NA>
+    dtype: Int64
+    >>> to_integer(["2001", "2011", "1999", ""])
+    0    2001
+    1    2011
+    2    1999
+    3    <NA>
+    dtype: Int64
+    >>> # to_integer(["1.1", "1,99999", "foobar"]) # fails because of 1.99
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -537,10 +598,30 @@ def to_numeric(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> to_numeric(pd.Series([1, 2, 3]))
-    >>> to_numeric(pd.Series([1., 2., 3., 4., 5., 6.]))
-    >>> to_numeric(pd.Series(["2001", "2011", "1999"]))
-    >>> to_numeric(pd.Series(["1.1", "2,1", "asd", ""]))
+    >>> to_numeric([1, 2, 3])
+    0    1.0
+    1    2.0
+    2    3.0
+    dtype: Float64
+    >>> to_numeric([1., 2., 3., 4., 5., 6.])
+    0    1.0
+    1    2.0
+    2    3.0
+    3    4.0
+    4    5.0
+    5    6.0
+    dtype: Float64
+    >>> to_numeric(["2001", "2011", "1999"])
+    0    2001.0
+    1    2011.0
+    2    1999.0
+    dtype: Float64
+    >>> to_numeric(["1.1", "2,1", "asd", ""])
+    0     1.1
+    1     2.1
+    2    <NA>
+    3    <NA>
+    dtype: Float64
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -562,7 +643,7 @@ def to_datetime(x=None) -> _pd.Series:
     Examples
     --------
     >>> import datetime as dt
-    >>> to_datetime(pd.Series([str(dt.datetime.now())] * 6))
+    >>> to_datetime([str(dt.datetime.now())] * 6)
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -582,9 +663,14 @@ def to_date(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> import datetime as dt
-    >>> to_date(pd.Series([str(dt.datetime.now())] * 6))
-    >>> to_date(pd.Series(["2020-01-02", "2021-01-01", "2022-01-02"] * 2))
+    >>> to_date(["2020-01-02", "2021-01-01", "2022-01-02"] * 2)
+    0   2020-01-02
+    1   2021-01-01
+    2   2022-01-02
+    3   2020-01-02
+    4   2021-01-01
+    5   2022-01-02
+    dtype: datetime64[ns]
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -617,6 +703,13 @@ def extract_dates(x=None) -> _pd.Series:
     Examples
     --------
     >>> extract_dates(pd.Series(["2020-01-02", "01/01/1956", "asdasd 12-01-02"] * 2))
+    0   2020-01-02
+    1   1956-01-01
+    2   2002-12-01
+    3   2020-01-02
+    4   1956-01-01
+    5   2002-12-01
+    dtype: datetime64[ns]
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -638,11 +731,21 @@ def to_categorical(x=None,
 
     Examples
     --------
-    >>> to_categorical(pd.Series([1, 2, 1, 2, 3]))
-    >>> to_categorical(pd.Series([1, 2., 1., 2, 3, np.nan]))
-    >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", "", np.nan]))
-    >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", "", np.nan]), categories=["aa", "AA"]  )
-    >>> to_categorical(pd.Series(["AA", "sd", "asd", "aa", ""]), lowcase = True)
+    >>> to_categorical([1, 2, 1, 2, 3])
+    [1, 2, 1, 2, 3]
+    Categories (3, int64): [1, 2, 3]
+    >>> to_categorical([1, 2., 1., 2, 3, np.nan])
+    [1.0, 2.0, 1.0, 2.0, 3.0, NaN]
+    Categories (3, float64): [1.0, 2.0, 3.0]
+    >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan])
+    ['AA', 'sd', 'asd', 'aa', NaN, NaN]
+    Categories (4, object): ['AA', 'aa', 'asd', 'sd']
+    >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan], categories=["aa", "AA"] )
+    ['AA', NaN, NaN, 'aa', NaN, NaN]
+    Categories (2, object): ['aa', 'AA']
+    >>> to_categorical(["AA", "sd", "asd", "aa", ""], lowcase = True)
+    ['aa', 'sd', 'asd', 'aa', NaN]
+    Categories (3, object): ['aa', 'asd', 'sd']
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -674,9 +777,15 @@ def to_noyes(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> to_noyes(pd.Series(["","yes","no","boh", "si", np.nan]))
-    >>> to_noyes(pd.Series([1,0,0, np.nan]))
-    >>> to_noyes(pd.Series([1.,0.,0., np.nan]))
+    >>> to_noyes(["","yes","no","boh", "si", np.nan])
+    [NaN, 'yes', 'no', NaN, 'yes', NaN]
+    Categories (2, object): ['no', 'yes']
+    >>> to_noyes([1,0,0, np.nan])
+    ['yes', 'no', 'no', NaN]
+    Categories (2, object): ['no', 'yes']
+    >>> to_noyes([1.,0.,0., np.nan])
+    ['yes', 'no', 'no', NaN]
+    Categories (2, object): ['no', 'yes']
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -706,7 +815,9 @@ def to_sex(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> to_sex(pd.Series(["","m","f"," m", "Fm", np.nan]))
+    >>> to_sex(["","m","f"," m", "Fm", np.nan])
+    [NaN, 'male', 'female', 'male', 'female', NaN]
+    Categories (2, object): ['male', 'female']
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -733,7 +844,9 @@ def to_recist(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> to_recist(pd.Series(["RC", "PD", "SD", "PR", "RP", "boh", np.nan]))
+    >>> to_recist(["RC", "PD", "SD", "PR", "RP", "boh", np.nan])
+    ['CR', 'PD', 'SD', 'PR', 'PR', NaN, NaN]
+    Categories (4, object): ['CR', 'PR', 'SD', 'PD']
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -764,6 +877,8 @@ def to_other_specify(x=None) -> _pd.Series:
     --------
     >>> x = pd.Series(["asd", "asd", "", "prova", "ciao", 3]+ ["bar"]*4)
     >>> to_other_specify(x)
+    ['asd', 'asd', NaN, 'prova', 'ciao', '3', 'bar', 'bar', 'bar', 'bar']
+    Categories (5, object): ['bar', 'asd', 'prova', 'ciao', '3']
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -832,54 +947,70 @@ class Coercer:
     >>> # Function as key
     >>> # ------------------------------------------------
     >>> raw = pd.DataFrame({
-    >>>     "idx" :  [1., 2., 3., 4., 5., 6., "2,0", "", np.nan],
-    >>>     "sex" :  ["m", "maschio", "f", "female", "m", "M", "", "a", np.nan],
-    >>>     "now":   [str(dt.datetime.now())] * 6 + [np.nan, "", "a"],
-    >>>     "date":  ["2020-01-02", "2021-01-01", "2022-01-02"] * 2  + [np.nan, "", "a"],
-    >>>     "state": ["Ohio", "Ohio", "Ohio", "Nevada", "Nevada", "Nevada"] + [np.nan, "", "a"],
-    >>>     "ohio" : [1, 1, 1, 0, 0, 0] + [np.nan] * 3 ,
-    >>>     "year":  [str(y) for y in [2000, 2001, 2002, 2001, 2002, 2003]] + [np.nan, "", "a"],
-    >>>     "pop":   [str(p) for p in [1.5, 1.7, 3.6, np.nan, 2.9]]  + ["3,2", np.nan, "", "a"],
-    >>>     "recist" : ["", "pd", "sd", "pr", "rc", "cr"] + [np.nan, "", "a"],
-    >>>     "other" : ["b"]*3 + ["a"]*2 + ["c"] + [np.nan, "", "a"]
-    >>> })
-    >>>
+    ...     "idx" :  [1., 2., 3., 4., 5., 6., "2,0", "", np.nan],
+    ...     "sex" :  ["m", "maschio", "f", "female", "m", "M", "", "a", np.nan],
+    ...     "now":   [str(dt.datetime.now())] * 6 + [np.nan, "", "a"],
+    ...     "date":  ["2020-01-02", "2021-01-01", "2022-01-02"] * 2  + [np.nan, "", "a"],
+    ...     "state": ["Ohio", "Ohio", "Ohio", "Nevada", "Nevada", "Nevada"] + [np.nan, "", "a"],
+    ...     "ohio" : [1, 1, 1, 0, 0, 0] + [np.nan] * 3 ,
+    ...     "year":  [str(y) for y in [2000, 2001, 2002, 2001, 2002, 2003]] + [np.nan, "", "a"],
+    ...     "pop":   [str(p) for p in [1.5, 1.7, 3.6, np.nan, 2.9]]  + ["3,2", np.nan, "", "a"],
+    ...     "recist" : ["", "pd", "sd", "pr", "rc", "cr"] + [np.nan, "", "a"],
+    ...     "other" : ["b"]*3 + ["a"]*2 + ["c"] + [np.nan, "", "a"]
+    ... })
     >>> directives = {
-    >>>     lb.dm.to_integer: ["idx", "year"],
-    >>>     lb.dm.to_sex : ["sex"],
-    >>>     lb.dm.to_datetime : ["now"],
-    >>>     lb.dm.to_date: ["date"],
-    >>>     lb.dm.to_categorical: ["state"],
-    >>>     lb.dm.to_bool: ["ohio"],
-    >>>     lb.dm.to_numeric: ["pop"],
-    >>>     lb.dm.to_recist: ["recist"],
-    >>>     lb.dm.to_other_specify: ["other"]
-    >>> }
+    ...     lb.dm.to_integer: ["idx", "year"],
+    ...     lb.dm.to_sex : ["sex"],
+    ...     lb.dm.to_datetime : ["now"],
+    ...     lb.dm.to_date: ["date"],
+    ...     lb.dm.to_categorical: ["state"],
+    ...     lb.dm.to_bool: ["ohio"],
+    ...     lb.dm.to_numeric: ["pop"],
+    ...     lb.dm.to_recist: ["recist"],
+    ...     lb.dm.to_other_specify: ["other"]
+    ... }
     >>>
-    >>> cleaned1 = lb.dm.Coercer(raw, fv = directives).coerce()
-    >>>
+    >>> cleaned1 = lb.dm.Coercer(raw, fv = directives, verbose = False).coerce()
     >>> raw
+       idx      sex                         now        date   state  ohio  year  pop recist other
+    0  1.0        m  2025-02-27 17:09:48.602618  2020-01-02    Ohio   1.0  2000  1.5            b
+    1  2.0  maschio  2025-02-27 17:09:48.602618  2021-01-01    Ohio   1.0  2001  1.7     pd     b
+    2  3.0        f  2025-02-27 17:09:48.602618  2022-01-02    Ohio   1.0  2002  3.6     sd     b
+    3  4.0   female  2025-02-27 17:09:48.602618  2020-01-02  Nevada   0.0  2001  nan     pr     a
+    4  5.0        m  2025-02-27 17:09:48.602618  2021-01-01  Nevada   0.0  2002  2.9     rc     a
+    5  6.0        M  2025-02-27 17:09:48.602618  2022-01-02  Nevada   0.0  2003  3,2     cr     c
+    6  2,0                                  NaN         NaN     NaN   NaN   NaN  NaN    NaN   NaN
+    7             a                                                   NaN                        
+    8  NaN      NaN                           a           a       a   NaN     a    a      a     a
     >>> cleaned1
+        idx     sex                        now       date   state   ohio  year   pop recist other
+    0     1    male 2025-02-27 17:09:48.602618 2020-01-02    Ohio   True  2000   1.5    NaN     b
+    1     2    male 2025-02-27 17:09:48.602618 2021-01-01    Ohio   True  2001   1.7     PD     b
+    2     3  female 2025-02-27 17:09:48.602618 2022-01-02    Ohio   True  2002   3.6     SD     b
+    3     4  female 2025-02-27 17:09:48.602618 2020-01-02  Nevada  False  2001  <NA>     PR     a
+    4     5    male 2025-02-27 17:09:48.602618 2021-01-01  Nevada  False  2002   2.9     CR     a
+    5     6    male 2025-02-27 17:09:48.602618 2022-01-02  Nevada  False  2003   3.2     CR     c
+    6     2     NaN                        NaT        NaT     NaN   <NA>  <NA>  <NA>    NaN   NaN
+    7  <NA>     NaN                        NaT        NaT     NaN   <NA>  <NA>  <NA>    NaN   NaN
+    8  <NA>     NaN                        NaT        NaT       a   <NA>  <NA>  <NA>    NaN     a
     >>>
     >>> # ------------------------------------------------
-    >>> # String as key
+    >>> # It's possilbe to specify string as key as well
     >>> # ------------------------------------------------
     >>>
     >>> directives2 = {
-    >>>     "lb.dm.to_categorical": ["state"],
-    >>>     "lb.dm.to_date": ["date"],
-    >>>     "lb.dm.to_datetime" : ["now"],
-    >>>     "lb.dm.to_integer": ["idx", "year"],
-    >>>     "lb.dm.to_noyes": ["ohio"],
-    >>>     "lb.dm.to_numeric": ["pop"],
-    >>>     "lb.dm.to_other_specify": ["other"],
-    >>>     "lb.dm.to_recist": ["recist"],
-    >>>     "lb.dm.to_sex" : ["sex"]
-    >>> }
+    ...     "lb.dm.to_categorical": ["state"],
+    ...     "lb.dm.to_date": ["date"],
+    ...     "lb.dm.to_datetime" : ["now"],
+    ...     "lb.dm.to_integer": ["idx", "year"],
+    ...     "lb.dm.to_noyes": ["ohio"],
+    ...     "lb.dm.to_numeric": ["pop"],
+    ...     "lb.dm.to_other_specify": ["other"],
+    ...     "lb.dm.to_recist": ["recist"],
+    ...     "lb.dm.to_sex" : ["sex"]
+    ... }
     >>>
-    >>>
-    >>> coercer2 = lb.dm.Coercer(raw, fv = directives2)
-    >>> cleaned2 = coercer2.coerce()
+    >>> # same results after ...
     """
 
     def __init__(
@@ -943,3 +1074,7 @@ class Coercer:
             vars = list(directives.keys())
             df = df[vars]
         return df
+
+
+if __name__ == "__main__":
+    pass

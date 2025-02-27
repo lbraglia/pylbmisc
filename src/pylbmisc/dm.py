@@ -327,9 +327,9 @@ def pii_find(x: _pd.DataFrame) -> list[str]:
         if pii_sum:
             probable_pii.append(var)
             if is_surname:
-                print(f"{var} matches 'surname'/'cognome'.")
+                print(f"'{var}' matches 'surname'/'cognome'.")
             if is_name:
-                print(f"{var} matches 'name'/'nome'.")
+                print(f"'{var}' matches 'name'/'nome'.")
             if has_mail:
                 print(f"{var} probably contains emails.")
             if has_fc:

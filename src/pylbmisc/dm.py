@@ -111,7 +111,7 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
         with outfile.open("w") as f:
             for col in df:
                 # Header
-                print(f"DataFrame: '{df_lab}' "
+                print(f"DataFrame: '{df_lab}', "
                       f"Column: '{col}', "
                       f"Dtype: {df[col].dtype}, "
                       f"Unique values:",
@@ -124,11 +124,32 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
                 print(file=f)
 
 
+def qcut(x, q, **kwargs) -> _pd.Series:
+    """An alternative to pd.qcut
+
+    This function produces categorization based on quantiles but without the
+    index produced by pd.qcut that can give issues in some routines not
+
+    Parameters
+    ----------
+    x: 1d ndarray or Series
+        as in pd.qcut
+    q: int or list-like of float
+        as in pd.qcut
+    kwargs:
+        other parameter passed to pd.qcut (all but labels!)
+    """
+    full = _pd.qcut(x, q, **kwargs)
+    categories = full.cat.categories.astype(str).to_list()
+    raw = _pd.qcut(x, q, labels=False, **kwargs)
+    recode = {prog: lab for prog, lab in enumerate(categories)}
+    mapped = raw.map(recode)
+    return to_categorical(mapped, categories=categories)
+
+
 # -------------------------------------------------------------------------
 # pii_erase
 # ------------------------------------------------------------------------
-
-
 # Searching by column name
 def _columns_match(df_columns, searched):
     """Search in columns names, both exact match and contains match"""

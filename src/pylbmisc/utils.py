@@ -15,6 +15,7 @@ import types as _types
 from pylbmisc.iter import unique as _unique
 from inspect import getsource as _getsource
 from typing import Sequence as _Sequence
+from pprint import pformat as _pformat
 
 _readline.parse_and_bind("set editing-mode emacs")
 
@@ -272,53 +273,80 @@ def dput(x) -> None:
     --------
     >>> from pylbmisc.utils import dput
     >>> import pylbmisc as lb
-    >>> List = [1, 2, 3]
+    >>> List = list(range(0, 200))
     >>> dput(List)
     >>> Dict = {"a": 1, "b": 2}
     >>> dput(Dict)
-    >>> nparray = _np.array([1, 2, 3])
+    >>> Dict2 = {"a": List, "b": List}
+    >>> dput(Dict2)
+    >>> nparray = _np.array(List)
     >>> dput(nparray)
-    >>> series = _pd.Series([1, 2, 3])
+    >>> series = _pd.Series(List)
     >>> dput(series)
-    >>> df = lb.datasets.load()
-    >>> dput(df)
-    >>> 
+    >>>
     >>> def function() -> None:
     >>>     pass
     >>> dput(function)
-
+    >>> lb.datasets.ls()
+    >>> df = lb.datasets.load('aidssi.csv')
+    >>> dput(df)
     """
     if isinstance(x, _types.FunctionType):  # special cases: don't use repr
         print(_getsource(x))
     elif isinstance(x, _pd.DataFrame):
-        dict_rep = repr(df.to_dict())
+        dict_rep = _pformat(x.to_dict(orient="list"), compact=True)
         print(f"pd.DataFrame({dict_rep})")
     elif isinstance(x, _pd.Series):
-        list_rep = repr(x.to_list())
+        list_rep = _pformat(x.to_list(), compact=True)
         print(f"pd.Series({list_rep})")
     elif isinstance(x, _np.ndarray):
-        list_rep = repr(nparray.tolist())
+        list_rep = _pformat(nparray.tolist(), compact=True)
         print(f"np.array({list_rep})")
-    elif hasattr(x, "__repr__"):  # default case: use repr if available
-        print(repr(x))
-    else:                         # remaining cases: throw error otherwise
-        raise NotImplementedError
+    else:
+        obj_repr = _pformat(x, compact=True)
+        print(obj_repr)
     return None
+
+
+def Table(x: _pd.Series | None = None,
+          y: _pd.Series | None = None,
+          **kwargs):
+    """Emulate the good old table for quick crosstabs
+
+    Parameters
+    ----------
+    x: pd.Series
+       first variable
+    y: pd.Series
+       second variable
+    kwargs: Any
+       other parameters passed to Series.value_counts or pd.crosstab
+    """
+    if x is None:
+        msg = 'Almeno una variable'
+        raise ValueError(msg)
+    if y is None:
+        return x.value_counts(dropna=False, **kwargs)
+    else:
+        return _pd.crosstab(x, y, dropna=False, margins=True, **kwargs)
 
 
 if __name__ == "__main__":
     import pylbmisc as lb
-    List = [1, 2, 3]
+    List = list(range(0, 200))
     dput(List)
     Dict = {"a": 1, "b": 2}
     dput(Dict)
-    nparray = _np.array([1, 2, 3])
+    Dict2 = {"a": List, "b": List}
+    dput(Dict2)
+    nparray = _np.array(List)
     dput(nparray)
-    series = _pd.Series([1, 2, 3])
+    series = _pd.Series(List)
     dput(series)
 
     def function() -> None:
         pass
     dput(function)
-    df = lb.datasets.load()
+    lb.datasets.ls()
+    df = lb.datasets.load('aidssi.csv')
     dput(df)

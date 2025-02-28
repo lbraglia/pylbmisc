@@ -90,8 +90,8 @@ def export_figure(fig,
 # Dataset Import/export routines
 # ------------------------------------
 def import_data(fpaths: str | _Path | _Sequence[str | _Path],
-                csv_kwargs: dict = {},
-                excel_kwargs: dict = {},
+                csv_kwargs: dict = {"dtype_backend": "pyarrow"},
+                excel_kwargs: dict = {"dtype_backend": "pyarrow"},
                 rm_common_prefix: bool = True) -> _pd.DataFrame | dict[str, _pd.DataFrame]:
     '''Import data
 
@@ -99,13 +99,13 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
 
     Parameters
     ----------
-    fpaths:
+    fpaths: string, Path, or sequence of
         file paths (supported formats: .csv .xls .xlsx .zip)
-    csv_kwargs:
+    csv_kwargs: dict
         parameter passed to read_csv
-    excel_kwargs:
+    excel_kwargs: dict
         parameter passed to read_excel
-    rm_common_prefix:
+    rm_common_prefix: bool
         if dataset share the same common prefix, remove it
 
     Returns

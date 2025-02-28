@@ -13,16 +13,15 @@ from lifelines.plotting import add_at_risk_counts as _add_at_risk_counts
 from lifelines.statistics import multivariate_logrank_test as _multivariate_logrank_test
 from lifelines.utils import qth_survival_times as _qth_survival_times
 from pylbmisc.dm import to_date as _to_date
-from pylbmisc.dm import to_integer as _to_integer
+from pylbmisc.dm import _to_integer
 from pylbmisc.stats import p_format as _p_format
 from warnings import warn as _warn
 
 
 def _estquant(fit, quantiles):
     "Return estimates and quantiles of survival function with confidence intervals"
-    estimates = _pd.concat([fit.survival_function_,
-                           fit.confidence_interval_],
-                          axis = 'columns')
+    estimates = _pd.concat([fit.survival_function_, fit.confidence_interval_],
+                           axis = 'columns')
     quant = _qth_survival_times(quantiles, estimates)
     quant = quant.reset_index()
     quant.columns = ["Quantile", "Estimate", "Lower", "Upper"]
@@ -31,21 +30,21 @@ def _estquant(fit, quantiles):
     return estimates, quant
 
 
-def km(time, status, group = None,
-       plot = True,
-       ylab = "Survival probability",
-       xlab = "Time",
-       counts = ["Events"],
-       xticks = None,
-       ci_alpha = 0.3,
-       quantiles = [0.5],
-       plot_logrank = True):
+def km(time,
+       status,
+       group=None,
+       plot=True,
+       ylab="Survival probability",
+       xlab="Time",
+       counts=["Events"],
+       xticks=None,
+       ci_alpha=0.3,
+       quantiles=[0.5],
+       plot_logrank=True):
     """Kaplan-Meier estimates and logrank test.
 
-    :meta public:
-   
     Does the Kaplan-Meier plot with logrank
-       
+
     Parameters
     ----------
     time: time

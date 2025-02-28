@@ -4,6 +4,7 @@ import functools as _functools
 import inspect as _inspect
 import numpy as _np
 import pandas as _pd
+# import pyarrow as _pa
 import re as _re
 import string as _string
 import subprocess as _subprocess
@@ -12,6 +13,8 @@ import tempfile as _tempfile
 from pprint import pprint as _pprint
 from pathlib import Path as _Path
 
+
+_dtype_backend = "pyarrow"
 
 # -------------------------------------------------------------------------
 # regular expressions used
@@ -117,10 +120,11 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
                       f"Unique values:",
                       file=f)
                 # Dati: non sortati perché ci sono problemi se i dati sono metà
-                # numerici e meta stringa
-                # _pprint(df[col].sort_values().unique().tolist(), stream = f,
-                # compact=True)
-                _pprint(df[col].unique().tolist(), stream=f, compact=True)
+                # numerici e meta stringa? bah ci riprovo
+                _pprint(df[col].sort_values().unique().tolist(),
+                        stream=f,
+                        compact=True)
+                # _pprint(df[col].unique().tolist(), stream=f, compact=True)
                 print(file=f)
 
 
@@ -181,7 +185,7 @@ def _is_string(x: _pd.Series) -> bool:
     >>> _is_string(x)
 
     """
-    return x.dtype == "O"
+    return x.dtype in ["O", "string[pyarrow]"]
 
 
 def _has_emails(x: _pd.Series) -> bool:
@@ -499,7 +503,6 @@ def sanitize_varnames(x: _pd.DataFrame | dict[str, _pd.DataFrame],
             return dfs
 
 
-
 # -------------------------------------------------------------------------
 # Coercion stuff below
 # -------------------------------------------------------------------------
@@ -517,7 +520,6 @@ def _verboser(f):
 
 
 # --------------- coercion workers ----------------------------------------
-
 def to_bool(x=None) -> _pd.Series:
     """Coerce to a boolean pd.Series
 
@@ -533,20 +535,20 @@ def to_bool(x=None) -> _pd.Series:
     1    False
     2     True
     3    False
-    dtype: boolean
+    dtype: boolean[pyarrow]
     >>> to_bool(pd.Series([1,0.,1,0.]))
     0     True
     1    False
     2     True
     3    False
-    dtype: boolean
+    dtype: boolean[pyarrow]
     >>> to_bool([1,0,1,0, np.nan])
     0     True
     1    False
     2     True
     3    False
     4     <NA>
-    dtype: boolean
+    dtype: boolean[pyarrow]
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -554,7 +556,7 @@ def to_bool(x=None) -> _pd.Series:
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     nas = _pd.isna(x)
-    rval = x.astype("boolean")
+    rval = x.astype("boolean[pyarrow]" if _dtype_backend == 'pyarrow' else "boolean")
     rval[nas] = _pd.NA
     return rval
 
@@ -570,7 +572,10 @@ def _replace_comma(x: _pd.Series):
         return x
 
 
-def to_integer(x=None):
+# actually to_integer is used only by tteep to ensure, otherwise to_numeric
+# with pyarrow backend should handle both integers and floats gracefully and
+# there's no need for another function
+def _to_integer(x=None) -> _pd.Series:
     """Coerce a pd.Series to integer (if possible)
 
     Parameters
@@ -606,7 +611,14 @@ def to_integer(x=None):
     # return _np.floor(_pd.to_numeric(s, errors='coerce')).astype('Int64')
     # mi fido piu di quella di sotto anche se fallisce con i numeri con virgola
     # (che ci può stare, per i quale bisogna usare np.floor)
-    return _pd.to_numeric(s, errors="coerce").astype("Int64")
+    return _pd.to_numeric(
+        s,
+        # dtype_backend = _dtype_backend,
+        errors="coerce").astype(
+            "Int64"
+            # "int64[pyarrow]" if _dtype_backend == 'pyarrow' else "Int64"
+            # _pd.ArrowDtype(_pa.int64()) if _dtype_backend == 'pyarrow' else "Int64"
+        )
 
 
 def to_numeric(x=None) -> _pd.Series:
@@ -620,10 +632,11 @@ def to_numeric(x=None) -> _pd.Series:
     Examples
     --------
     >>> to_numeric([1, 2, 3])
-    0    1.0
-    1    2.0
-    2    3.0
-    dtype: Float64
+
+    0    1
+    1    2
+    2    3
+    dtype: int64[pyarrow]
     >>> to_numeric([1., 2., 3., 4., 5., 6.])
     0    1.0
     1    2.0
@@ -631,18 +644,18 @@ def to_numeric(x=None) -> _pd.Series:
     3    4.0
     4    5.0
     5    6.0
-    dtype: Float64
+    dtype: double[pyarrow]
     >>> to_numeric(["2001", "2011", "1999"])
-    0    2001.0
-    1    2011.0
-    2    1999.0
-    dtype: Float64
+    0    2001
+    1    2011
+    2    1999
+    dtype: int64[pyarrow]
     >>> to_numeric(["1.1", "2,1", "asd", ""])
     0     1.1
     1     2.1
     2    <NA>
     3    <NA>
-    dtype: Float64
+    dtype: double[pyarrow]
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -650,7 +663,7 @@ def to_numeric(x=None) -> _pd.Series:
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     s = _replace_comma(x)
-    return _pd.to_numeric(s, errors="coerce").astype("Float64")
+    return _pd.to_numeric(s, errors="coerce", dtype_backend=_dtype_backend)
 
 
 def to_datetime(x=None) -> _pd.Series:
@@ -742,13 +755,20 @@ def extract_dates(x=None) -> _pd.Series:
 
 def to_categorical(x=None,
                    categories: list[str] | None = None,
-                   lowcase: bool = False):
+                   ordered: bool = False,
+                   lowcase: bool = False) -> _pd.Categorical:
     """Coerce to categorical a pd.Series, with blank values as missing
 
     Parameters
     ----------
     x: Series or something coercible to
         data to be coerced
+    categories: list of str
+        labels to be considered as valid groups
+    ordered: bool
+        make an ordered categorical?
+    lowcase: bool
+        lowcase the data (str) before transforming to categories?
 
     Examples
     --------
@@ -781,14 +801,14 @@ def to_categorical(x=None,
         x[nas] = _pd.NA
         if lowcase:
             x = x.str.lower()
-            if categories != None:
+            if categories is not None:
                 categories = [c.lower() for c in categories]
 
     # categorical making
-    return _pd.Categorical(x, categories=categories)
+    return _pd.Categorical(x, categories=categories, ordered=ordered)
 
 
-def to_noyes(x=None) -> _pd.Series:
+def to_noyes(x=None) -> _pd.Categorical:
     """Coerce to no/yes a string pd.Series
 
     Parameters
@@ -826,7 +846,7 @@ def to_noyes(x=None) -> _pd.Series:
                           categories=["no", "yes"])
 
 
-def to_sex(x=None) -> _pd.Series:
+def to_sex(x=None) -> _pd.Categorical:
     """Coerce to male/female a pd.Series of strings (Mm/Ff)
 
     Parameters
@@ -855,7 +875,7 @@ def to_sex(x=None) -> _pd.Series:
     return to_categorical(tmp, categories=["male", "female"])
 
 
-def to_recist(x=None) -> _pd.Series:
+def to_recist(x=None) -> _pd.Categorical:
     """Coerce to recist categories a pd.Series of strings
 
     Parameters
@@ -886,13 +906,13 @@ def to_recist(x=None) -> _pd.Series:
                           categories=["CR", "PR", "SD", "PD"])
 
 
-def to_other_specify(x=None) -> _pd.Series:
+def to_other_specify(x=None) -> _pd.Categorical:
     """Try to polish a bit a free-text variable and create a categorical one
 
     Parameters
     ----------
     x: Series or something coercible to
-        data to be coerced 
+        data to be coerced
 
     Examples
     --------

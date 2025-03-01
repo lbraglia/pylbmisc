@@ -1,8 +1,9 @@
 import unittest
 import pandas as pd
 import numpy as np
-from pylbmisc.dm import to_bool, to_integer, to_numeric, to_datetime, to_date, \
-    to_categorical, to_noyes, to_sex, to_recist, to_other_specify, to_string
+from pylbmisc.dm import to_bool, to_integer, to_numeric, to_datetime, \
+    to_date, to_categorical, to_noyes, to_sex, to_recist, to_other_specify, \
+    to_string
 
 
 class TestDMFunctions(unittest.TestCase):

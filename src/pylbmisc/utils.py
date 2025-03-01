@@ -26,24 +26,24 @@ def argparser(opts):
     Examples
     --------
     >>> import pylbmisc as lb # third party
-    >>> # from ..utils import argparser # in scripts directory
     >>>
     >>> opts = (
-    >>>   # (param, help, default, type)
-    >>>   # --dirs
-    >>>   ("dirs", "str: comma separated list of exercise source directories","~/src/pypkg/exercises/db", str),
-    >>>   # --lists
-    >>>   ("lists", "str: comma separated list of file with lists of source dir", None, str),
-    >>>   # --outfile
-    >>>   ("outfile", "str:  sqlite3 db to save", "~/.exercises.db", str))
-    >>>
-    >>> args = lb.utils.argparser(opts)
-    >>> dirs = args["dirs"]
-    >>> dirs = dirs.split(",")
-    >>> lists = args["lists"]
-    >>> lists = lists.split(",")
-    >>> outfile = args["outfile"]
-    >>> print({"dirs": dirs, "lists": lists, "outfile": outfile})
+    ...  # (param, help, default, type)
+    ...  # --dirs
+    ...  ("dirs", "str: comma separated list of exercise source directories",
+    ...  "~/src/pypkg/exercises/db", str),
+    ...  # --list
+    ...  ("list", "str: comma separated list of file with lists of source dir",
+    ...   None, str),
+    ...  # --outfile
+    ...  ("outfile", "str:  sqlite3 db to save", "~/.exercises.db", str))
+    >>> # args = lb.utils.argparser(opts)   # tests, you know ...
+    >>> # dirs = args["dirs"]
+    >>> # dirs = dirs.split(",")
+    >>> # lists = args["lists"]
+    >>> # lists = lists.split(",")
+    >>> # outfile = args["outfile"]
+    >>> # print({"dirs": dirs, "lists": lists, "outfile": outfile})
     """
     parser = _argparse.ArgumentParser()
     # defaults = {}
@@ -89,21 +89,29 @@ def argparser(opts):
                 args[optname] = "True"
             else:
                 args[optname] = ""
-        # converti il tipo a quello specificato, a meno che non sia None se no lascialo così
+        # converti il tipo a quello specificato, a meno che non sia None se no
+        # lascialo così
         if args[optname] is not None:
             args[optname] = opttype(args[optname])
     return args
 
 
 def line_to_numbers(x: str) -> list[int]:
-    """transform a string of positive numbers "1 2-3, 4, 6-10" into a
+    """Transform a string of positive numbers "1 2-3, 4, 6-10" into a
     list [1,2,3,4,6,7,8,9,10]
+
+    Parameters
+    ----------
+    x: str
+       string containing numbers such as printers pages lists
 
     Examples
     --------
-    >>> line_to_numbers("1, 2-5")
+    >>> from pylbmisc.utils import line_to_numbers
+    >>> line_to_numbers("1, 2-4, 16-18")
+    [1, 2, 3, 4, 16, 17, 18]
     """
-    # replace comma with white chars
+    # # replace comma with white chars
     x = x.replace(",", " ")
     # keep only digits, - and white spaces
     x = _re.sub(r"[^\d\- ]", "", x)
@@ -136,9 +144,6 @@ def line_to_numbers(x: str) -> list[int]:
                 pass
             expanded_range = [str(val) for val in range(first, second, step)]
             expanded += expanded_range
-        else:
-            msg = str(spl[i]) + "does not match a single page re nor a pages range re."
-            raise ValueError(msg)
     # coerce to integer expanded
     res: list[int] = [int(x) for x in expanded]
     return res
@@ -161,11 +166,13 @@ def menu(choices: _Sequence[str],
     allow_repetition: bool
          multiple selected items
     strict: bool
-         all the selection number are among the available ones (or take the consistent otherwise)
+         all the selection number are among the available ones
+         (or take the consistent otherwise)
     """
     available_ind = [i + 1 for i in range(len(choices))]
     avail_with_0 = [0, *available_ind]
-    the_menu = "\n".join([str(i) + ". " + str(c) for i, c in zip(available_ind, choices)])
+    the_menu = "\n".join([str(i) + ". " + str(c)
+                          for i, c in zip(available_ind, choices)])
     if title:
         ascii_header(title)
     print(the_menu, "\n")
@@ -205,14 +212,23 @@ def ascii_header(x: str) -> None:
     """
     Create an ascii header given a string as title.
 
+    Parameters
+    ----------
+    x: str
+        message to be prettyprinted
+
     Examples
     --------
-    >>> ascii_header("Title")
+    >>> import pylbmisc as lb
+    >>> ascii_header("Hello, world!")
+    =============
+    Hello, world!
+    =============
+    <BLANKLINE>
     """
     header = "=" * len(x)
-    print(header)
-    print(x)
-    print(header, "\n")
+    msg = f"{header}\n{x}\n{header}\n"
+    print(msg)
 
 
 def match_arg(arg, choices):
@@ -220,22 +236,23 @@ def match_arg(arg, choices):
 
     Examples
     --------
+    >>> from pylbmisc.utils import match_arg
     >>> # questo ritorna errore perché matcha troppo
     >>> user_input = "foo"
-    >>> a = match_arg(user_input, ["foobar", "foos", "asdomar"])
-
+    >>> # a = match_arg(user_input, ["foobar", "foos", "asdomar"]) # errore
     >>> # questo è ok e viene espanso
     >>> user_input2 = "foob"
     >>> a = match_arg(user_input2, ["foobar", "foos", "asdomar"])
     >>> print(a)
+    foobar
     """
     res = [expanded for expanded in choices if expanded.startswith(arg)]
     choices_str = ", ".join(choices)
-    l = len(res)
-    if l == 0:
+    res_len = len(res)
+    if res_len == 0:
         msg = f"Parameter {arg} must be one of: {choices_str}"
         raise ValueError(msg)
-    elif l > 1:
+    elif res_len > 1:
         msg = f"Parameter {arg} matches multiple choices from: {choices_str}"
         raise ValueError(msg)
     else:
@@ -248,10 +265,18 @@ def expand_grid(dictionary):
 
     Examples
     --------
+    >>> import pylbmisc as lb
     >>> stratas =  {"centres": ["ausl re", "ausl mo"],
-                    "agecl": ["<18", "18-65", ">65"],
-                    "foo": ["1"]}
+    ...             "agecl": ["<18", "18-65", ">65"],
+    ...             "foo": ["1"]}
     >>> lb.utils.expand_grid(stratas)
+       centres  agecl foo
+    0  ausl re    <18   1
+    1  ausl re  18-65   1
+    2  ausl re    >65   1
+    3  ausl mo    <18   1
+    4  ausl mo  18-65   1
+    5  ausl mo    >65   1
     """
     rows = [row for row in _itertools.product(*dictionary.values())]
     return _pd.DataFrame(rows, columns=dictionary.keys())
@@ -267,25 +292,37 @@ def dput(x) -> None:
 
     Examples
     --------
+    >>> import numpy as np
+    >>> import pandas as pd
     >>> from pylbmisc.utils import dput
     >>> import pylbmisc as lb
-    >>> List = list(range(0, 200))
+    >>> List = list(range(0, 15))
     >>> dput(List)
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
     >>> Dict = {"a": 1, "b": 2}
     >>> dput(Dict)
+    {'a': 1, 'b': 2}
     >>> Dict2 = {"a": List, "b": List}
     >>> dput(Dict2)
-    >>> nparray = _np.array(List)
+    {'a': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+     'b': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]}
+    >>> nparray = np.array(List)
     >>> dput(nparray)
-    >>> series = _pd.Series(List)
+    np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+    >>> series = pd.Series(List)
     >>> dput(series)
-    >>>
+    pd.Series([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
     >>> def function() -> None:
-    >>>     pass
+    ...     pass
     >>> dput(function)
-    >>> lb.datasets.ls()
-    >>> df = lb.datasets.load('aidssi.csv')
+    def function() -> None:
+        pass
+    <BLANKLINE>
+    >>> df = lb.datasets.load()
     >>> dput(df)
+    pd.DataFrame({'dead': [6, 13, 18, 28, 52, 53, 61, 60],
+     'logdose': [1.691, 1.724, 1.755, 1.784, 1.811, 1.837, 1.861, 1.884],
+     'n': [59, 60, 62, 56, 63, 59, 62, 60]})
     """
     if isinstance(x, _types.FunctionType):  # special cases: don't use repr
         print(_getsource(x))
@@ -296,7 +333,7 @@ def dput(x) -> None:
         list_rep = _pformat(x.to_list(), compact=True)
         print(f"pd.Series({list_rep})")
     elif isinstance(x, _np.ndarray):
-        list_rep = _pformat(nparray.tolist(), compact=True)
+        list_rep = _pformat(x.tolist(), compact=True)
         print(f"np.array({list_rep})")
     else:
         obj_repr = _pformat(x, compact=True)
@@ -306,7 +343,7 @@ def dput(x) -> None:
 def table(x: _pd.Series | None = None,
           y: _pd.Series | None = None,
           **kwargs):
-    """Emulate the good old table for quick crosstabs
+    """Emulate the good old table for quick crosstabs.
 
     Parameters
     ----------
@@ -327,21 +364,5 @@ def table(x: _pd.Series | None = None,
 
 
 if __name__ == "__main__":
-    import pylbmisc as lb
-    List = list(range(0, 200))
-    dput(List)
-    Dict = {"a": 1, "b": 2}
-    dput(Dict)
-    Dict2 = {"a": List, "b": List}
-    dput(Dict2)
-    nparray = _np.array(List)
-    dput(nparray)
-    series = _pd.Series(List)
-    dput(series)
-
-    def function() -> None:
-        pass
-    dput(function)
-    lb.datasets.ls()
-    df = lb.datasets.load("aidssi.csv")
-    dput(df)
+    import doctest
+    doctest.testmod()

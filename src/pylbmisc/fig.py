@@ -7,6 +7,7 @@ from matplotlib.axes import Axes as _Axes
 from typing import Optional as _Optional
 from typing import Tuple as _Tuple
 
+
 def fun2d(f: _Callable = lambda x: x**2,
           xlim: list[int | float] = [-5, 5],
           ylim: _Optional[list[int | float]] = None,

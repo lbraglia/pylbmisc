@@ -185,7 +185,7 @@ def _check_sequential_dates(x: _pd.DataFrame):
         with _pd.option_context("display.max_rows", None, "display.max_columns", None):
             print(_pd.concat([x, not_sequential], axis = 1).loc[not_sequential_mask, :])
 
-            
+
 def _check_negative_times(s, t, outcome):
     status = s.copy()
     time = t.copy()
@@ -199,7 +199,7 @@ def _check_negative_times(s, t, outcome):
         time[neg_times] = _pd.NA
     return status, time
 
-        
+
 def tteep(start_date = None,
           prog_date = None,
           death_date = None,
@@ -254,14 +254,14 @@ def tteep(start_date = None,
     drugs and biologics, FDA, May 2007
 
     """
-    
+
     _date_check(x = start_date, name = "start_date", can_be_none = False)
     _date_check(x = last_fup, name = "last_fup", can_be_none = False)
     _date_check(x = prog_date, name = "prog_date", can_be_none = True)
     _date_check(x = death_date, name ="death_date", can_be_none = True)
 
     n = len(start_date)
-    
+
     # Create indicator variables based on dates
     prog = (~prog_date.isna()) if (prog_date is not None) else _pd.Series([_pd.NA] * n)
     death = (~death_date.isna()) if (death_date is not None) else _pd.Series([_pd.NA] * n)
@@ -273,7 +273,7 @@ def tteep(start_date = None,
         "death_date": death_date,
         "last_fup": last_fup
     })
-    
+
     # Check sequential dates
     _check_sequential_dates(all_dates)
 
@@ -286,7 +286,7 @@ def tteep(start_date = None,
         s, t = _check_negative_times(os_status, os_time, "OS")
         rval["os_status"] = s
         rval["os_time"] = t
-        
+
     if "pfs" in ep:
         pfs_status = _to_integer(death | prog)
         min_prog_death = _pd.concat([death_date, prog_date], axis=1).min(axis=1)
@@ -296,7 +296,7 @@ def tteep(start_date = None,
         s, t = _check_negative_times(pfs_status, pfs_time, "PFS")
         rval["pfs_status"] = s
         rval["pfs_time"] = t
-            
+
     if "ttp" in ep:
         ttp_status = _to_integer(prog)
         min_death_lfup = _pd.concat([death_date, last_fup], axis=1).min(axis=1)
@@ -337,25 +337,25 @@ if __name__ == "__main__":
 
 
 # if False:
-    
+
 #     # Competing risk endpoint
 #     if comprisk:
 #         all_dates2_n = all_dates.apply(lambda x: x.astype('int64') // 10**9)
 
 #         first_event_date = all_dates2_n.min(axis=1)
 #         first_event_time = (first_event_date - all_dates2_n['start_date'])
-        
+
 #         first_event_status_labels = ['Progression', 'Death', 'FUP exit']
 #         first_event_status_codes = all_dates2_n.apply(lambda row: row.idxmin(), axis=1).map(lambda x: first_event_status_labels.index(x))
-        
+
 #         first_event_status_codes[first_event_time.isna()] = _pd.NA
-        
+
 #         neg_times = (first_event_time < 0)
 #         if neg_times.any():
 #             print("some first times are < 0")
 #             if sequential_strict:
 #                 first_event_time[neg_times] = _pd.NA
 #                 first_event_status_codes[neg_times] = _pd.NA
-        
+
 #         rval_df["first_event_time"] = first_event_time
 #         rval_df["first_event_status"] = _pd.Categorical.from_codes(first_event_status_codes, categories=first_event_status_labels)

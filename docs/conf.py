@@ -3,28 +3,28 @@ from datetime import date
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path('..', 'src').resolve()))
+sys.path.insert(0, str(Path("..", "src").resolve()))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'pylbmisc'
-author = 'Luca Braglia'
-copyright = f'2023-{date.today().year}, {author}'
+project = "pylbmisc"
+author = "Luca Braglia"
+copyright = f"2023-{date.today().year}, {author}"
 # version = lb.__version__ # short version
 # release = version        # long version
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon", "sphinx.ext.autosummary"]
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 autosummary_generate = True  # Turn on sphinx.ext.autosummary
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = "alabaster"
 
 # Napoleon settings (below the defaults)
 # napoleon_google_docstring = True

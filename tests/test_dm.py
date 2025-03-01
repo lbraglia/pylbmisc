@@ -78,5 +78,5 @@ class TestDMFunctions(unittest.TestCase):
         result = to_string(series)
         pd.testing.assert_series_equal(result, expected)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -53,9 +53,7 @@ def argparser(opts):
         optdefault = i[2]
         opttype = i[3]
         # create help string and add argument to parsing
-        help_string = "{0} (default: {1})".format(
-            optdescription, str(optdefault)
-        )
+        help_string = f"{optdescription} (default: {str(optdefault)})"
         parser.add_argument("--" + optname, help=help_string, type=str)
     # do parsing
     args = vars(parser.parse_args())  # vars to change to a dict
@@ -139,10 +137,8 @@ def line_to_numbers(x: str) -> list[int]:
             expanded_range = [str(val) for val in range(first, second, step)]
             expanded += expanded_range
         else:
-            ValueError(
-                str(spl[i])
-                + "does not match a single page re nor a pages range re."
-            )
+            msg = str(spl[i]) + "does not match a single page re nor a pages range re."
+            raise ValueError(msg)
     # coerce to integer expanded
     res: list[int] = [int(x) for x in expanded]
     return res
@@ -168,7 +164,7 @@ def menu(choices: _Sequence[str],
          all the selection number are among the available ones (or take the consistent otherwise)
     """
     available_ind = [i + 1 for i in range(len(choices))]
-    avail_with_0 = [0] + available_ind
+    avail_with_0 = [0, *available_ind]
     the_menu = "\n".join([str(i) + ". " + str(c) for i, c in zip(available_ind, choices)])
     if title:
         ascii_header(title)

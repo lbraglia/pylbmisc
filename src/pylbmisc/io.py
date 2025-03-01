@@ -445,7 +445,7 @@ def latex_table(
     latex_label = "tab:" + label
     if isinstance(tab, _pd.DataFrame):
         tab.columns.name = None
-    if (column_format == None) and isinstance(tab, _pd.DataFrame):
+    if (column_format is None) and isinstance(tab, _pd.DataFrame):
         ncols = tab.shape[1]
         column_format = "".join(["l"] + ["r"] * ncols)
     # per avere il centering è necessario impostare lo stile

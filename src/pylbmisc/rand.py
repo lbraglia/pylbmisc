@@ -14,7 +14,8 @@ from pathlib import Path as _Path
 from pprint import pp as _pp
 from pprint import pformat as _pformat
 
-class List():
+
+class List:
     """ Stratified/blocked randomization list generation
 
     Examples
@@ -111,8 +112,8 @@ class List():
         stratas_stats = _pd.DataFrame(stratas_stats)
         with _pd.option_context("display.max_rows", None, "display.max_columns", None):
             print(stratas_stats)
-        
-    
+
+
     def __repr__(self):
         with _pd.option_context("display.max_rows", None, "display.max_columns", None):
             return _pformat(self._randlist, indent = 0, sort_dicts = False)

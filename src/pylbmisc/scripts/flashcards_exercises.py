@@ -1,21 +1,24 @@
 import argparse
 import csv
 import genanki
-import glob
+# import glob
 import os
 import pandas as pd
-import random
+# import random
 import re
 import sqlite3
-import sys
+# import sys
 import pprint
 
 from dataclasses import dataclass
 from pathlib import Path
 from pybtex.database import parse_file
 
-from ..io import data_export
-from ..utils import argparser as my_argparse
+# from ..io import data_export
+# from ..utils import argparser as my_argparse
+# sopra la versione stabile che però fa incazzare mypy sotto la "sperimentale"
+from pylbmisc.io import data_export
+from pylbmisc.utils import argparser as my_argparse
 
 # -----------
 # latex stuff
@@ -192,7 +195,7 @@ class Flashcards(object):
             # remove newline and duplicate spaces
             tmp = tmp.replace("\n", "")
             tmp = re.sub(r"\\label{.+?}", "", tmp)
-            tmp = re.sub("\s+", " ", tmp)
+            tmp = re.sub(r"\s+", " ", tmp)
             matches = self.__env_re.findall(tmp)
             for match in matches:
                 if len(match) == 3:  # no [] for the environment, only content
@@ -451,7 +454,7 @@ class Database(object):
         with open(path, 'r') as f:
             data = f.read()
         data = data.replace('\n', '')
-        data = re.sub('\s+', ' ', data)
+        data = re.sub(r'\s+', ' ', data)
         # parsing
         # 1) split by exercise
         exercises = self.__exercise_re.findall(data)

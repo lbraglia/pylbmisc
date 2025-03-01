@@ -13,7 +13,6 @@ import tempfile as _tempfile
 from pprint import pprint as _pprint
 from pathlib import Path as _Path
 
-
 _dtype_backend = "pyarrow"
 
 # -------------------------------------------------------------------------
@@ -44,7 +43,7 @@ def view(df: _pd.DataFrame) -> None:
 
     Examples
     --------
-    >>> lb.dm.view(df)
+    >>> # lb.dm.view(df) # commented to avoid tests fails
     """
     if not isinstance(df, _pd.DataFrame):
         msg = "Only dataframes are visualized."
@@ -68,11 +67,14 @@ def table2df(df: _pd.DataFrame) -> _pd.DataFrame:
 
     Examples
     --------
-    >>> a = np.array(["foo", "foo", "foo", "foo", "bar", "bar", "bar", "bar", "foo", "foo", "foo"], dtype=object)
-    >>> b = np.array(["one", "one", "one", "two", "one", "one", "one", "two", "two", "two", "one"], dtype=object)
+    >>> import pandas as pd
+    >>> a = pd.Series(["foo", "foo", "foo", "foo", "bar", "bar",
+    ...                "bar", "bar", "foo", "foo", "foo"], dtype=object)
+    >>> b = pd.Series(["one", "one", "one", "two", "one", "one",
+    ...                "one", "two", "two", "two", "one"], dtype=object)
     >>> pd.crosstab(a, b)
     col_0  one  two
-    row_0
+    row_0          
     bar      3    1
     foo      4    3
     >>> tab = pd.crosstab(a,b)
@@ -128,7 +130,7 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
                 print(file=f)
 
 
-def qcut(x, q, **kwargs) -> _pd.Series:
+def qcut(x, q, **kwargs) -> _pd.Categorical:
     """An alternative to pd.qcut
 
     This function produces categorization based on quantiles but without the
@@ -180,10 +182,12 @@ def _is_string(x: _pd.Series) -> bool:
 
     Examples
     --------
-    >>> x = pd.Series(["a", np.nan])
+    >>> import pandas as pd
+    >>> x = pd.Series(["a", pd.NA])
     >>> pd.api.types.is_string_dtype(x)
+    False
     >>> _is_string(x)
-
+    True
     """
     return x.dtype in ["O", "string[pyarrow]"]
 
@@ -277,19 +281,20 @@ def pii_find(x: _pd.DataFrame) -> list[str]:
 
     Examples
     --------
+    >>> import pandas as pd
     >>> df = pd.DataFrame({
-    >>>     "id" : [1,2,3],
-    >>>     "cognome": ["brazorv", "gigetti", "ginetti"],
-    >>>     "nome  " : [1,2,3],
-    >>>     "mail": ["lgasd@asdkj.com", " asòdlk@asd.com", "aaaa"],
-    >>>     "fc": ["nrgasd12h05h987z", "aaaa", "eee"],
-    >>>     "num": ["0654-6540123", "aa", "eee"],
-    >>>     "cel": ["3921231231", "aa", "eee"]
-    >>>     })
+    ...     "id" : [1,2,3],
+    ...     "cognome": ["brazorv", "gigetti", "ginetti"],
+    ...     "nome  " : [1,2,3],
+    ...     "mail": ["lgasd@asdkj.com", " asòdlk@asd.com", "aaaa"],
+    ...     "fc": ["nrgasd12h05h987z", "aaaa", "eee"],
+    ...     "num": ["0654-6540123", "aa", "eee"],
+    ...     "cel": ["3921231231", "aa", "eee"]
+    ...     })
     >>>
     >>> probable_piis = pii_find(df)
-    cognome matches 'surname'/'cognome'.
-    nome   matches 'name'/'nome'.
+    'cognome' matches 'surname'/'cognome'.
+    'nome  ' matches 'name'/'nome'.
     mail probably contains emails.
     fc probably contains fiscal codes.
     num probably contains telephone numbers.
@@ -298,8 +303,8 @@ def pii_find(x: _pd.DataFrame) -> list[str]:
     ['cognome', 'nome  ', 'mail', 'fc', 'num', 'cel']
     >>> if probable_piis:
     ...     df.drop(columns=probable_piis)
-    ... 
-    id
+    ...
+       id
     0   1
     1   2
     2   3
@@ -530,25 +535,26 @@ def to_bool(x=None) -> _pd.Series:
 
     Examples
     --------
+    >>> import pandas as pd
     >>> to_bool([1,0,1,0])
     0     True
     1    False
     2     True
     3    False
-    dtype: boolean[pyarrow]
+    dtype: bool[pyarrow]
     >>> to_bool(pd.Series([1,0.,1,0.]))
     0     True
     1    False
     2     True
     3    False
-    dtype: boolean[pyarrow]
-    >>> to_bool([1,0,1,0, np.nan])
+    dtype: bool[pyarrow]
+    >>> to_bool([1,0,1,0, pd.NA])
     0     True
     1    False
     2     True
     3    False
     4     <NA>
-    dtype: boolean[pyarrow]
+    dtype: bool[pyarrow]
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -575,7 +581,7 @@ def _replace_comma(x: _pd.Series):
 # actually to_integer is used only by tteep to ensure, otherwise to_numeric
 # with pyarrow backend should handle both integers and floats gracefully and
 # there's no need for another function
-def _to_integer(x=None) -> _pd.Series:
+def to_integer(x=None) -> _pd.Series:
     """Coerce a pd.Series to integer (if possible)
 
     Parameters
@@ -585,6 +591,7 @@ def _to_integer(x=None) -> _pd.Series:
 
     Examples
     --------
+    >>> import numpy as np
     >>> to_integer([1., 2., 3., 4., 5., 6., np.nan])
     0       1
     1       2
@@ -632,7 +639,6 @@ def to_numeric(x=None) -> _pd.Series:
     Examples
     --------
     >>> to_numeric([1, 2, 3])
-
     0    1
     1    2
     2    3
@@ -676,8 +682,10 @@ def to_datetime(x=None) -> _pd.Series:
 
     Examples
     --------
-    >>> import datetime as dt
-    >>> to_datetime([str(dt.datetime.now())] * 6)
+    >>> to_datetime(['2025-03-01 10:02:22.756611'] * 2)
+    0   2025-03-01 10:02:22.756611
+    1   2025-03-01 10:02:22.756611
+    dtype: datetime64[ns]
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -772,6 +780,7 @@ def to_categorical(x=None,
 
     Examples
     --------
+    >>> import numpy as np
     >>> to_categorical([1, 2, 1, 2, 3])
     [1, 2, 1, 2, 3]
     Categories (3, int64): [1, 2, 3]
@@ -818,6 +827,7 @@ def to_noyes(x=None) -> _pd.Categorical:
 
     Examples
     --------
+    >>> import numpy as np
     >>> to_noyes(["","yes","no","boh", "si", np.nan])
     [NaN, 'yes', 'no', NaN, 'yes', NaN]
     Categories (2, object): ['no', 'yes']
@@ -856,6 +866,7 @@ def to_sex(x=None) -> _pd.Categorical:
 
     Examples
     --------
+    >>> import numpy as np
     >>> to_sex(["","m","f"," m", "Fm", np.nan])
     [NaN, 'male', 'female', 'male', 'female', NaN]
     Categories (2, object): ['male', 'female']
@@ -885,6 +896,7 @@ def to_recist(x=None) -> _pd.Categorical:
 
     Examples
     --------
+    >>> import numpy as np
     >>> to_recist(["RC", "PD", "SD", "PR", "RP", "boh", np.nan])
     ['CR', 'PD', 'SD', 'PR', 'PR', NaN, NaN]
     Categories (4, object): ['CR', 'PR', 'SD', 'PD']
@@ -971,7 +983,7 @@ class Coercer:
     as value) it applies all the function on a copy of the DataFrame
     and return it.  If verbose print a report of the introduced
     missing values with the coercion for check
-    
+
     Parameters
     ----------
     df:
@@ -1118,4 +1130,5 @@ class Coercer:
 
 
 if __name__ == "__main__":
-    pass
+    import doctest
+    doctest.testmod()

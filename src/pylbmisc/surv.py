@@ -13,7 +13,7 @@ from lifelines.plotting import add_at_risk_counts as _add_at_risk_counts
 from lifelines.statistics import multivariate_logrank_test as _multivariate_logrank_test
 from lifelines.utils import qth_survival_times as _qth_survival_times
 from pylbmisc.dm import to_date as _to_date
-from pylbmisc.dm import _to_integer
+from pylbmisc.dm import to_integer as _to_integer
 from pylbmisc.stats import p_format as _p_format
 from warnings import warn as _warn
 

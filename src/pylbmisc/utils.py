@@ -308,7 +308,7 @@ def dput(x) -> None:
     return None
 
 
-def Table(x: _pd.Series | None = None,
+def table(x: _pd.Series | None = None,
           y: _pd.Series | None = None,
           **kwargs):
     """Emulate the good old table for quick crosstabs

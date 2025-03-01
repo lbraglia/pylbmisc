@@ -668,7 +668,8 @@ def to_numeric(x=None) -> _pd.Series:
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     s = _replace_comma(x)
-    return _pd.to_numeric(s, errors="coerce", dtype_backend=_default_dtype_backend)
+    return _pd.to_numeric(s, errors="coerce",
+                          dtype_backend=_default_dtype_backend)
 
 
 def to_datetime(x=None) -> _pd.Series:
@@ -902,7 +903,7 @@ def to_recist(x=None) -> _pd.Categorical:
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
-        raise ValueError(msg)    
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     if not _is_string(x):
@@ -964,7 +965,7 @@ def to_string(x=None) -> _pd.Series:
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
-        raise ValueError(msg)   
+        raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
 

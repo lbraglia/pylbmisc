@@ -41,7 +41,8 @@ def export_figure(fig,
     fdir: str
         directory dove salvare, se mancante si usa /tmp
     fname: str
-        basename del file da salvare, se mancante si prova a riusare label oppure a creare un file temporaneo
+        basename del file da salvare, se mancante si prova a riusare
+        label oppure a creare un file temporaneo
     scale: float
         scale di includegraphics di LaTeX
     """
@@ -93,7 +94,8 @@ def export_figure(fig,
 def import_data(fpaths: str | _Path | _Sequence[str | _Path],
                 csv_kwargs: dict = {"dtype_backend": _default_dtype_backend},
                 excel_kwargs: dict = {"dtype_backend": _default_dtype_backend},
-                rm_common_prefix: bool = True) -> _pd.DataFrame | dict[str, _pd.DataFrame]:
+                rm_common_prefix: bool = True
+                ) -> _pd.DataFrame | dict[str, _pd.DataFrame]:
     '''Import data
 
     Can be used to import data from one or several filepaths
@@ -256,13 +258,10 @@ def _rdf_bool(x: _pd.Series, xn: str):
     return rval
 
 
-# Thigs yet TODO
-def _rdf_NA(x: _pd.Series, xn: str):
-    rval = "{} = NA".format(xn)
+def _rdf_datetime(x: _pd.Series, xn: str):
+    val = ", ".join(x.dt.strftime("'%Y-%m-%d %H:%M:%S'"))
+    rval = f"{xn} = c({val})"
     return rval
-
-
-_rdf_datetime = _rdf_NA
 
 
 def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):

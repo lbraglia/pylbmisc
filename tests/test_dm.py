@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 import numpy as np
-from pylbmisc.dm import to_bool, to_numeric, to_datetime, to_date, \
+from pylbmisc.dm import to_bool, to_integer, to_numeric, to_datetime, to_date, \
     to_categorical, to_noyes, to_sex, to_recist, to_other_specify, to_string
 
 
@@ -9,8 +9,21 @@ class TestDMFunctions(unittest.TestCase):
 
     def test_to_bool(self):
         series = pd.Series([1., 0, 1., 0, np.nan])
-        expected = pd.Series([True, False, True, False, pd.NA], dtype="boolean[pyarrow]")
+        expected = pd.Series([True, False, True, False, pd.NA],
+                             dtype="boolean[pyarrow]")
         result = to_bool(series)
+        pd.testing.assert_series_equal(result, expected)
+
+    def test_to_integer_float(self):
+        series = pd.Series([1., 2., np.nan])
+        expected = pd.Series([1, 2,  pd.NA], dtype="Int64")
+        result = to_integer(series)
+        pd.testing.assert_series_equal(result, expected)
+
+    def test_to_integer_string(self):
+        series = pd.Series(["2001", "2011", "1999", np.nan])
+        expected = pd.Series([2001, 2011, 1999, pd.NA], dtype="Int64")
+        result = to_integer(series)
         pd.testing.assert_series_equal(result, expected)
 
     def test_to_numeric_string(self):

@@ -92,16 +92,16 @@ def p_adjust(p, method="holm"):
         p_adj = x
     elif method == "bonferroni":
         p_adj = x * n_nonmiss
-        for i, p in enumerate(p_adj):
-            if p > 1:
+        for i, pa in enumerate(p_adj):
+            if pa > 1:
                 p_adj[i] = 1
     elif method == "holm":
         p_adj = _np.empty(n)
         values = [(pval, prog_id) for prog_id, pval in enumerate(x)]
         # ordino sulla base dei p.value, i missing finiscono alla fine ma ho
-        # tenuto l'ordine dove compaiono nel secondo elemento
-        # ora per poter ordinare sulla base dei p, in presenza di missing è necessario
-        # usare np.sort che richiede uno structured array (vedi np.sort)
+        # tenuto l'ordine dove compaiono nel secondo elemento ora per poter
+        # ordinare sulla base dei p, in presenza di missing è necessario usare
+        # np.sort che richiede uno structured array (vedi np.sort)
         dtype = [("pval", float), ("prog_id", int)]
         values = _np.array(values, dtype=dtype)
         sa = _np.sort(values, order="pval")

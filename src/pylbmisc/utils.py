@@ -53,7 +53,7 @@ def argparser(opts):
         optdefault = i[2]
         opttype = i[3]
         # create help string and add argument to parsing
-        help_string = f"{optdescription} (default: {str(optdefault)})"
+        help_string = f"{optdescription} (default: {optdefault!r})"
         parser.add_argument("--" + optname, help=help_string, type=str)
     # do parsing
     args = vars(parser.parse_args())  # vars to change to a dict
@@ -69,7 +69,7 @@ def argparser(opts):
             args[optname] = optdefault
         # se il tipo è logico sostituisci un valore possibile true con
         # l'equivalente python
-        if opttype == bool:
+        if opttype is bool:
             # mv to character if not already (not if used optdefault)
             args[optname] = str(args[optname])
             true_values = (
@@ -183,7 +183,7 @@ def menu(choices: _Sequence[str],
         ind = list(ind)
     if strict:
         # continue asking for input until all index are between the selectable
-        while not all([i in avail_with_0 for i in ind]):
+        while not all(i in avail_with_0 for i in ind):
             not_in = [i for i in ind if i not in avail_with_0]
             print("Not valid insertion: ", not_in, "\n")
             ind = line_to_numbers(input(select_msg))

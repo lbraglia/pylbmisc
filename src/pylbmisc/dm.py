@@ -73,7 +73,7 @@ def table2df(df: _pd.DataFrame) -> _pd.DataFrame:
     ...                "one", "two", "two", "two", "one"], dtype=object)
     >>> pd.crosstab(a, b)
     col_0  one  two
-    row_0          
+    row_0
     bar      3    1
     foo      4    3
     >>> tab = pd.crosstab(a,b)
@@ -413,7 +413,7 @@ def fix_varnames(x: str | list[str]):
 
     Examples
     --------
-    >>> fix_varnames("  asd 98n2 3")                       
+    >>> fix_varnames("  asd 98n2 3")
     'asd_98n2_3'
     >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
     ['x98n2_3', 'l_kiafj8_0']
@@ -1036,7 +1036,7 @@ class Coercer:
     4  5.0        m  2021-01-01  Nevada   0.0  2002  2.9     rc     a
     5  6.0        M  2022-01-02  Nevada   0.0  2003  3,2     cr     c
     6  2,0                  NaN     NaN   NaN   NaN  NaN    NaN   NaN
-    7             a                       NaN                        
+    7             a                       NaN
     8  NaN      NaN           a       a   NaN     a    a      a     a
     >>> cleaned1
         idx     sex       date   state   ohio  year   pop recist other

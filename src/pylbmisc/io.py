@@ -76,8 +76,8 @@ def export_figure(fig,
     )
     latex = (
         "\\begin{figure} \\centering "
-        + "\\includegraphics[scale=%(scale).2f]{%(base_path)s}"
-        + " \\caption{%(caption)s} \\label{%(label)s} \\end{figure}"
+        "\\includegraphics[scale=%(scale).2f]{%(base_path)s}"
+        " \\caption{%(caption)s} \\label{%(label)s} \\end{figure}"
     )
     subs = {
         "scale": scale,
@@ -161,7 +161,7 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
                     zipped_data = import_data(zipped_fpaths)
             # prepend zip name to fname (as keys) and update results
             zipped_data = {
-                "f{fname}_{k}": v for k, v in zipped_data.items()
+                f"{fname}_{k}": v for k, v in zipped_data.items()
             }
             rval.update(zipped_data)
         else:
@@ -219,16 +219,13 @@ def _rdf_factor(x: _pd.Series, xn: str):
     labels = []
     for lev, lab in enumerate(categs):
         levels.append(str(lev))
-        labels.append("'{}'".format(lab))
+        labels.append(f"'{lab}'")
 
     levs = ", ".join(levels)
     labs = ", ".join(labels)
-    levels_str = "levels = c({})".format(levs)
-    labels_str = "labels = c({})".format(labs)
-    # return
-    rval = "{} = factor({}, {}, {})".format(
-        xn, data_str, levels_str, labels_str
-    )
+    levels_str = f"levels = c({levs})"
+    labels_str = f"labels = c({labs})"
+    rval = f"{xn} = factor({data_str}, {levels_str}, {labels_str})"
     return rval
 
 
@@ -237,11 +234,11 @@ def _rdf_object(x: _pd.Series, xn: str):
     data_l2 = []
     for s in data_l:
         if isinstance(s, str) and s != "":
-            data_l2.append('"{}"'.format(s))
+            data_l2.append(f"'{s}'")
         else:
             data_l2.append("NA")
     data_str = ", ".join(data_l2)
-    rval = "{} = c({})".format(xn, data_str)
+    rval = f"{xn} = c({data_str})"
     return rval
 
 
@@ -271,7 +268,7 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
     path = _Path(path)
 
     r_code = []
-    r_code.append("{} <- data.frame(".format(dfname))
+    r_code.append(f"{dfname} <- data.frame(")
     for var in df.columns:
         x = df[var]
         if _pd.api.types.is_bool_dtype(x):
@@ -287,7 +284,7 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
         elif _pd.api.types.is_object_dtype(x):
             r_code.append(_rdf_object(x, var))
         else:
-            msg = f"{var}: il tipo {str(x.dtype)} non è ancora gestito."
+            msg = f"{var}: il tipo {x.dtype!r} non è ancora gestito."
             raise ValueError(msg)
         is_last = var == df.columns[-1]
         if not is_last:
@@ -371,8 +368,8 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
         elif isinstance(x, dict):
             # use dict key as postfix
             for k, v in x.items():
-                R_path = path.parent / (str(path.stem) + f"_{k}.R")
-                _rdf(v, R_path)
+                r_path = path.parent / (str(path.stem) + f"_{k}.R")
+                _rdf(v, r_path)
 
 
 # ------------------------------------

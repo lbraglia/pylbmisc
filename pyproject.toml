@@ -29,12 +29,12 @@ Documentation = "https://github.com/lbraglia/pylbmisc#readme"
 Issues = "https://github.com/lbraglia/pylbmisc/issues"
 Source = "https://github.com/lbraglia/pylbmisc"
 
-[project.scripts]
-compile_article = "pylbmisc.scripts.compile_latex:article"
-compile_book = "pylbmisc.scripts.compile_latex:book"
-flashcards = "pylbmisc.scripts.flashcards_exercises:flashcards"
-exercises_db = "pylbmisc.scripts.flashcards_exercises:exercises_db"
-exercises_ws = "pylbmisc.scripts.flashcards_exercises:exercises_ws"
+# [project.scripts]
+# compile_article = "pylbmisc.scripts.compile_latex:article"
+# compile_book = "pylbmisc.scripts.compile_latex:book"
+# flashcards = "pylbmisc.scripts.flashcards_exercises:flashcards"
+# exercises_db = "pylbmisc.scripts.flashcards_exercises:exercises_db"
+# exercises_ws = "pylbmisc.scripts.flashcards_exercises:exercises_ws"
 
 
 [tool.hatch.version]

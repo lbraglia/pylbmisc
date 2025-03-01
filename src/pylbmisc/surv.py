@@ -10,7 +10,7 @@ import matplotlib.pyplot as _plt
 
 from lifelines import KaplanMeierFitter as _KaplanMeierFitter
 from lifelines.plotting import add_at_risk_counts as _add_at_risk_counts
-from lifelines.statistics import multivariate_logrank_test as _multivariate_logrank_test
+from lifelines.statistics import multivariate_logrank_test as  _multivariate_logrank_test
 from lifelines.utils import qth_survival_times as _qth_survival_times
 from pylbmisc.dm import to_integer as _to_integer
 from pylbmisc.stats import p_format as _p_format

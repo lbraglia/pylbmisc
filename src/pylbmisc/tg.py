@@ -31,18 +31,21 @@ def bot_token(b):
     """
     Get Bot API token from environment variables.
     """
-    return _os.environ["TG_BOT_%s" % b]
+    var = f"TG_BOT_{b}"
+    return _os.environ[var]
 
 
 def user_id(u):
     """
     Get user id from environment variables.
     """
-    return _os.environ["TG_USER_%s" % u]
+    var = f"TG_USER_{u}"
+    return _os.environ[var]
 
 
 def group_id(g):
     """
     Get group id from environment variables.
     """
-    return _os.environ["TG_GROUP_%s" % g]
+    var = f"TG_GROUP_{g}"
+    return _os.environ[var]

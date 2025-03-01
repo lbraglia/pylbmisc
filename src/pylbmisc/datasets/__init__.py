@@ -37,6 +37,7 @@ def load(fname: str = "beetles1.csv", **kwargs) -> _pd.DataFrame:
     >>> import pylbmisc as lb
     >>> lb.datasets.ls()
     >>> df = lb.datasets.load("laureati.csv")
+
     """
     return _pd.read_csv(_dataset_dir / fname, engine="python",
                         dtype_backend=_default_dtype_backend,

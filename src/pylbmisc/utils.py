@@ -323,7 +323,7 @@ def table(x: _pd.Series | None = None,
        other parameters passed to Series.value_counts or pd.crosstab
     """
     if x is None:
-        msg = 'Almeno una variable'
+        msg = "Almeno una variable"
         raise ValueError(msg)
     if y is None:
         return x.value_counts(dropna=False, **kwargs)
@@ -348,5 +348,5 @@ if __name__ == "__main__":
         pass
     dput(function)
     lb.datasets.ls()
-    df = lb.datasets.load('aidssi.csv')
+    df = lb.datasets.load("aidssi.csv")
     dput(df)

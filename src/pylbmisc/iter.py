@@ -31,6 +31,6 @@ def duplicated(x) -> _Iterator[bool]:
             yield False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     alist = [1, 2, 1, 3]
     print(list(duplicated(alist)))

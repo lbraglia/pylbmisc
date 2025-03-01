@@ -21,7 +21,7 @@ from warnings import warn as _warn
 def _estquant(fit, quantiles):
     "Return estimates and quantiles of survival function with confidence intervals"
     estimates = _pd.concat([fit.survival_function_, fit.confidence_interval_],
-                           axis = 'columns')
+                           axis = "columns")
     quant = _qth_survival_times(quantiles, estimates)
     quant = quant.reset_index()
     quant.columns = ["Quantile", "Estimate", "Lower", "Upper"]
@@ -182,7 +182,7 @@ def _check_sequential_dates(x: _pd.DataFrame):
     if not_sequential_mask.any():
         msg = "Some dates are not sequential."
         _warn(msg)
-        with _pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        with _pd.option_context("display.max_rows", None, "display.max_columns", None):
             print(_pd.concat([x, not_sequential], axis = 1).loc[not_sequential_mask, :])
 
             
@@ -193,7 +193,7 @@ def _check_negative_times(s, t, outcome):
     if neg_times.any():
         msg = f"Some {outcome} times are < 0. Setting to NA both time and status below. Please fix the dates."
         _warn(msg)
-        with _pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        with _pd.option_context("display.max_rows", None, "display.max_columns", None):
             print(_pd.DataFrame({"status": status, "time": time}).loc[neg_times, :])
         status[neg_times] = _pd.NA
         time[neg_times] = _pd.NA
@@ -268,10 +268,10 @@ def tteep(start_date = None,
 
     # dates dataframe for checks and other
     all_dates = _pd.DataFrame({
-        'start_date': start_date,
-        'prog_date': prog_date,
-        'death_date': death_date,
-        'last_fup': last_fup
+        "start_date": start_date,
+        "prog_date": prog_date,
+        "death_date": death_date,
+        "last_fup": last_fup
     })
     
     # Check sequential dates

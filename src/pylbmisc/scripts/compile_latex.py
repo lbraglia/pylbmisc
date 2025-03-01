@@ -40,7 +40,7 @@ def worker(what):
     if not inpath.exists():
         raise FileNotFoundError
     if inpath.is_dir():
-        files = [f for f in list(inpath.iterdir()) if f.suffix == '.tex']
+        files = [f for f in list(inpath.iterdir()) if f.suffix == ".tex"]
     else:
         files = [inpath]
     contents = []

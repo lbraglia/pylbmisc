@@ -562,7 +562,7 @@ def to_bool(x=None) -> _pd.Series:
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     nas = _pd.isna(x)
-    rval = x.astype("boolean[pyarrow]" if _dtype_backend == 'pyarrow' else "boolean")
+    rval = x.astype("boolean[pyarrow]" if _dtype_backend == "pyarrow" else "boolean")
     rval[nas] = _pd.NA
     return rval
 

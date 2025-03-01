@@ -102,9 +102,9 @@ def p_adjust(p, method="holm"):
         # tenuto l'ordine dove compaiono nel secondo elemento
         # ora per poter ordinare sulla base dei p, in presenza di missing è necessario
         # usare np.sort che richiede uno structured array (vedi np.sort)
-        dtype = [('pval', float), ('prog_id', int)]
+        dtype = [("pval", float), ("prog_id", int)]
         values = _np.array(values, dtype=dtype)
-        sa = _np.sort(values, order='pval')
+        sa = _np.sort(values, order="pval")
         pmax = 0  # initialize so the first maximum
         for k, vals in enumerate(sa, start=1):
             pval, prog_id = vals

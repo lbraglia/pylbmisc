@@ -104,17 +104,17 @@ class List():
                 "overall_balance": len(rl.trt.value_counts().unique()) == 1,
                 "block_balance": _pd.crosstab(rl.block, rl.trt).apply(
                     # all the rows must have the same frequencies
-                    axis = 'columns', # apply the function by row
+                    axis = "columns", # apply the function by row
                     func = lambda x : len(x.unique())==1, # check row has all same freq
                     ).all()} # return True if all check are ok
             stratas_stats.append(rval)
         stratas_stats = _pd.DataFrame(stratas_stats)
-        with _pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        with _pd.option_context("display.max_rows", None, "display.max_columns", None):
             print(stratas_stats)
         
     
     def __repr__(self):
-        with _pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        with _pd.option_context("display.max_rows", None, "display.max_columns", None):
             return _pformat(self._randlist, indent = 0, sort_dicts = False)
 
 
@@ -126,7 +126,7 @@ class List():
         """
         with _Path(fpath).open("w") as f:
             # print all the rows thanks
-            with _pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            with _pd.option_context("display.max_rows", None, "display.max_columns", None):
                 for stratalist in self._randlist:
                     print("-" * 82, file = f)
                     _pp(stratalist["strata"], stream = f)
@@ -148,7 +148,7 @@ class List():
             stratalist["rl"].to_csv(actual_path, index = False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # i centri debbono essere il PRIMO criterio di stratificazione altrimenti
     # l'aggiunta di centri in corso dello studio può incasinare la
     # randomizzazione (delle liste gia fatte)

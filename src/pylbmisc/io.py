@@ -45,7 +45,7 @@ def export_figure(fig,
     """
     # fdir not existing, using /tmp
     if not _os.path.isdir(fdir):
-        fdir = '/tmp'
+        fdir = "/tmp"
 
     # default filename to be set as label, if available or a temporary one
     if fname == "":
@@ -67,7 +67,7 @@ def export_figure(fig,
     fig.savefig(pdf_path)
 
     # latex stuff
-    latex_label = 'fig:' + label
+    latex_label = "fig:" + label
     caption = (
         label.capitalize().replace("_", " ") if caption == "" else caption
     )
@@ -130,7 +130,7 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
     for fpath in accepted_fpaths:
         fname = _os.path.splitext(_os.path.basename(fpath))[0]
         fext = _os.path.splitext(fpath)[1].lower()
-        if fext == '.csv':
+        if fext == ".csv":
             dfname = fname
             data = _pd.read_csv(fpath, **csv_kwargs)
             if dfname not in rval.keys():  # check for duplicates
@@ -138,7 +138,7 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
             else:
                 msg = f"{dfname} is duplicated, skipping to avoid overwriting"
                 raise Warning(msg)
-        elif fext in {'.xls', '.xlsx'}:
+        elif fext in {".xls", ".xlsx"}:
             sheets = _pd.read_excel(
                 fpath, None, **excel_kwargs
             )  # import all the sheets as a dict of DataFrame
@@ -147,7 +147,7 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
             }  # add xlsx to sheet names
             rval.update(sheets)
         elif (
-            fext == '.zip'
+            fext == ".zip"
         ):  # unzip in temporary directory and go by recursion
             with _tempfile.TemporaryDirectory() as tempdir:
                 with _zipfile.ZipFile(fpath) as myzip:
@@ -200,7 +200,7 @@ _rdf_numeric = _rdf_integer
 def _rdf_factor(x: _pd.Series, xn: str):
     # to be safe it's seems to be better rather than
     # pd.Categorical
-    x = _pd.Series(x, dtype='category')
+    x = _pd.Series(x, dtype="category")
     # raw data (integers)
     data = x.cat.codes
     data_str = "c({})".format(
@@ -236,8 +236,8 @@ def _rdf_object(x: _pd.Series, xn: str):
         if isinstance(s, str) and s != "":
             data_l2.append('"{}"'.format(s))
         else:
-            data_l2.append('NA')
-    data_str = ', '.join(data_l2)
+            data_l2.append("NA")
+    data_str = ", ".join(data_l2)
     rval = "{} = c({})".format(xn, data_str)
     return rval
 
@@ -380,21 +380,21 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
 # ------------------------------------
 # Thanks PyLaTeX guys
 _latex_special_chars = {
-    '&': r'\&',
-    '%': r'\%',
-    '$': r'\$',
-    '#': r'\#',
-    '_': r'\_',
-    '{': r'\{',
-    '}': r'\}',
-    '~': r'\textasciitilde{}',
-    '^': r'\^{}',
-    '\\': r'\textbackslash{}',
-    '\n': '\\newline%\n',
-    '-': r'{-}',
-    '\xA0': '~',  # Non-breaking space
-    '[': r'{[}',
-    ']': r'{]}',
+    "&": r"\&",
+    "%": r"\%",
+    "$": r"\$",
+    "#": r"\#",
+    "_": r"\_",
+    "{": r"\{",
+    "}": r"\}",
+    "~": r"\textasciitilde{}",
+    "^": r"\^{}",
+    "\\": r"\textbackslash{}",
+    "\n": "\\newline%\n",
+    "-": r"{-}",
+    "\xA0": "~",  # Non-breaking space
+    "[": r"{[}",
+    "]": r"{]}",
 }
 
 
@@ -406,7 +406,7 @@ def _latex_escape(s):
     >>> print(latex_escape("asd_foo_bar"))
     """
     string = str(s)
-    return ''.join(_latex_special_chars.get(c, c) for c in string)
+    return "".join(_latex_special_chars.get(c, c) for c in string)
 
 
 def latex_table(
@@ -441,7 +441,7 @@ def latex_table(
         label.capitalize().replace("_", " ") if caption == "" else caption
     )
     latex_caption = _latex_escape(caption)
-    latex_label = 'tab:' + label
+    latex_label = "tab:" + label
     if isinstance(tab, _pd.DataFrame):
         tab.columns.name = None
     if (column_format == None) and isinstance(tab, _pd.DataFrame):

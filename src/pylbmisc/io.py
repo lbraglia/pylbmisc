@@ -12,6 +12,8 @@ from pylbmisc.dm import fix_varnames as _fix_varnames
 from pathlib import Path as _Path
 from typing import Sequence as _Sequence
 
+from pylbmisc.dm import _default_dtype_backend
+
 
 # ------------------------------------
 # Figure and images stuff
@@ -89,8 +91,8 @@ def export_figure(fig,
 # Dataset Import/export routines
 # ------------------------------------
 def import_data(fpaths: str | _Path | _Sequence[str | _Path],
-                csv_kwargs: dict = {"dtype_backend": "pyarrow"},
-                excel_kwargs: dict = {"dtype_backend": "pyarrow"},
+                csv_kwargs: dict = {"dtype_backend": _default_dtype_backend},
+                excel_kwargs: dict = {"dtype_backend": _default_dtype_backend},
                 rm_common_prefix: bool = True) -> _pd.DataFrame | dict[str, _pd.DataFrame]:
     '''Import data
 

@@ -13,7 +13,7 @@ import tempfile as _tempfile
 from pprint import pprint as _pprint
 from pathlib import Path as _Path
 
-_dtype_backend = "pyarrow"
+_default_dtype_backend = "pyarrow"
 
 # -------------------------------------------------------------------------
 # regular expressions used
@@ -561,7 +561,7 @@ def to_bool(x=None) -> _pd.Series:
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     nas = _pd.isna(x)
-    rval = x.astype("boolean[pyarrow]" if _dtype_backend == "pyarrow" else "boolean")
+    rval = x.astype("boolean[pyarrow]" if _default_dtype_backend == "pyarrow" else "boolean")
     rval[nas] = _pd.NA
     return rval
 
@@ -619,11 +619,11 @@ def to_integer(x=None) -> _pd.Series:
     # (che ci può stare, per i quale bisogna usare np.floor)
     return _pd.to_numeric(
         s,
-        # dtype_backend = _dtype_backend,
+        # dtype_backend = _default_dtype_backend,
         errors="coerce").astype(
             "Int64"
-            # "int64[pyarrow]" if _dtype_backend == 'pyarrow' else "Int64"
-            # _pd.ArrowDtype(_pa.int64()) if _dtype_backend == 'pyarrow' else "Int64"
+            # "int64[pyarrow]" if _default_dtype_backend == 'pyarrow' else "Int64"
+            # _pd.ArrowDtype(_pa.int64()) if _default_dtype_backend == 'pyarrow' else "Int64"
         )
 
 
@@ -668,7 +668,7 @@ def to_numeric(x=None) -> _pd.Series:
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
     s = _replace_comma(x)
-    return _pd.to_numeric(s, errors="coerce", dtype_backend=_dtype_backend)
+    return _pd.to_numeric(s, errors="coerce", dtype_backend=_default_dtype_backend)
 
 
 def to_datetime(x=None) -> _pd.Series:

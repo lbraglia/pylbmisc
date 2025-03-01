@@ -1,10 +1,11 @@
 import pandas as _pd
 from importlib import resources as _resources
+from pylbmisc.dm import _default_dtype_backend
 
 _dataset_dir = _resources.files("pylbmisc") / "datasets"
 
 
-def ls():
+def ls() -> list[str]:
     """List available datasets.
 
     Examples
@@ -17,14 +18,14 @@ def ls():
     return fnames
 
 
-def load(fname: str = "beetles1.csv", **kwargs):
+def load(fname: str = "beetles1.csv", **kwargs) -> _pd.DataFrame:
     """Load an available dataset.
 
     Parameters
     ----------
-    fname:
+    fname: str
         string coming from lb.datasets.ls()
-    kwargs:
+    kwargs: Any
         named paramers passed to pd.read_csv
 
     Examples
@@ -32,6 +33,7 @@ def load(fname: str = "beetles1.csv", **kwargs):
     >>> import pylbmisc as lb
     >>> lb.datasets.ls()
     >>> df = lb.datasets.load("laureati.csv")
-
     """
-    return _pd.read_csv(_dataset_dir / fname, engine="python", **kwargs)
+    return _pd.read_csv(_dataset_dir / fname, engine="python",
+                        dtype_backend=_default_dtype_backend,
+                        **kwargs)

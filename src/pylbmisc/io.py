@@ -83,7 +83,6 @@ def export_figure(fig,
         "label": latex_label,
     }
     print(latex % subs)
-    return None
 
 
 # ------------------------------------

@@ -3,10 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 from pylbmisc import datasets, dm, fig, io, iter, rand,  \
-    stats, surv, tg, tmpl, utils
+    stats, surv, tg, utils
 
 from pylbmisc.__about__ import __version__
 
 
 __all__ = ["datasets", "dm", "fig", "io", "iter", "rand", "stats", "surv",
-           "tg", "tmpl", "utils"]
+           "tg", "utils"]

@@ -305,7 +305,6 @@ def dput(x) -> None:
     else:
         obj_repr = _pformat(x, compact=True)
         print(obj_repr)
-    return None
 
 
 def table(x: _pd.Series | None = None,

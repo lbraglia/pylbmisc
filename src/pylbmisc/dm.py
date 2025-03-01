@@ -52,7 +52,6 @@ def view(df: _pd.DataFrame) -> None:
     fname = tempfile[1]
     df.to_excel(fname)
     _subprocess.Popen(["libreoffice", fname])
-    return None
 
 
 def table2df(df: _pd.DataFrame) -> _pd.DataFrame:

@@ -9,7 +9,6 @@ Subpackages
 
    pylbmisc.datasets
    pylbmisc.scripts
-   pylbmisc.tmpl
 
 Submodules
 ----------

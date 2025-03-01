@@ -988,7 +988,9 @@ class Coercer:
     df:
         The DataFrame to be coerced
     fv:
-        function-variable dict: key can be a function or a string containing name of the function, variables is a list of strings with name of variables to apply the function to
+        function-variable dict: key can be a function or a string containing
+        name of the function, variables is a list of strings with name
+        of variables to apply the function to
     verbose:
         be verbose about operations applied
 

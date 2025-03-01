@@ -1,3 +1,7 @@
+"""
+Datasets related utilities (list, load).
+"""
+
 import pandas as _pd
 from importlib import resources as _resources
 from pylbmisc.dm import _default_dtype_backend

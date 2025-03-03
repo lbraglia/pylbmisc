@@ -5,6 +5,7 @@ interactive ascii menu) and some R utilities (match_arg, expand_grid, dput)
 """
 
 import argparse as _argparse
+import inspect as _inspect
 import itertools as _itertools
 import numpy as _np
 import pandas as _pd
@@ -13,11 +14,30 @@ import readline as _readline
 import types as _types
 
 from pylbmisc.iter import unique as _unique
-from inspect import getsource as _getsource
 from typing import Sequence as _Sequence
 from pprint import pformat as _pformat
 
 _readline.parse_and_bind("set editing-mode emacs")
+
+
+def interactive():
+    """Check if python is running in interactive mode
+
+    Returns
+    -------
+    bool: True if running in interactive mode, False if running using
+         ipykernel/quarto
+
+    Examples
+    --------
+    >>> import sys
+    >>> from pyblmisc.utils import interactive
+    >>> interactive()
+    False  # tests aren't run interactively
+    """
+    parent_frame = _inspect.currentframe().f_back
+    test = "'__PYTHON_EL_eval' in dir()"  # active in Emacs, not in quarto
+    return eval(test, parent_frame.f_locals, parent_frame.f_globals)
 
 
 def argparser(opts):
@@ -325,7 +345,7 @@ def dput(x) -> None:
      'n': [59, 60, 62, 56, 63, 59, 62, 60]})
     """
     if isinstance(x, _types.FunctionType):  # special cases: don't use repr
-        print(_getsource(x))
+        print(_inspect.getsource(x))
     elif isinstance(x, _pd.DataFrame):
         dict_rep = _pformat(x.to_dict(orient="list"), compact=True)
         print(f"pd.DataFrame({dict_rep})")

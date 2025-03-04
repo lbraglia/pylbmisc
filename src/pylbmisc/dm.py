@@ -817,6 +817,65 @@ def to_categorical(x=None,
     return _pd.Categorical(x, categories=categories, ordered=ordered)
 
 
+def to_categorical2(x=None,
+                    levels=None,
+                    labels=None,
+                    ordered: bool = False) -> _pd.Categorical:
+    """Coerce to categorical a pd.Series with R's factor flavour API
+
+    Parameters
+    ----------
+    x: Series or something coercible to
+        data to be coerced
+    levels: list
+        labels to be considered as valid groups, if missing modalities by
+        decreasing frequencies will be considered
+    labels: list
+        labels to be applied to the levels (if missing, will be replaced by
+        levels)
+    ordered: bool
+        make an ordered categorical?
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> to_categorical([1, 2, 1, 2, 3])
+    [1, 2, 1, 2, 3]
+    Categories (3, int64): [1, 2, 3]
+    >>> to_categorical([1, 2., 1., 2, 3, np.nan])
+    [1.0, 2.0, 1.0, 2.0, 3.0, NaN]
+    Categories (3, float64): [1.0, 2.0, 3.0]
+    >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan])
+    ['AA', 'sd', 'asd', 'aa', NaN, NaN]
+    Categories (4, object): ['AA', 'aa', 'asd', 'sd']
+    >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan],
+    ...                levels=["aa", "AA"] )
+    ['AA', NaN, NaN, 'aa', NaN, NaN]
+    Categories (2, object): ['aa', 'AA']
+    """
+    if x is None:
+        msg = "x must be a Series or something coercible to, not None."
+        raise ValueError(msg)
+    if not isinstance(x, _pd.Series):
+        x = _pd.Series(x)
+    if levels is None:
+        # take levels as from frequencies
+        # msg = "levels must be a list of string not None."
+        # raise ValueError(msg)
+        levels = x.value_counts(sort=True, ascending=False).index.to_list()
+    if labels is None:
+        labels = levels
+
+    levlabs_mapping = {lev: lab for lev, lab in zip(levels, labels)}
+    return _pd.Categorical(x.map(levlabs_mapping), 
+                           categories=labels,
+                           ordered=ordered)
+
+
+
+
+
+
 def to_noyes(x=None) -> _pd.Categorical:
     """Coerce to no/yes a string pd.Series
 

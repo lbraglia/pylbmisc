@@ -54,7 +54,7 @@ class TestDMFunctions(unittest.TestCase):
     def test_to_categorical(self):
         series = pd.Series(["A", "B", "A", "C", "", np.nan])
         expected = pd.Categorical(["A", "B", "A", "C", pd.NA, pd.NA])
-        result = to_categorical(series)
+        result = to_categorical(series, levels=["A", "B", "C"])
         # categorical in pandas seems to be extension arrays
         # https://pandas.pydata.org/community/blog/extension-arrays.html
         pd.testing.assert_extension_array_equal(result, expected)

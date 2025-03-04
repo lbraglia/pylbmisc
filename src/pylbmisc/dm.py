@@ -122,10 +122,15 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
                       file=f)
                 # Dati: non sortati perché ci sono problemi se i dati sono metà
                 # numerici e meta stringa? bah ci riprovo
-                _pprint(df[col].sort_values().unique().tolist(),
-                        stream=f,
-                        compact=True)
-                # _pprint(df[col].unique().tolist(), stream=f, compact=True)
+                if _is_string(df[col]):
+                    _pprint(df[col].value_counts().index.to_list(),
+                            stream=f,
+                            compact=True)
+                else:
+                    _pprint(df[col].sort_values().unique().tolist(),
+                            stream=f,
+                            compact=True)
+                    # _pprint(df[col].unique().tolist(), stream=f, compact=True)
                 print(file=f)
 
 
@@ -149,7 +154,7 @@ def qcut(x, q, **kwargs) -> _pd.Categorical:
     raw = _pd.qcut(x, q, labels=False, **kwargs)
     recode = {prog: lab for prog, lab in enumerate(categories)}
     mapped = raw.map(recode)
-    return to_categorical(mapped, categories=categories)
+    return to_categorical(mapped, levels=categories)
 
 
 # -------------------------------------------------------------------------
@@ -524,6 +529,22 @@ def _verboser(f):
 
 
 # --------------- coercion workers ----------------------------------------
+
+def identity(x):
+    """The identity function to coerce nothing
+
+    Parameters
+    ----------
+    x: Any
+      any data
+
+    Returns
+    -------
+    the object x unchanged
+    """
+    return x
+
+
 def to_bool(x=None) -> _pd.Series:
     """Coerce to a boolean pd.Series
 
@@ -761,67 +782,67 @@ def extract_dates(x=None) -> _pd.Series:
     return x.apply(_extract_dates_worker)
 
 
+# def to_categorical(x=None,
+#                    categories: list[str] | None = None,
+#                    ordered: bool = False,
+#                    lowcase: bool = False) -> _pd.Categorical:
+#     """Coerce to categorical a pd.Series, with blank values as missing
+
+#     Parameters
+#     ----------
+#     x: Series or something coercible to
+#         data to be coerced
+#     categories: list of str
+#         labels to be considered as valid groups
+#     ordered: bool
+#         make an ordered categorical?
+#     lowcase: bool
+#         lowcase the data (str) before transforming to categories?
+
+#     Examples
+#     --------
+#     >>> import numpy as np
+#     >>> to_categorical([1, 2, 1, 2, 3])
+#     [1, 2, 1, 2, 3]
+#     Categories (3, int64): [1, 2, 3]
+#     >>> to_categorical([1, 2., 1., 2, 3, np.nan])
+#     [1.0, 2.0, 1.0, 2.0, 3.0, NaN]
+#     Categories (3, float64): [1.0, 2.0, 3.0]
+#     >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan])
+#     ['AA', 'sd', 'asd', 'aa', NaN, NaN]
+#     Categories (4, object): ['AA', 'aa', 'asd', 'sd']
+#     >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan], categories=["aa", "AA"] )
+#     ['AA', NaN, NaN, 'aa', NaN, NaN]
+#     Categories (2, object): ['aa', 'AA']
+#     >>> to_categorical(["AA", "sd", "asd", "aa", ""], lowcase = True)
+#     ['aa', 'sd', 'asd', 'aa', NaN]
+#     Categories (3, object): ['aa', 'asd', 'sd']
+#     """
+#     if x is None:
+#         msg = "x must be a Series or something coercible to, not None."
+#         raise ValueError(msg)
+#     if not isinstance(x, _pd.Series):
+#         x = _pd.Series(x)
+#     if _is_string(x):
+#         # string preprocessing
+#         # rm spaces and uniform NAs
+#         x = x.str.strip()
+#         nas = (x.isna()) | (x == "")
+#         x[nas] = _pd.NA
+#         if lowcase:
+#             x = x.str.lower()
+#             if categories is not None:
+#                 categories = [c.lower() for c in categories]
+
+#     # categorical making
+#     return _pd.Categorical(x, categories=categories, ordered=ordered)
+
+
 def to_categorical(x=None,
-                   categories: list[str] | None = None,
-                   ordered: bool = False,
-                   lowcase: bool = False) -> _pd.Categorical:
-    """Coerce to categorical a pd.Series, with blank values as missing
-
-    Parameters
-    ----------
-    x: Series or something coercible to
-        data to be coerced
-    categories: list of str
-        labels to be considered as valid groups
-    ordered: bool
-        make an ordered categorical?
-    lowcase: bool
-        lowcase the data (str) before transforming to categories?
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> to_categorical([1, 2, 1, 2, 3])
-    [1, 2, 1, 2, 3]
-    Categories (3, int64): [1, 2, 3]
-    >>> to_categorical([1, 2., 1., 2, 3, np.nan])
-    [1.0, 2.0, 1.0, 2.0, 3.0, NaN]
-    Categories (3, float64): [1.0, 2.0, 3.0]
-    >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan])
-    ['AA', 'sd', 'asd', 'aa', NaN, NaN]
-    Categories (4, object): ['AA', 'aa', 'asd', 'sd']
-    >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan], categories=["aa", "AA"] )
-    ['AA', NaN, NaN, 'aa', NaN, NaN]
-    Categories (2, object): ['aa', 'AA']
-    >>> to_categorical(["AA", "sd", "asd", "aa", ""], lowcase = True)
-    ['aa', 'sd', 'asd', 'aa', NaN]
-    Categories (3, object): ['aa', 'asd', 'sd']
-    """
-    if x is None:
-        msg = "x must be a Series or something coercible to, not None."
-        raise ValueError(msg)
-    if not isinstance(x, _pd.Series):
-        x = _pd.Series(x)
-    if _is_string(x):
-        # string preprocessing
-        # rm spaces and uniform NAs
-        x = x.str.strip()
-        nas = (x.isna()) | (x == "")
-        x[nas] = _pd.NA
-        if lowcase:
-            x = x.str.lower()
-            if categories is not None:
-                categories = [c.lower() for c in categories]
-
-    # categorical making
-    return _pd.Categorical(x, categories=categories, ordered=ordered)
-
-
-def to_categorical2(x=None,
-                    levels=None,
-                    labels=None,
-                    ordered: bool = False) -> _pd.Categorical:
-    """Coerce to categorical a pd.Series with R's factor flavour API
+                   levels=None,
+                   labels=None,
+                   ordered: bool = False) -> _pd.Categorical:
+    """Coerce to categorical a pd.Series with R's factor API
 
     Parameters
     ----------
@@ -839,19 +860,17 @@ def to_categorical2(x=None,
     Examples
     --------
     >>> import numpy as np
-    >>> to_categorical([1, 2, 1, 2, 3])
-    [1, 2, 1, 2, 3]
-    Categories (3, int64): [1, 2, 3]
-    >>> to_categorical([1, 2., 1., 2, 3, np.nan])
+    >>> to_categorical([1, 2, 1, 2, 3, np.nan])
     [1.0, 2.0, 1.0, 2.0, 3.0, NaN]
     Categories (3, float64): [1.0, 2.0, 3.0]
-    >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan])
-    ['AA', 'sd', 'asd', 'aa', NaN, NaN]
-    Categories (4, object): ['AA', 'aa', 'asd', 'sd']
-    >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan],
-    ...                levels=["aa", "AA"] )
-    ['AA', NaN, NaN, 'aa', NaN, NaN]
-    Categories (2, object): ['aa', 'AA']
+    >>> to_categorical(["AA", "BB", "asd", "aa", "", np.nan],
+    ...                levels=["AA", "BB"])
+    ['AA', 'BB', NaN, NaN, NaN, NaN]
+    Categories (2, object): ['AA', 'BB']
+    >>> to_categorical(["AA", "BB", "asd", "aa", "", np.nan],
+    ...                levels=["AA", "BB"], labels = ["x", "y"])
+    ['x', 'y', NaN, NaN, NaN, NaN]
+    Categories (2, object): ['x', 'y']
     """
     if x is None:
         msg = "x must be a Series or something coercible to, not None."
@@ -860,20 +879,50 @@ def to_categorical2(x=None,
         x = _pd.Series(x)
     if levels is None:
         # take levels as from frequencies
-        # msg = "levels must be a list of string not None."
-        # raise ValueError(msg)
         levels = x.value_counts(sort=True, ascending=False).index.to_list()
     if labels is None:
         labels = levels
 
     levlabs_mapping = {lev: lab for lev, lab in zip(levels, labels)}
-    return _pd.Categorical(x.map(levlabs_mapping), 
+    return _pd.Categorical(x.map(levlabs_mapping),
                            categories=labels,
                            ordered=ordered)
 
 
+def mc(levels=None,
+       labels=None, 
+       ordered: bool = False):
+    """Function factory to make categorical variables
 
+    Parameters
+    ----------
+    levels:
+        levels as in to_categorical
+    labels:
+        labels as in to_categorical
+    ordered: bool
+        labels as in to_categorical
 
+    Returns
+    -------
+    a function which coerce to a categorical with specified categories/ordered
+
+    Examples
+    --------
+    >>> import pylbmisc as lb
+    >>> scuola = lb.dm.mc(['Scuola Media Inferiore', 'Scuola Media Superiore',
+    ...                    'Laurea', 'Altro'])
+    >>> coercer = {
+    ...    scuola: ["titolo_istruzione"],
+    ... }
+    >>>
+    """
+    def f(x):
+        return to_categorical(x=x,
+                              levels=levels,
+                              labels=labels,
+                              ordered=ordered)
+    return f
 
 
 def to_noyes(x=None) -> _pd.Categorical:
@@ -912,7 +961,7 @@ def to_noyes(x=None) -> _pd.Categorical:
         tmp = to_bool(x).map({False: "n", True: "y"})
 
     return to_categorical(tmp.map({"n": "no", "y": "yes"}),
-                          categories=["no", "yes"])
+                          levels=["no", "yes"])
 
 
 def to_sex(x=None) -> _pd.Categorical:
@@ -942,7 +991,7 @@ def to_sex(x=None) -> _pd.Categorical:
     # take the first letter (Mm/Ff)
     tmp = x.str.strip().str.lower().str[0]
     tmp = tmp.map({"m": "male", "f": "female"})
-    return to_categorical(tmp, categories=["male", "female"])
+    return to_categorical(tmp, levels=["male", "female"])
 
 
 def to_recist(x=None) -> _pd.Categorical:
@@ -974,7 +1023,7 @@ def to_recist(x=None) -> _pd.Categorical:
     # uniform italian to english
     ita2eng = {"RC": "CR", "RP": "PR"}
     return to_categorical(tmp.replace(ita2eng),
-                          categories=["CR", "PR", "SD", "PD"])
+                          levels=["CR", "PR", "SD", "PD"])
 
 
 def to_other_specify(x=None) -> _pd.Categorical:
@@ -1002,7 +1051,7 @@ def to_other_specify(x=None) -> _pd.Categorical:
     tmp[nas] = _pd.NA
     # categs ordered by decreasing counts
     categs = list(tmp.value_counts().index)
-    return to_categorical(tmp, categories=categs)
+    return to_categorical(tmp, levels=categs)
 
 
 def to_string(x=None) -> _pd.Series:
@@ -1166,6 +1215,8 @@ class Coercer:
         """
         # do not modify the input data
         df = self._df.copy()
+        # keep order of the input variables
+        varorder = df.columns.to_list()
         directives = self._directives
         # make verbose all the functions by decorating them
         if self._verbose:
@@ -1185,9 +1236,11 @@ class Coercer:
         _pd.set_option("display.max_rows", old_nrows)
         # return results
         if keep_coerced_only:
-            vars = list(directives.keys())
-            df = df[vars]
-        return df
+            keep = list(directives.keys())
+            kept_in_order = [v for v in varorder if v in keep]
+            return df[kept_in_order]
+        else:
+            return df[varorder]
 
 
 if __name__ == "__main__":

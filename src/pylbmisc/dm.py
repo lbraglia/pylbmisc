@@ -392,6 +392,15 @@ def _replace_unwanted_chars(s):
     return s
 
 
+def _replace_accents(s):
+    tmp = _re.sub("à", "a", s)
+    tmp = _re.sub("è", "e", tmp)
+    tmp = _re.sub("é", "e", tmp)
+    tmp = _re.sub("ì", "i", tmp)
+    tmp = _re.sub("ù", "u", tmp)
+    return tmp
+
+
 def _remove_duplicated_underscore(s):
     return _re.sub("_+", "_", s)
 
@@ -422,7 +431,7 @@ def fix_varnames(x: str | list[str]):
     'asd_98n2_3'
     >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
     ['x98n2_3', 'l_kiafj8_0']
-    >>> fix_varnames(["asd", "foo0", "asd"])
+    >>> fix_varnames(["àsd", "foo0", "asd"])
     ['asd', 'foo0', 'asd_1']
     """
     if isinstance(x, str):
@@ -437,6 +446,7 @@ def fix_varnames(x: str | list[str]):
     funcs = [
         lambda s: str(s),
         lambda s: s.lower().strip(),
+        lambda s: _replace_accents(s),
         lambda s: _replace_unwanted_chars(s),
         lambda s: _remove_duplicated_underscore(s),
         lambda s: _remove_external_underscore(s),
@@ -884,13 +894,14 @@ def to_categorical(x=None,
         labels = levels
 
     levlabs_mapping = {lev: lab for lev, lab in zip(levels, labels)}
-    return _pd.Categorical(x.map(levlabs_mapping),
-                           categories=labels,
-                           ordered=ordered)
+    recoded = x.map(levlabs_mapping)
+    # ensure labels are unique, https://stackoverflow.com/questions/480214
+    unique_labels = list(dict.fromkeys(labels))
+    return _pd.Categorical(recoded, categories=unique_labels, ordered=ordered)
 
 
 def mc(levels=None,
-       labels=None, 
+       labels=None,
        ordered: bool = False):
     """Function factory to make categorical variables
 

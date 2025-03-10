@@ -292,6 +292,8 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
         else:
             r_code.append(")\n")
 
+    # fix some NA
+    r_code = [line.replace("<NA>", "NA") for line in r_code]
     with path.open(mode="w") as f:
         f.writelines(r_code)
 

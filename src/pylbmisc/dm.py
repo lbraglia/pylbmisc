@@ -893,6 +893,10 @@ def to_categorical(x=None,
     if labels is None:
         labels = levels
 
+    if len(levels) != len(labels):
+        raise ValueError("levels and labels must have the "
+                         "same number of elements")
+
     levlabs_mapping = {lev: lab for lev, lab in zip(levels, labels)}
     recoded = x.map(levlabs_mapping)
     # ensure labels are unique, https://stackoverflow.com/questions/480214

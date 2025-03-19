@@ -12,12 +12,37 @@ import pandas as _pd
 import re as _re
 import readline as _readline
 import types as _types
+import subprocess as _subprocess
+import tempfile as _tempfile
 
 from pylbmisc.iter import unique as _unique
 from typing import Sequence as _Sequence
 from pprint import pformat as _pformat
 
 _readline.parse_and_bind("set editing-mode emacs")
+
+
+def view(df: _pd.DataFrame) -> None:
+    """View a pd.DataFrame using LibreOffice.
+
+    Parameters
+    ----------
+    df:
+        the dataframe to be visualized
+
+    Examples
+    --------
+    >>> # lb.dm.view(df) # commented to avoid tests fails
+    """
+    if not isinstance(df, _pd.DataFrame):
+        msg = "Only dataframes are visualized."
+        raise Exception(msg)
+    tempfile = _tempfile.mkstemp(suffix=".xlsx")
+    fname = tempfile[1]
+    df.to_excel(fname)
+    _subprocess.Popen(["libreoffice", fname])
+
+
 
 
 def interactive():

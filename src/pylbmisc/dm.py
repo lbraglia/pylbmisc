@@ -7,8 +7,6 @@ import pandas as _pd
 # import pyarrow as _pa
 import re as _re
 import string as _string
-import subprocess as _subprocess
-import tempfile as _tempfile
 
 from pprint import pprint as _pprint
 from pathlib import Path as _Path
@@ -33,27 +31,6 @@ _mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
 # -------------------------------------------------------------------------
 # Utilities
 # -------------------------------------------------------------------------
-def view(df: _pd.DataFrame) -> None:
-    """View a pd.DataFrame using LibreOffice.
-
-    Parameters
-    ----------
-    df:
-        the dataframe to be visualized
-
-    Examples
-    --------
-    >>> # lb.dm.view(df) # commented to avoid tests fails
-    """
-    if not isinstance(df, _pd.DataFrame):
-        msg = "Only dataframes are visualized."
-        raise Exception(msg)
-    tempfile = _tempfile.mkstemp(suffix=".xlsx")
-    fname = tempfile[1]
-    df.to_excel(fname)
-    _subprocess.Popen(["libreoffice", fname])
-
-
 def table2df(df: _pd.DataFrame) -> _pd.DataFrame:
     """Transform a pd.DataFrame representing a two-way table (es
     crosstable, correlation matrix, p.val matrix) in a

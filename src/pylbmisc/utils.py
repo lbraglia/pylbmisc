@@ -22,7 +22,7 @@ from pprint import pformat as _pformat
 _readline.parse_and_bind("set editing-mode emacs")
 
 
-def view(df: _pd.DataFrame) -> None:
+def view(df: _pd.DataFrame | _pd.Series) -> None:
     """View a pd.DataFrame using LibreOffice.
 
     Parameters
@@ -34,7 +34,7 @@ def view(df: _pd.DataFrame) -> None:
     --------
     >>> # lb.dm.view(df) # commented to avoid tests fails
     """
-    if not isinstance(df, _pd.DataFrame):
+    if not isinstance(df, (_pd.DataFrame, _pd.Series)):
         msg = "Only dataframes are visualized."
         raise Exception(msg)
     tempfile = _tempfile.mkstemp(suffix=".xlsx")

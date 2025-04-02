@@ -4,7 +4,7 @@ import functools as _functools
 import inspect as _inspect
 import numpy as _np
 import pandas as _pd
-# import pyarrow as _pa
+import pyarrow as _pa
 import re as _re
 import string as _string
 
@@ -1070,7 +1070,7 @@ def to_string(x=None) -> _pd.Series:
         x = _pd.Series(x)
 
     nas = x.isna()
-    rval = x.astype("str")
+    rval = x.astype(_pd.ArrowDtype(_pa.string()))
     rval[nas] = _pd.NA
     return rval
 

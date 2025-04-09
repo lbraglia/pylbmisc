@@ -393,33 +393,7 @@ def _add_x_if_first_is_digit(s):
         return s
 
 
-def fix_varnames(x: str | list[str]):
-    """The good-old R preprocess_varnames, returns just the fixed strings. See
-    sanitize_varnames for DataFrame or dict of DataFrames.
-
-    Parameters
-    ----------
-    x:
-        string or list of strig to be fixed
-
-    Examples
-    --------
-    >>> fix_varnames("  asd 98n2 3")
-    'asd_98n2_3'
-    >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
-    ['x98n2_3', 'l_kiafj8_0']
-    >>> fix_varnames(["àsd", "foo0", "asd"])
-    ['asd', 'foo0', 'asd_1']
-    """
-    if isinstance(x, str):
-        original = [x]
-    elif isinstance(x, list):
-        original = x
-    else:
-        msg = "Only str and list are allowed, see sanitize_varnames for DataFrame or dict of DataFrames."
-        raise ValueError(msg)
-    # let's go functional: s is (should be) a str, the following are to be applied
-    # in order
+def _fix_varnames_worker(vnames: list[str]) -> list[str]:
     funcs = [
         lambda s: str(s),
         lambda s: s.lower().strip(),
@@ -434,7 +408,7 @@ def fix_varnames(x: str | list[str]):
     # di sopra
     funcs.reverse()
     worker = _functools.reduce(_compose, funcs)
-    mod = [worker(s) for s in original]
+    mod = [worker(s) for s in vnames]
     # handle duplicated names by adding numeric postfix
     has_duplicates = len(mod) != len(set(mod))
     if has_duplicates:
@@ -455,30 +429,58 @@ def fix_varnames(x: str | list[str]):
     # for o, m in zip(original, uniq_mod):
     #     rename_dict.update({o: m})
     # if it was a string that was passed, return a string, not a list
-    return uniq if not isinstance(x, str) else uniq[0]
+    return uniq
 
 
-def sanitize_varnames(x: _pd.DataFrame | dict[str, _pd.DataFrame],
-                      return_tfd: bool = True):
-    """Fix a DataFrame or a dict of DataFrames names using fix_varnames to
-    obtain the cleaned ones.
+def fix_varnames(x: str | list[str] | _pd.Series | _pd.DataFrame | dict[str, _pd.DataFrame],
+                 return_tfd: bool = False):
+    """The good-old R preprocess_varnames, working with strings,
+    lists, pd.DataFrame or dicts of pd.DataFrames.
 
     Parameters
     ----------
     x:
-       the data to be fixed
-    return_tfd:
-       wheter to return or not (default return) the original and processed
-       strings as dict
+        string, list of strigs/varnames, series, dataframe or dict of dataframes
+
+    Examples
+    --------
+    >>> fix_varnames("  asd 98n2 3")
+    'asd_98n2_3'
+    >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
+    ['x98n2_3', 'l_kiafj8_0']
+    >>> fix_varnames(["àsd", "foo0", "asd"])
+    ['asd', 'foo0', 'asd_1']
 
     """
-    if isinstance(x, _pd.DataFrame):
+
+    if isinstance(x, str):
+        x = [x]
+
+    if isinstance(x, list):
+        from_name = x
+        to_name = _fix_varnames_worker(from_name)
+        to_name = to_name if len(to_name) > 1 else to_name[0]
+        if return_tfd:
+            tf = {t: f for t, f in zip(to_name, from_name)}
+            return to_name, tf
+        else:
+            return to_name
+    elif isinstance(x, _pd.Series):
+        from_name = x.to_list()
+        to_name = _fix_varnames_worker(from_name)
+        rval = _pd.Series(to_name, index=x.index).astype(_pd.ArrowDtype(_pa.string()))
+        if return_tfd:
+            tf = {t: f for t, f in zip(to_name, from_name)}
+            return rval, tf
+        else:
+            return rval
+    elif isinstance(x, _pd.DataFrame):
         from_name = list(x.columns.values)
-        to_name = fix_varnames(from_name)
+        to_name = _fix_varnames_worker(from_name)
         df = x.copy()
         df.columns = to_name
-        tf = {t : f for t, f in zip(to_name, from_name)}
         if return_tfd:
+            tf = {t: f for t, f in zip(to_name, from_name)}
             return df, tf
         else:
             return df
@@ -487,7 +489,7 @@ def sanitize_varnames(x: _pd.DataFrame | dict[str, _pd.DataFrame],
         tfs = {}
         for k, v in x.items():
             from_name = list(v.columns.values)
-            to_name = fix_varnames(from_name)
+            to_name = _fix_varnames_worker(from_name)
             df = v.copy()
             df.columns = to_name
             tf = {t: f for t, f in zip(to_name, from_name)}
@@ -497,6 +499,116 @@ def sanitize_varnames(x: _pd.DataFrame | dict[str, _pd.DataFrame],
             return dfs, tfs
         else:
             return dfs
+    else:
+        msg = "Only str and list are allowed, see sanitize_varnames for DataFrame or dict of DataFrames."
+        raise ValueError(msg)
+
+
+    
+# def _old_fix_varnames(x: str | list[str]):
+#     """The good-old R preprocess_varnames, returns just the fixed strings. See
+#     sanitize_varnames for DataFrame or dict of DataFrames.
+
+#     Parameters
+#     ----------
+#     x:
+#         string or list of strig to be fixed
+
+#     Examples
+#     --------
+#     >>> fix_varnames("  asd 98n2 3")
+#     'asd_98n2_3'
+#     >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
+#     ['x98n2_3', 'l_kiafj8_0']
+#     >>> fix_varnames(["àsd", "foo0", "asd"])
+#     ['asd', 'foo0', 'asd_1']
+#     """
+#     if isinstance(x, str):
+#         original = [x]
+#     elif isinstance(x, list):
+#         original = x
+#     else:
+#         msg = "Only str and list are allowed, see sanitize_varnames for DataFrame or dict of DataFrames."
+#         raise ValueError(msg)
+#     # let's go functional: s is (should be) a str, the following are to be applied
+#     # in order
+#     funcs = [
+#         lambda s: str(s),
+#         lambda s: s.lower().strip(),
+#         lambda s: _replace_accents(s),
+#         lambda s: _replace_unwanted_chars(s),
+#         lambda s: _remove_duplicated_underscore(s),
+#         lambda s: _remove_external_underscore(s),
+#         lambda s: _add_x_if_first_is_digit(s),
+#     ]
+#     # sotto serve dato che compose applica prima la funzione a destra
+#     # e poi quella a sx (come in math) mentre vogliamo tenere l'ordine
+#     # di sopra
+#     funcs.reverse()
+#     worker = _functools.reduce(_compose, funcs)
+#     mod = [worker(s) for s in original]
+#     # handle duplicated names by adding numeric postfix
+#     has_duplicates = len(mod) != len(set(mod))
+#     if has_duplicates:
+#         seen = {}
+#         uniq = []
+#         for v in mod:
+#             if v not in seen:
+#                 seen[v] = 0
+#                 uniq.append(v)
+#             else:
+#                 seen[v] += 1
+#                 uniq.append(f"{v}_{seen[v]}")
+#     else:
+#         uniq = mod
+#     # se ci sono doppi nei nomi di partenza meglio evitare i dict se no i
+#     # doppi vengono considerati solo una volta
+#     # rename_dict = {}
+#     # for o, m in zip(original, uniq_mod):
+#     #     rename_dict.update({o: m})
+#     # if it was a string that was passed, return a string, not a list
+#     return uniq if not isinstance(x, str) else uniq[0]
+
+
+# def _old_sanitize_varnames(x: _pd.DataFrame | dict[str, _pd.DataFrame],
+#                            return_tfd: bool = True):
+#     """Fix a DataFrame or a dict of DataFrames names using fix_varnames to
+#     obtain the cleaned ones.
+
+#     Parameters
+#     ----------
+#     x:
+#        the data to be fixed
+#     return_tfd:
+#        wheter to return or not (default return) the original and processed
+#        strings as dict
+
+#     """
+#     if isinstance(x, _pd.DataFrame):
+#         from_name = list(x.columns.values)
+#         to_name = fix_varnames(from_name)
+#         df = x.copy()
+#         df.columns = to_name
+#         tf = {t : f for t, f in zip(to_name, from_name)}
+#         if return_tfd:
+#             return df, tf
+#         else:
+#             return df
+#     elif isinstance(x, dict):
+#         dfs = {}
+#         tfs = {}
+#         for k, v in x.items():
+#             from_name = list(v.columns.values)
+#             to_name = fix_varnames(from_name)
+#             df = v.copy()
+#             df.columns = to_name
+#             tf = {t: f for t, f in zip(to_name, from_name)}
+#             dfs[k] = df
+#             tfs[k] = tf
+#         if return_tfd:
+#             return dfs, tfs
+#         else:
+#             return dfs
 
 
 # -------------------------------------------------------------------------

@@ -13,7 +13,7 @@ from pathlib import Path as _Path
 from typing import Sequence as _Sequence
 
 from pylbmisc.dm import _default_dtype_backend
-
+from pylbmisc.dm import _is_string
 
 # ------------------------------------
 # Figure and images stuff
@@ -234,7 +234,7 @@ def _rdf_object(x: _pd.Series, xn: str):
     data_l2 = []
     for s in data_l:
         if isinstance(s, str) and s != "":
-            data_l2.append(f"'{s}'")
+            data_l2.append(f'"{s}"')
         else:
             data_l2.append("NA")
     data_str = ", ".join(data_l2)
@@ -281,7 +281,7 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
             r_code.append(_rdf_factor(x, var))
         elif _pd.api.types.is_datetime64_any_dtype(x):
             r_code.append(_rdf_datetime(x, var))
-        elif _pd.api.types.is_object_dtype(x):
+        elif _is_string(x):
             r_code.append(_rdf_object(x, var))
         else:
             msg = f"{var}: il tipo {x.dtype!r} non è ancora gestito."
@@ -301,7 +301,8 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
 def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
                 path: str | _Path,
                 ext: str | list[str] = ["xlsx", "csv", "pkl", "R"],
-                index=False
+                index=False,
+                dfname="df"
                 ) -> None:
     """Export a DataFrame or a dict of DataFrames as csv/xlsx
 
@@ -366,12 +367,15 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
 
     if "R" in used_formats:
         if isinstance(x, _pd.DataFrame):
-            _rdf(x, path if path_has_suffix else path.with_suffix(".R"))
+            _rdf(x,
+                 path if path_has_suffix else path.with_suffix(".R"),
+                 dfname
+                 )
         elif isinstance(x, dict):
             # use dict key as postfix
             for k, v in x.items():
                 r_path = path.parent / (str(path.stem) + f"_{k}.R")
-                _rdf(v, r_path)
+                _rdf(v, r_path, dfname = k)
 
 
 # ------------------------------------

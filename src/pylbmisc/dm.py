@@ -393,7 +393,8 @@ def _add_x_if_first_is_digit(s):
         return s
 
 
-def _fix_varnames_worker(vnames: list[str]) -> list[str]:
+def _fix_varnames_worker(vnames: list[str],
+                         make_unique: bool) -> list[str]:
     funcs = [
         lambda s: str(s),
         lambda s: s.lower().strip(),
@@ -411,7 +412,7 @@ def _fix_varnames_worker(vnames: list[str]) -> list[str]:
     mod = [worker(s) for s in vnames]
     # handle duplicated names by adding numeric postfix
     has_duplicates = len(mod) != len(set(mod))
-    if has_duplicates:
+    if has_duplicates and make_unique:
         seen = {}
         uniq = []
         for v in mod:
@@ -433,7 +434,9 @@ def _fix_varnames_worker(vnames: list[str]) -> list[str]:
 
 
 def fix_varnames(x: str | list[str] | _pd.Series | _pd.DataFrame | dict[str, _pd.DataFrame],
-                 return_tfd: bool = False):
+                 return_tfd: bool = False,
+                 make_unique: bool = True,
+                 ):
     """The good-old R preprocess_varnames, working with strings,
     lists, pd.DataFrame or dicts of pd.DataFrames.
 
@@ -441,6 +444,10 @@ def fix_varnames(x: str | list[str] | _pd.Series | _pd.DataFrame | dict[str, _pd
     ----------
     x:
         string, list of strigs/varnames, series, dataframe or dict of dataframes
+    return_tfd:
+        bool, return a dict of to/from descriptions
+    make_unique:
+        bool, assure returned varnames are unique by adding a progressive number as postfix
 
     Examples
     --------
@@ -458,7 +465,7 @@ def fix_varnames(x: str | list[str] | _pd.Series | _pd.DataFrame | dict[str, _pd
 
     if isinstance(x, list):
         from_name = x
-        to_name = _fix_varnames_worker(from_name)
+        to_name = _fix_varnames_worker(from_name, make_unique=make_unique)
         to_name = to_name if len(to_name) > 1 else to_name[0]
         if return_tfd:
             tf = {t: f for t, f in zip(to_name, from_name)}
@@ -467,7 +474,7 @@ def fix_varnames(x: str | list[str] | _pd.Series | _pd.DataFrame | dict[str, _pd
             return to_name
     elif isinstance(x, _pd.Series):
         from_name = x.to_list()
-        to_name = _fix_varnames_worker(from_name)
+        to_name = _fix_varnames_worker(from_name, make_unique=make_unique)
         rval = _pd.Series(to_name, index=x.index).astype(_pd.ArrowDtype(_pa.string()))
         if return_tfd:
             tf = {t: f for t, f in zip(to_name, from_name)}
@@ -476,7 +483,7 @@ def fix_varnames(x: str | list[str] | _pd.Series | _pd.DataFrame | dict[str, _pd
             return rval
     elif isinstance(x, _pd.DataFrame):
         from_name = list(x.columns.values)
-        to_name = _fix_varnames_worker(from_name)
+        to_name = _fix_varnames_worker(from_name, make_unique=make_unique)
         df = x.copy()
         df.columns = to_name
         if return_tfd:
@@ -489,7 +496,7 @@ def fix_varnames(x: str | list[str] | _pd.Series | _pd.DataFrame | dict[str, _pd
         tfs = {}
         for k, v in x.items():
             from_name = list(v.columns.values)
-            to_name = _fix_varnames_worker(from_name)
+            to_name = _fix_varnames_worker(from_name, make_unique=make_unique)
             df = v.copy()
             df.columns = to_name
             tf = {t: f for t, f in zip(to_name, from_name)}

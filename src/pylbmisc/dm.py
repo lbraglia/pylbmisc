@@ -1066,7 +1066,7 @@ def to_noyes(x=None) -> _pd.Categorical:
         # take only the first character and map to n/y
         tmp = x.str.strip().str.lower().str[0]
         tmp[tmp == "s"] = "y"
-        tmp = tmp.replace({"0": "n", "1": "y"}) # 0/1 for strings
+        tmp = tmp.replace({"0": "n", "1": "y"})  # 0/1 for strings
     else:
         # try to convert to boolean and map to n/y
         tmp = to_bool(x).map({False: "n", True: "y"})

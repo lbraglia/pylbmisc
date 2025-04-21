@@ -9,8 +9,10 @@ import pandas as _pd
 import matplotlib.pyplot as _plt
 
 from lifelines import KaplanMeierFitter as _KaplanMeierFitter
+from lifelines import CoxPHFitter as _CoxPHFitter
 from lifelines.plotting import add_at_risk_counts as _add_at_risk_counts
-from lifelines.statistics import multivariate_logrank_test as  _multivariate_logrank_test
+from lifelines.statistics import multivariate_logrank_test \
+    as _multivariate_logrank_test
 from lifelines.utils import qth_survival_times as _qth_survival_times
 from pylbmisc.dm import to_integer as _to_integer
 from pylbmisc.stats import p_format as _p_format
@@ -41,7 +43,7 @@ def km(time,
        ci_alpha=0.3,
        quantiles=[0.5],
        plot_logrank=True):
-    """Kaplan-Meier estimates and logrank test.
+    """Kaplan-Meier estimates, logrank test and Hazard ratios.
 
     Does the Kaplan-Meier plot with logrank
 
@@ -53,6 +55,8 @@ def km(time,
         the event indicator
     group: categorical variable
         a grouping variable used to create different survival groups/function
+    plot: logical
+        wether to do the plot or not (just return estimates)
     ylab: ylab
         as in R
     xlab: xlab
@@ -64,7 +68,7 @@ def km(time,
     ci_alpha: percentage
          shading (alpha) for confidence interval  (set to 0 for no CI)
     quantiles: list[float]
-         a list of quantiles of survival function to be returned (by default median)
+         list of quantiles of survival function to be returned (def: median)
     plot_logrank: bool
          add logrank to the plot
 
@@ -100,7 +104,7 @@ def km(time,
             "estimates": estimates,
             "quantiles": quants
         }
-    else:  #---------------------- several curves -----------------------------
+    else:  # ---------------------- several curves ----------------------------
         try:
             categs = group.cat.categories.to_list()
         except AttributeError:
@@ -140,6 +144,9 @@ def km(time,
                                            ci_alpha=ci_alpha)
         quants = _pd.concat(quants)
         lr = _multivariate_logrank_test(df["time"], df["group"], df["status"])
+        # Cox HR
+        cph = _CoxPHFitter().fit(df, 'time', 'status')
+        hr_keep = ['exp(coef)', 'coef lower 95%', 'coef upper 95%', 'p']
         if plot:
             ax.set_ylabel(ylab)
             ax.set_xlabel(xlab)
@@ -161,7 +168,8 @@ def km(time,
             "fit": fits,
             "estimates": estimates,
             "quantiles": quants,
-            "logrank": lr
+            "logrank": lr,
+            "hr": cph.summary[hr_keep]
         }
 
 

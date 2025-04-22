@@ -7,6 +7,7 @@ Survival analysis function and utilities.
 import numpy as _np
 import pandas as _pd
 import matplotlib.pyplot as _plt
+import sys as _sys
 
 from lifelines import KaplanMeierFitter as _KaplanMeierFitter
 from lifelines import CoxPHFitter as _CoxPHFitter
@@ -108,26 +109,33 @@ def km(time,
         try:
             categs = group.cat.categories.to_list()
         except AttributeError:
-            msg = "Group must be a pandas categorical variable."
-            print(msg)
+            msg = f"Group must be a pandas categorical variable: now {group.dtype}"
+            raise AttributeError(msg)
+
         if len(categs) < 2:
             msg = "Group must have at least two categories."
             raise Exception(msg)
+
         # do fit for all categories
         fits = {}               # fits
         estimates = {}          # survival estimates
         quants = []             # quantiles
-        df = _pd.DataFrame({"time": time,
-                            "status": status,
-                            "group": group}).dropna()
+
+        df = _pd.DataFrame({
+            "time": time,
+            "status": status,
+            "group": group}).dropna()
         df["group"] = df.group.cat.remove_unused_categories()
         new_categs = df.group.cat.categories.to_list()
+
         if len(new_categs) < len(categs):
             removed_categ = set(categs) - set(new_categs)
             removed_categ_str = ", ".join(removed_categ)
             msg = "Some categories were removed due" \
                 f" to missingness: {removed_categ_str}."
             _warn(msg)
+
+        # Kaplan-meier fit and quantiles
         for categ in new_categs:
             kmf = _KaplanMeierFitter(label=ylab)
             mask = df["group"] == categ
@@ -143,33 +151,43 @@ def km(time,
                                            loc=xticks,
                                            ci_alpha=ci_alpha)
         quants = _pd.concat(quants)
+        # lograng test
         lr = _multivariate_logrank_test(df["time"], df["group"], df["status"])
-        # Cox HR
-        cph = _CoxPHFitter().fit(df, 'time', 'status')
-        hr_keep = ['exp(coef)', 'coef lower 95%', 'coef upper 95%', 'p']
+        # Cox HR:
+        # we have to construct dummies https://stackoverflow.com/questions/60114847
+        dummies = _pd.get_dummies(df.group, drop_first=True)
+        df_cox = _pd.concat([df[["time", "status"]], dummies], axis=1)
+        cph = _CoxPHFitter().fit(df_cox, 'time', 'status')
+        cox_keep = ['coef', 'coef lower 95%', 'coef upper 95%', 'p']
+        cox_res = cph.summary[cox_keep]
+        cox_res.iloc[:, 0:3] = cox_res.iloc[:, 0:3].apply(_np.exp)
+        cox_res.columns = ["HR", "lower.95", "upper.95", "p"]
+
+        # plotting
         if plot:
             ax.set_ylabel(ylab)
             ax.set_xlabel(xlab)
             lgnd = ax.legend(loc="upper right")
-            # lgnd.set_visible(False)
 
             if plot_at_risk:
                 _add_at_risk_counts(*list(fits.values()),
                                     rows_to_show=counts,
                                     ax=ax, fig=fig)
                 _plt.tight_layout()
+
             if plot_logrank:
                 lr_string = (f"logr: {lr.test_statistic:.3f}, "
                              f"df: {lr.degrees_of_freedom}, "
                              f"p: {_p_format(lr.p_value)}")
                 ax.set_title(lr_string)
             fig.show()
+
         return {
             "fit": fits,
             "estimates": estimates,
             "quantiles": quants,
             "logrank": lr,
-            "hr": cph.summary[hr_keep]
+            "hr": cox_res
         }
 
 

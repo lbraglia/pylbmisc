@@ -1,13 +1,18 @@
+""" Utilities coming from R."""
+
 import itertools as _itertools
 import numpy as _np
 import pandas as _pd
+import types as _types
+from pprint import pformat as _pformat
+
 
 def match_arg(arg, choices):
     """R's match.arg equivalent for programming function for interactive use
 
     Examples
     --------
-    >>> from pylbmisc.utils import match_arg
+    >>> from pylbmisc.r import match_arg
     >>> # questo ritorna errore perché matcha troppo
     >>> user_input = "foo"
     >>> # a = match_arg(user_input, ["foobar", "foos", "asdomar"]) # errore
@@ -40,7 +45,7 @@ def expand_grid(dictionary):
     >>> stratas =  {"centres": ["ausl re", "ausl mo"],
     ...             "agecl": ["<18", "18-65", ">65"],
     ...             "foo": ["1"]}
-    >>> lb.utils.expand_grid(stratas)
+    >>> lb.r.expand_grid(stratas)
        centres  agecl foo
     0  ausl re    <18   1
     1  ausl re  18-65   1
@@ -65,7 +70,7 @@ def dput(x) -> None:
     --------
     >>> import numpy as np
     >>> import pandas as pd
-    >>> from pylbmisc.utils import dput
+    >>> from pylbmisc.r import dput
     >>> import pylbmisc as lb
     >>> List = list(range(0, 15))
     >>> dput(List)
@@ -134,7 +139,7 @@ def table(x: _pd.Series | None = None,
         return _pd.crosstab(x, y, dropna=False, margins=True, **kwargs)
 
 
-def in(x: list, y: list):
+def IN(x: list, y: list):
     """Emulate R's %in% for lists"""
     set_y = set(y)
     return [a in set_y for a in x]

@@ -1,23 +1,20 @@
 """Miscellaneous utilities
 
 This module has utilities for everyday work such UI/UX (argument parsing,
-interactive ascii menu) and some R utilities (match_arg, expand_grid, dput)
+interactive ascii menu)
 """
 
 import argparse as _argparse
 import inspect as _inspect
-import itertools as _itertools
-import numpy as _np
 import pandas as _pd
 import re as _re
 import readline as _readline
-import types as _types
 import subprocess as _subprocess
 import tempfile as _tempfile
 
 from pylbmisc.iter import unique as _unique
 from typing import Sequence as _Sequence
-from pprint import pformat as _pformat
+
 
 _readline.parse_and_bind("set editing-mode emacs")
 

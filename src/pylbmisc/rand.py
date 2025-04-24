@@ -5,7 +5,7 @@ The main class is List which produces a blocked randomizzation list with
 optional stratification by several factors.
 """
 
-from pylbmisc.utils import expand_grid as _expand_grid
+from pylbmisc.r import expand_grid as _expand_grid
 import numpy as _np
 import pandas as _pd
 from itertools import permutations as _permutations

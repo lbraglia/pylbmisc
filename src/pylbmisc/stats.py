@@ -2,7 +2,7 @@
 
 import pandas as _pd
 import numpy as _np
-from pylbmisc.utils import match_arg as _match_arg
+from pylbmisc.r import match_arg as _match_arg
 
 
 def _pstar_worker(p):

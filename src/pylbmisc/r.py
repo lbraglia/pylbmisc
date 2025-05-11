@@ -1,6 +1,7 @@
 """ Utilities coming from R."""
 
 import itertools as _itertools
+import inspect as _inspect
 import numpy as _np
 import pandas as _pd
 import types as _types
@@ -139,24 +140,6 @@ def table(x: _pd.Series | None = None,
         return _pd.crosstab(x, y, dropna=False, margins=True, **kwargs)
 
 
-def IN(x: list, y: list):
-    """Emulate R's %in% for lists"""
-    set_y = set(y)
-    return [a in set_y for a in x]
-
-
-def nin(x: list, y: list):
-    """Emulate my %nin% for lists"""
-    set_y = set(y)
-    return [a not in set_y for a in x]
-
-
-def without(x: list, y: list):
-    set_y = set(y)
-    """Emulate my %nin% for lists"""
-    return [a for a in x if a not in set_y]
-
-    
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

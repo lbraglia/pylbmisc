@@ -7,7 +7,6 @@ Survival analysis function and utilities.
 import numpy as _np
 import pandas as _pd
 import matplotlib.pyplot as _plt
-import sys as _sys
 
 from lifelines import KaplanMeierFitter as _KaplanMeierFitter
 from lifelines import CoxPHFitter as _CoxPHFitter
@@ -379,6 +378,53 @@ def tteep(start_date=None,
         rval["ttp_time"] = t
 
     return _pd.DataFrame(rval)
+
+
+def coxph(df, time, status, formula, **kwargs):
+    """ Fit a Cox proportional hazard model.
+
+    Fit a Cox proportional hazard model, with check for proportionality
+    assumption using Schoenfeld's residuals.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame with variables
+    time: chr
+         variable name for time in df
+    status: chr
+         variable name for status in df
+    formula: chr
+         formula as per lifelines' CoxPHFitter
+    kwargs: dict
+         other parameters passed to CoxPHFitter.fit
+
+    Returns
+    -------
+    mod: pd.DataFrame
+         DataFrame with the estimated model's HR, ci and pretty printed p-values.
+
+    """
+    cph = _CoxPHFitter()
+    cph.fit(df=df,
+            duration_col=time,
+            event_col=status,
+            formula=formula,
+            **kwargs)
+    cols_kept = ['exp(coef)', 'exp(coef) lower 95%', 'exp(coef) upper 95%', 'p']
+    mod = cph.summary[cols_kept]
+    mod.columns = ["HR", "Low 95%CI", "Up 95%CI", "p"]
+    mod["p"] = _p_format(mod["p"])
+    # schoenfeld ph test
+    cph.check_assumptions(df,
+                          advice=False,
+                          # p_value_threshold=0.05, # by default at 0.01
+                          show_plots=False)
+    # returning
+    return mod
+
+
+
 
 
 if __name__ == "__main__":

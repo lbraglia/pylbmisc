@@ -40,9 +40,7 @@ def view(df: _pd.DataFrame | _pd.Series) -> None:
     _subprocess.Popen(["libreoffice", fname])
 
 
-
-
-def interactive():
+def is_interactive():
     """Check if python is running in interactive mode
 
     Returns
@@ -53,8 +51,8 @@ def interactive():
     Examples
     --------
     >>> import sys
-    >>> from pyblmisc.utils import interactive
-    >>> interactive()
+    >>> from pyblmisc.utils import is_interactive
+    >>> is_interactive()
     False  # tests aren't run interactively
     """
     parent_frame = _inspect.currentframe().f_back

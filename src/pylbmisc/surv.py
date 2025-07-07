@@ -36,13 +36,16 @@ def km(time,
        status,
        group=None,
        plot=True,
+       plot_censored=True,  # TODO IMPLEMENT
+       plot_censored_style={"ms": 5,  "marker": "|"},
+       plot_legend_loc=None, # TODO IMPLEMENT
+       plot_logrank=True,
        ylab="Survival probability",
        xlab="Time",
        counts=["Events"],
        xticks=None,
        ci_alpha=0.3,
-       quantiles=[0.5],
-       plot_logrank=True):
+       quantiles=[0.5]):
     """Kaplan-Meier estimates, logrank test and Hazard ratios.
 
     Does the Kaplan-Meier plot with logrank
@@ -57,6 +60,15 @@ def km(time,
         a grouping variable used to create different survival groups/function
     plot: logical
         wether to do the plot or not (just return estimates)
+    plot_censored: logical
+        plot ticks of censored observations
+    plot_censored_style: dict
+        dict of configs given to matplotlib.lines.Line2D
+    plot_legend_loc: str
+        positioning of legend, by default upper-right if two or more groups are
+        available, none if only one group is plotted
+    plot_logrank: bool
+         add logrank to the plot
     ylab: ylab
         as in R
     xlab: xlab
@@ -69,8 +81,6 @@ def km(time,
          shading (alpha) for confidence interval  (set to 0 for no CI)
     quantiles: list[float]
          list of quantiles of survival function to be returned (def: median)
-    plot_logrank: bool
-         add logrank to the plot
 
     Returns
     -------
@@ -87,12 +97,21 @@ def km(time,
         fit = kmf.fit(df["time"], df["status"])
         estimates, quants = _estquant(fit, quantiles)
         if plot:
-            ax = fit.plot_survival_function(loc=xticks, ci_alpha=ci_alpha)
+            # https://lifelines.readthedocs.io/en/latest/fitters/univariate/KaplanMeierFitter.html
+            ax = fit.plot_survival_function(
+                loc=xticks,
+                show_censors=plot_censored,
+                censor_styles=plot_censored_style,
+                ci_alpha=ci_alpha)
             ax.set_ylabel(ylab)
             ax.set_xlabel(xlab)
-            # avoid legend for 1 group
-            lgnd = ax.legend()
-            lgnd.set_visible(False)
+            # legend: avoid by default for 1 group
+            if (plot_legend_loc is None or plot_legend_loc == "none"):
+                lgnd = ax.legend()
+                lgnd.set_visible(False)
+            else:
+                lgnd = ax.legend(loc=plot_legend_loc)
+            # number at risk
             if plot_at_risk:
                 _add_at_risk_counts(fit, labels=["All"],
                                     rows_to_show=counts,
@@ -146,9 +165,12 @@ def km(time,
             q.insert(0, "Group", categ)
             quants.append(q)
             if plot:
-                kmf.plot_survival_function(ax=ax,
-                                           loc=xticks,
-                                           ci_alpha=ci_alpha)
+                kmf.plot_survival_function(
+                    ax=ax,
+                    show_censors=plot_censored,
+                    censor_styles=plot_censored_style,
+                    loc=xticks,
+                    ci_alpha=ci_alpha)
         quants = _pd.concat(quants)
         # lograng test
         lr = _multivariate_logrank_test(df["time"], df["group"], df["status"])
@@ -166,8 +188,16 @@ def km(time,
         if plot:
             ax.set_ylabel(ylab)
             ax.set_xlabel(xlab)
-            lgnd = ax.legend(loc="upper right")
 
+            # legend: by default upper right for more than 1 group
+            if (plot_legend_loc is None):
+                lgnd = ax.legend(loc="upper right")
+            elif (plot_legend_loc == "none"):
+                lgnd = ax.legend()
+                lgnd.set_visible(False)
+            else:
+                lgnd = ax.legend(loc=plot_legend_loc)
+            # number at ris
             if plot_at_risk:
                 _add_at_risk_counts(*list(fits.values()),
                                     rows_to_show=counts,

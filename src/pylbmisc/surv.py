@@ -110,7 +110,7 @@ def km(time,
                 lgnd = ax.legend()
                 lgnd.set_visible(False)
             else:
-                lgnd = ax.legend(loc=plot_legend_loc)
+                lgnd = ax.legend(loc=plot_legend_loc, bbox_to_anchor=(1,1)) # outside the plotting area
             # number at risk
             if plot_at_risk:
                 _add_at_risk_counts(fit, labels=["All"],
@@ -191,12 +191,12 @@ def km(time,
 
             # legend: by default upper right for more than 1 group
             if (plot_legend_loc is None):
-                lgnd = ax.legend(loc="upper right")
+                lgnd = ax.legend(loc="upper right", bbox_to_anchor=(1,1))
             elif (plot_legend_loc == "none"):
                 lgnd = ax.legend()
                 lgnd.set_visible(False)
             else:
-                lgnd = ax.legend(loc=plot_legend_loc)
+                lgnd = ax.legend(loc=plot_legend_loc, bbox_to_anchor=(1,1))
             # number at ris
             if plot_at_risk:
                 _add_at_risk_counts(*list(fits.values()),

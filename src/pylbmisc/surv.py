@@ -36,7 +36,7 @@ def km(time,
        status,
        group=None,
        plot=True,
-       plot_censored=True,  # TODO IMPLEMENT
+       plot_censored=True,
        plot_censored_style={"ms": 5,  "marker": "|"},
        plot_legend_loc=None, # TODO IMPLEMENT
        plot_logrank=True,
@@ -64,8 +64,11 @@ def km(time,
         plot ticks of censored observations
     plot_censored_style: dict
         dict of configs given to matplotlib.lines.Line2D
-    plot_legend_loc: str
-        positioning of legend, by default upper-right if two or more groups are
+    plot_legend_loc: None, str or pair of floats
+        positioning of legend: can None (use defaults: no plotting for one
+        curve, "best" for 2+), "none": dont plot, any loc parameter for
+        ax.legend (eg "lower center"), "outside": bbox_to_anchor to the right
+        by default upper-right if two or more groups are
         available, none if only one group is plotted
     plot_logrank: bool
          add logrank to the plot
@@ -109,8 +112,10 @@ def km(time,
             if (plot_legend_loc is None or plot_legend_loc == "none"):
                 lgnd = ax.legend()
                 lgnd.set_visible(False)
+            elif (plot_legend_loc == "outside"):
+                lgnd = ax.legend(bbox_to_anchor=(1, 1), loc="upper left")
             else:
-                lgnd = ax.legend(loc=plot_legend_loc, bbox_to_anchor=(1,1)) # outside the plotting area
+                lgnd = ax.legend(loc=plot_legend_loc)
             # number at risk
             if plot_at_risk:
                 _add_at_risk_counts(fit, labels=["All"],
@@ -189,14 +194,16 @@ def km(time,
             ax.set_ylabel(ylab)
             ax.set_xlabel(xlab)
 
-            # legend: by default upper right for more than 1 group
+            # legend: by default best for more than 1 group
             if (plot_legend_loc is None):
-                lgnd = ax.legend(loc="upper right", bbox_to_anchor=(1,1))
-            elif (plot_legend_loc == "none"):
+                lgnd = ax.legend(loc="best")
+            elif ("none" == plot_legend_loc):
                 lgnd = ax.legend()
                 lgnd.set_visible(False)
+            elif ("outside" == plot_legend_loc):
+                lgnd = ax.legend(bbox_to_anchor=(1, 1), loc="upper left")
             else:
-                lgnd = ax.legend(loc=plot_legend_loc, bbox_to_anchor=(1,1))
+                lgnd = ax.legend(loc=plot_legend_loc)
             # number at ris
             if plot_at_risk:
                 _add_at_risk_counts(*list(fits.values()),

@@ -40,6 +40,7 @@ def km(time,
        plot_censored_style={"ms": 5,  "marker": "|"},
        plot_legend_loc=None, # TODO IMPLEMENT
        plot_logrank=True,
+       ylim=(-0.05, 1.05),
        ylab="Survival probability",
        xlab="Time",
        counts=["Events"],
@@ -72,6 +73,8 @@ def km(time,
         available, none if only one group is plotted
     plot_logrank: bool
          add logrank to the plot
+    ylim: tuple
+        as in R
     ylab: ylab
         as in R
     xlab: xlab
@@ -106,6 +109,7 @@ def km(time,
                 show_censors=plot_censored,
                 censor_styles=plot_censored_style,
                 ci_alpha=ci_alpha)
+            ax.set_ylim(ylim)
             ax.set_ylabel(ylab)
             ax.set_xlabel(xlab)
             # legend: avoid by default for 1 group
@@ -191,6 +195,7 @@ def km(time,
 
         # plotting
         if plot:
+            ax.set_ylim(ylim)
             ax.set_ylabel(ylab)
             ax.set_xlabel(xlab)
 

@@ -15,14 +15,17 @@ from typing import Sequence as _Sequence
 from pylbmisc.dm import _default_dtype_backend
 from pylbmisc.dm import _is_string
 
+
 # ------------------------------------
 # Figure and images stuff
 # ------------------------------------
 def export_figure(fig,
-                  label: str = "",
-                  caption: str = "",
                   fdir: str = "outputs",
                   fname: str = "",
+                  fext: str|list|set = ("eps", "png", "pdf"),
+                  latex_include = True,
+                  label: str = "",
+                  caption: str = "",
                   scale: float = 1
                   ) -> None:
     """Dump a figure (save to file, include in LaTeX)
@@ -34,21 +37,28 @@ def export_figure(fig,
     ----------
     fig: matplotlib.figure.Figure
         the fig
-    label: str
-        posta dopo "fig:" in LaTeX
-    caption: str
-        caption LaTeX, se mancante viene riadattata label
     fdir: str
         directory dove salvare, se mancante si usa /tmp
     fname: str
         basename del file da salvare, se mancante si prova a riusare
-        label oppure a creare un file temporaneo
+        label (se specificata) oppure a creare un file temporaneo
+    fext: str, list or set
+        list or set with format/extensions to be used for exporting
+    latex_include: bool
+        print command for latex includeing
+    label: str
+        posta dopo "fig:" in LaTeX
+    caption: str
+        caption LaTeX, se mancante viene riadattata label
     scale: float
         scale di includegraphics di LaTeX
     """
     # fdir not existing, using /tmp
     if not _os.path.isdir(fdir):
         fdir = "/tmp"
+
+    if isinstance(fext, str):
+        fext = [fext]
 
     # default filename to be set as label, if available or a temporary one
     if fname == "":
@@ -65,27 +75,31 @@ def export_figure(fig,
     pdf_path = base_path + ".pdf"
 
     # save figures to hard drive
-    fig.savefig(eps_path)
-    fig.savefig(png_path)  # , dpi = 600)
-    fig.savefig(pdf_path)
+    if "eps" in fext:
+        fig.savefig(eps_path)
+    if "png" in fext:
+        fig.savefig(png_path)  # , dpi = 600)
+    if "pdf" in fext:
+        fig.savefig(pdf_path)
 
     # latex stuff
-    latex_label = "fig:" + label
-    caption = (
-        label.capitalize().replace("_", " ") if caption == "" else caption
-    )
-    latex = (
-        "\\begin{figure} \\centering "
-        "\\includegraphics[scale=%(scale).2f]{%(base_path)s}"
-        " \\caption{%(caption)s} \\label{%(label)s} \\end{figure}"
-    )
-    subs = {
-        "scale": scale,
-        "base_path": base_path,
-        "caption": caption,
-        "label": latex_label,
-    }
-    print(latex % subs)
+    if latex_include:
+        latex_label = "fig:" + label
+        caption = (
+            label.capitalize().replace("_", " ") if caption == "" else caption
+        )
+        latex = (
+            "\\begin{figure} \\centering "
+            "\\includegraphics[scale=%(scale).2f]{%(base_path)s}"
+            " \\caption{%(caption)s} \\label{%(label)s} \\end{figure}"
+        )
+        subs = {
+            "scale": scale,
+            "base_path": base_path,
+            "caption": caption,
+            "label": latex_label,
+        }
+        print(latex % subs)
 
 
 # ------------------------------------

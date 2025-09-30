@@ -184,7 +184,7 @@ def km(time,
         # lograng test
         lr = _multivariate_logrank_test(df["time"], df["group"], df["status"])
         # Cox HR:
-        # we have to construct dummies https://stackoverflow.com/questions/60114847
+        # need to construct dummies https://stackoverflow.com/questions/60114847
         dummies = _pd.get_dummies(df.group, drop_first=True)
         df_cox = _pd.concat([df[["time", "status"]], dummies], axis=1)
         cph = _CoxPHFitter().fit(df_cox, 'time', 'status')
@@ -192,7 +192,15 @@ def km(time,
         cox_res = cph.summary[cox_keep]
         cox_res.iloc[:, 0:3] = cox_res.iloc[:, 0:3].apply(_np.exp)
         cox_res.columns = ["HR", "lower.95", "upper.95", "p"]
-
+        cox_res.index = cox_res.index.set_names("group")
+        # aggiungo numerosità e gruppo di base per forest plot
+        freqs = _pd.DataFrame({"n": df.group.value_counts(dropna=True)})
+        freqs.index = freqs.index.set_names("group")
+        cox_res = _pd.merge(freqs, cox_res,
+                            left_index=True, right_index=True,
+                            how="left")
+        cox_res.iloc[0, 1] = 1 # HR for base group
+        
         # plotting
         if plot:
             ax.set_ylim(ylim)

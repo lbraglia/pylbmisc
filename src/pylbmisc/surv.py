@@ -194,7 +194,7 @@ def km(time,
         cox_res.columns = ["HR", "lower.95", "upper.95", "p"]
         cox_res.index = cox_res.index.set_names("group")
         # aggiungo numerosità e gruppo di base per forest plot
-        freqs = _pd.DataFrame({"n": df.group.value_counts(dropna=True)})
+        freqs = _pd.DataFrame({"n": df.group.value_counts(dropna=True, sort=False)})
         freqs.index = freqs.index.set_names("group")
         cox_res = _pd.merge(freqs, cox_res,
                             left_index=True, right_index=True,

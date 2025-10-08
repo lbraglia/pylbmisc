@@ -22,7 +22,8 @@ def _pformat_worker(p):
     elif p == 1:
         return "0.999"
     else:
-        return f"{p:.3f}"
+        tmp = f"{p:.3f}"
+        return tmp if tmp != "nan" else ""
 
 
 def p_star(p):

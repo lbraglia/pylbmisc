@@ -22,8 +22,8 @@ from pylbmisc.dm import _is_string
 def export_figure(fig,
                   fdir: str = "outputs",
                   fname: str = "",
-                  fext: str|list|set = ("eps", "png", "pdf"),
-                  latex_include = True,
+                  fext: str | list | set = ("eps", "png", "pdf"),
+                  latex_include=True,
                   label: str = "",
                   caption: str = "",
                   scale: float = 1
@@ -76,11 +76,11 @@ def export_figure(fig,
 
     # save figures to hard drive
     if "eps" in fext:
-        fig.savefig(eps_path)
+        fig.savefig(eps_path, transparent=True)
     if "png" in fext:
-        fig.savefig(png_path)  # , dpi = 600)
+        fig.savefig(png_path, transparent=True)  # , dpi = 600)
     if "pdf" in fext:
-        fig.savefig(pdf_path)
+        fig.savefig(pdf_path, transparent=True)
 
     # latex stuff
     if latex_include:

@@ -226,8 +226,8 @@ def forestplot(
     len_longest_group = df[group_col].str.len().max()
     group_col_width = 0.19 * len_longest_group
     n_col_width = 1.3
-    ci_col_width = 2.1
-    pval_col_width = 1.5
+    ci_col_width = 2.5
+    pval_col_width = 1.4
     forest_col_width = 5
     width_ratios = [variable_col_width, group_col_width, n_col_width,
                     ci_col_width, pval_col_width, forest_col_width]
@@ -249,7 +249,7 @@ def forestplot(
 
     # figure setup
     fig = _plt.figure(figsize=(fig_width, fig_height))
-    gs = fig.add_gridspec(1, 6, width_ratios=width_ratios, wspace=0.2)
+    gs = fig.add_gridspec(1, 6, width_ratios=width_ratios, wspace=0.1)
     ax_variables = fig.add_subplot(gs[0, 0])
     ax_groups = fig.add_subplot(gs[0, 1], sharey=ax_variables)
     ax_n = fig.add_subplot(gs[0, 2], sharey=ax_variables)

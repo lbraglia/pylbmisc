@@ -474,7 +474,91 @@ def coxph(df, time, status, formula, **kwargs):
     return mod
 
 
+def median_fup(time, status, group=None):
+    r"""
+    Calculate median follow up using reverse Kaplan-Meier method
 
+    Parameters
+    ----------
+    time: pd.Series only?
+        the time variable
+    status: pd.Series only?
+        the status variable (eg os_status)
+    group: None or categorical
+        groups to calculate stratified medians
+
+    References
+    ----------
+    Schemper, Michael, and Terry L. Smith. “A Note on Quantifying Follow-up in
+    Studies of Failure Time.” Controlled Clinica Trials 17, no. 4 (1996):
+    343–46. https://doi.org/10.1016/0197-2456(96)00075-X
+
+    Examples
+    --------
+    >>> import pylbmisc as lb
+    >>> ov = lb.datasets.load("ovarian.csv")
+    >>> median_fup(time=ov.survtime/365.25, status=ov.surv)
+       Quantile  Estimate     Lower      Upper
+    0       0.5  9.604381  9.029432  10.110883
+    >>> ov["group"] = lb.dm.to_categorical(ov.histo_cl)
+    >>> median_fup(time=ov.survtime/365.25, status=ov.surv, group=ov.group)
+            Group  Quantile  Estimate     Lower      Upper
+    0      serous       0.5  9.637235  9.029432  10.234086
+    0  not serous       0.5  9.366188  8.295688  10.390144
+    """
+    km_res = km(
+        time=time,
+        status=1-status,
+        group=group,
+        plot=False,
+        quantiles=[0.5]
+    )
+    return km_res["quantiles"]
+
+
+def censor_at(time, status, censoring_time, name_prefix=""):
+    r"""Censor observation at a given time
+
+    Parameters
+    ----------
+    time: pd.Series
+        time variable
+    status: pd.Series
+        status variable
+    censoring_time: int
+        integer where to censor
+    name_prefix: char
+        string to prefixto the outputted dataset (eg "os_")
+
+    Examples
+    --------
+    >>> import pylbmisc as lb
+    >>> ov = lb.datasets.load("ovarian.csv")
+    >>> pd.concat([
+    >>>    ov[["survtime","surv"]],
+    >>>    censor_at(time=ov.survtime, status=ov.surv, censoring_time=500)
+    >>> ], axis=1)
+    >>>
+    >>> time = pd.Series([100, 150, 200])
+    >>> timena = pd.Series([100, 150, np.nan])
+    >>> status = pd.Series([1, 0, 0])
+    >>> statusna = pd.Series([0, 1, np.nan])
+    >>> censor_at(time, statusna, 120)
+    >>> censor_at(timena, status, 120)
+    """
+    to_censor = time > censoring_time
+    time_censored = _np.where(to_censor, censoring_time, time)
+    status_censored = _np.where(
+        to_censor,
+        _np.where(_pd.isna(status), _pd.NA, 0),
+        status)
+    time_varname = f"{name_prefix}time_cens{censoring_time}"
+    status_varname = f"{name_prefix}status_cens{censoring_time}"
+    rval = _pd.DataFrame({
+        time_varname: time_censored,
+        status_varname: _to_integer(status_censored)
+    })
+    return rval
 
 
 if __name__ == "__main__":

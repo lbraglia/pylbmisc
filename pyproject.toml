@@ -4,7 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pylbmisc"
-dynamic = ["version"]
+version = "0.0.7"
+# dynamic = ["version"]
 description = 'Personal functions'
 readme = "README.md"
 requires-python = ">=3.11"
@@ -37,8 +38,8 @@ Source = "https://github.com/lbraglia/pylbmisc"
 # exercises_ws = "pylbmisc.scripts.flashcards_exercises:exercises_ws"
 
 
-[tool.hatch.version]
-path = "src/pylbmisc/__about__.py"
+# [tool.hatch.version]
+# path = "src/pylbmisc/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [

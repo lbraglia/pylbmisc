@@ -5,7 +5,7 @@
 from pylbmisc import datasets, dm, fig, io, iter, rand, r, \
     stats, surv, tg, utils
 
-from pylbmisc.__about__ import __version__
+# from pylbmisc.__about__ import __version__
 
 
 __all__ = ["datasets", "dm", "fig", "io", "iter", "rand", "stats", "surv",

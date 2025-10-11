@@ -5,6 +5,8 @@ import inspect as _inspect
 import numpy as _np
 import pandas as _pd
 import types as _types
+import subprocess as _subprocess
+import tempfile as _tempfile
 from pprint import pformat as _pformat
 
 
@@ -138,6 +140,51 @@ def table(x: _pd.Series | None = None,
         return x.value_counts(dropna=False, **kwargs)
     else:
         return _pd.crosstab(x, y, dropna=False, margins=True, **kwargs)
+
+
+def debug(step_into_this):
+    r"""Emulate R's debug function as a decorator
+
+    Parameters
+    ----------
+    step_into_this: function
+        the function to be breakpoint()-ed
+
+    Examples
+    --------
+    >>> # comment the decorator when done with debugging
+    >>> @debug
+    >>> def myfunction(x, y=1):
+    ...     m = 1
+    ...     return x * y * m
+    >>>
+    >>> myfunction(5) # this call is breakpointed
+    """
+    def wrapper(*args, **kwargs):
+        breakpoint()
+        return step_into_this(*args, **kwargs)
+    return wrapper
+
+
+def view(df: _pd.DataFrame | _pd.Series) -> None:
+    """View a pd.DataFrame using LibreOffice.
+
+    Parameters
+    ----------
+    df:
+        the dataframe to be visualized
+
+    Examples
+    --------
+    >>> # lb.dm.view(df) # commented to avoid tests fails
+    """
+    if not isinstance(df, (_pd.DataFrame, _pd.Series)):
+        msg = "Only dataframes are visualized."
+        raise Exception(msg)
+    tempfile = _tempfile.mkstemp(suffix=".xlsx")
+    fname = tempfile[1]
+    df.to_excel(fname)
+    _subprocess.Popen(["libreoffice", fname])
 
 
 if __name__ == "__main__":

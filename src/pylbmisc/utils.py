@@ -1,14 +1,18 @@
 """Miscellaneous utilities
 
 This module has utilities for everyday work such UI/UX (argument parsing,
-interactive ascii menu)
+interactive ascii menu), system info
 """
 
 import argparse as _argparse
+import datetime as _dt
 import inspect as _inspect
 import re as _re
 import readline as _readline
+import sys as _sys
+import types as _types
 
+from pprint import pp as _pp
 from pylbmisc.iter import unique as _unique
 from typing import Sequence as _Sequence
 
@@ -245,6 +249,41 @@ def ascii_header(x: str) -> None:
     header = "=" * len(x)
     msg = f"{header}\n{x}\n{header}\n"
     print(msg)
+
+
+def _imports(globs):
+    "Something like https://stackoverflow.com/questions/4858100"
+    for val in globs.values():
+        if isinstance(val, _types.ModuleType):
+            yield val
+
+
+# def _imports2(globs, mods):
+#     "The main alternative on https://stackoverflow.com/questions/4858100"
+#     modulenames = set(_sys.modules) & set(globs)
+#     allmodules = [_sys.modules[name] for name in modulenames]
+#     return allmodules
+
+
+def sysinfo(globs):
+    """Display several system informations.
+    
+    Examples
+    --------
+    >>> import pylbmisc as lb
+    >>> lb.utils.sysinfo(globals())
+    """
+    _pp({
+        "python-path": _sys.executable,
+        "python-version": _sys.version,
+        # "python-argv": _sys.argv,
+        # "python-call-options": _sys.flags,
+        # "dir": d,
+        "imports": list(_unique(_imports(globs=globs))),
+        # "imports2": _imports2(globs=globs),
+        "paths": _sys.path,
+        "now": _dt.datetime.now().isoformat(),
+    })
 
 
 if __name__ == "__main__":

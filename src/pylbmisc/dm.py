@@ -7,7 +7,6 @@ import pandas as _pd
 import pyarrow as _pa
 import re as _re
 import string as _string
-
 from pprint import pprint as _pprint
 from pathlib import Path as _Path
 
@@ -109,6 +108,25 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
                             compact=True)
                     # _pprint(df[col].unique().tolist(), stream=f, compact=True)
                 print(file=f)
+
+
+def names_list(dfs):
+    """Dump names to stdout to ease code creation for Coercer
+
+    Parameters
+    ----------
+    dfs:
+        dataframe or dict of dataframes to be dumped
+    """
+    if isinstance(dfs, dict):
+        for k, df in dfs.items():
+            print(k, "\n")
+            _pprint.pp(df.columns.to_list())
+    elif isinstance(dfs, _pd.DataFrame):
+        _pprint.pp(dfs.columns.to_list())
+    else:
+        msg = "Not handled data (only dataframe or dicts of dataframes)"
+        raise Exception(msg)
 
 
 def qcut(x, q, **kwargs) -> _pd.Categorical:

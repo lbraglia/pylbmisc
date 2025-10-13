@@ -258,21 +258,16 @@ def _imports(globs):
             yield val
 
 
-# def _imports2(globs, mods):
-#     "The main alternative on https://stackoverflow.com/questions/4858100"
-#     modulenames = set(_sys.modules) & set(globs)
-#     allmodules = [_sys.modules[name] for name in modulenames]
-#     return allmodules
-
-
-def sysinfo(globs):
+def sysinfo():
     """Display several system informations.
-    
+
     Examples
     --------
     >>> import pylbmisc as lb
-    >>> lb.utils.sysinfo(globals())
+    >>> lb.utils.sysinfo()
     """
+    parent_frame = _inspect.currentframe().f_back
+    globs = parent_frame.f_globals
     _pp({
         "python-path": _sys.executable,
         "python-version": _sys.version,

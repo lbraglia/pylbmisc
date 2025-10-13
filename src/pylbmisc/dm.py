@@ -69,7 +69,7 @@ def table2df(df: _pd.DataFrame) -> _pd.DataFrame:
 
 
 def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
-                       fpath: str | _Path = "data/uniq_"):
+                       fpath: str | _Path = "data/uniq.txt"):
     """Save unique value of a (dict of) dataframe for inspection and monitor
     during time.
 
@@ -78,7 +78,7 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
     dfs:
         dataframe or dict of dataframes to be dumped
     fpath:
-        path root part where to save the unique values
+        path where to save the unique values
     """
     if not isinstance(dfs, (_pd.DataFrame, dict)):
         msg = "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
@@ -86,9 +86,10 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
     # normalize single dataframe
     if isinstance(dfs, _pd.DataFrame):
         dfs = {"df": dfs}
-    for df_lab, df in dfs.items():
-        outfile = _Path(str(fpath) + df_lab + ".txt")
-        with outfile.open("w") as f:
+        # output
+    outfile = _Path(fpath)
+    with outfile.open("w") as f:
+        for df_lab, df in dfs.items():
             for col in df:
                 # Header
                 print(f"DataFrame: '{df_lab}', "
@@ -106,8 +107,8 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
                     _pprint(df[col].sort_values().unique().tolist(),
                             stream=f,
                             compact=True)
-                    # _pprint(df[col].unique().tolist(), stream=f, compact=True)
                 print(file=f)
+            print("-"*80 + "\n\n", file=f)
 
 
 def names_list(dfs):
@@ -121,9 +122,9 @@ def names_list(dfs):
     if isinstance(dfs, dict):
         for k, df in dfs.items():
             print(k, "\n")
-            _pprint.pp(df.columns.to_list())
+            _pprint(df.columns.to_list())
     elif isinstance(dfs, _pd.DataFrame):
-        _pprint.pp(dfs.columns.to_list())
+        _pprint(dfs.columns.to_list())
     else:
         msg = "Not handled data (only dataframe or dicts of dataframes)"
         raise Exception(msg)

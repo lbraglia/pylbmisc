@@ -271,11 +271,7 @@ def sysinfo():
     _pp({
         "python-path": _sys.executable,
         "python-version": _sys.version,
-        # "python-argv": _sys.argv,
-        # "python-call-options": _sys.flags,
-        # "dir": d,
         "imports": list(_unique(_imports(globs=globs))),
-        # "imports2": _imports2(globs=globs),
         "paths": _sys.path,
         "now": _dt.datetime.now().isoformat(),
     })

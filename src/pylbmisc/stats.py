@@ -125,7 +125,7 @@ def p_adjust(p, method="holm"):
     return p_adj
 
 
-def ci_prop(x, n=None, nas=_pd.NA, confidence_level=0.95):
+def ci_prop(x, n=None, nas=_pd.NA, confidence_level=0.95, method="exact"):
     """Exact Clopper-Pearson confidence interval
 
     Examples
@@ -166,7 +166,9 @@ def ci_prop(x, n=None, nas=_pd.NA, confidence_level=0.95):
             n=first_group_n + second_group_n
         )
         est = binom_test.statistic
-        ci = binom_test.proportion_ci(confidence_level=confidence_level)
+        ci = binom_test.proportion_ci(
+            confidence_level=confidence_level,
+            method=method)
         lower = ci.low
         upper = ci.high
     except Exception:

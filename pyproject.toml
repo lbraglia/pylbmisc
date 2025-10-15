@@ -22,7 +22,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "pandas", "openpyxl", "matplotlib", "lifelines", "pyarrow"
+  "pandas", "openpyxl", "matplotlib", "lifelines", "pyarrow", "scipy"
 ]
 
 [project.urls]

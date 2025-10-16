@@ -179,7 +179,7 @@ def ci_prop(x, n=None, nas=_pd.NA, confidence_level=0.95):
         "NA": [na],
         first_group: [first_group_n],
         second_group: [second_group_n],
-        "est": [est],
-        "lower": [lower],
-        "upper": [upper]
+        "perc": [est],
+        "ci_lower": [lower],
+        "ci_upper": [upper]
     })

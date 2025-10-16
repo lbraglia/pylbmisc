@@ -125,8 +125,17 @@ def p_adjust(p, method="holm"):
     return p_adj
 
 
-def ci_prop(x, n=None, nas=_pd.NA, confidence_level=0.95, method="exact"):
+def ci_prop(x, n=None, nas=0, confidence_level=0.95, method="exact"):
     """Exact Clopper-Pearson confidence interval
+
+    Parameters
+    ----------
+    x: int or pd.Categorical with two categories
+        variable or count of successes
+    n: int
+        if x is integer, number of trials
+    nas: int
+        if x is integer, number of missing values out of n
 
     Examples
     --------
@@ -141,7 +150,10 @@ def ci_prop(x, n=None, nas=_pd.NA, confidence_level=0.95, method="exact"):
     >>>
     >>> res = {}
     >>> for var in main_vars:
-    ...     res[var] = df.loc[:, var].groupby(df.time).apply(lambda x: ci_prop(x=x))
+    ...     res[var] = (
+    ...           df.loc[:, var].groupby(df.time).apply(lambda x: ci_prop(x=x))
+    ...                         .reset_index().drop(columns = ["level_1"])
+    ... )
     """
     if n is None:
         # caso in cui passo una serie: guarda le labels (la seconda,
@@ -157,31 +169,33 @@ def ci_prop(x, n=None, nas=_pd.NA, confidence_level=0.95, method="exact"):
         first_group = "unsuccesses"
         second_group = "successes"
         na = nas
+        first_group_n = n - x - na
         second_group_n = x
-        first_group_n = n - x
 
     try:
         binom_test = _stats.binomtest(
             k=second_group_n,
             n=first_group_n + second_group_n
         )
-        est = binom_test.statistic
         ci = binom_test.proportion_ci(
             confidence_level=confidence_level,
-            method=method)
-        lower = ci.low
-        upper = ci.high
+            method=method
+        )
     except Exception:
         est = _pd.NA
         lower = _pd.NA
         upper = _pd.NA
+    else:
+        est = binom_test.statistic
+        lower = ci.low
+        upper = ci.high
 
     return _pd.DataFrame({
         "n": [na + first_group_n + second_group_n],
         "NA": [na],
         first_group: [first_group_n],
         second_group: [second_group_n],
-        "perc": [est],
-        "ci_lower": [lower],
-        "ci_upper": [upper]
+        "perc": [est * 100],
+        "ci_lower": [lower * 100],
+        "ci_upper": [upper * 100]
     })

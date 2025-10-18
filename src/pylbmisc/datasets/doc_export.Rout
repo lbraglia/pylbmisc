@@ -1,0 +1,1422 @@
+
+R version 4.5.0 (2025-04-11) -- "How About a Twenty-Six"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R è un software libero ed è rilasciato SENZA ALCUNA GARANZIA.
+Siamo ben lieti se potrai redistribuirlo, ma sotto certe condizioni.
+Scrivi 'license()' o 'licence()' per maggiori dettagli.
+
+R è un progetto collaborativo con molti contributi esterni.
+Scrivi 'contributors()' per maggiori informazioni e 'citation()'
+per sapere come citare R o i pacchetti nelle pubblicazioni.
+
+Scrivi 'demo()' per una dimostrazione, 'help()' per la guida
+oppure 'help.start()' per la guida nel browser HTML.
+Scrivi 'q()' per uscire da R.
+
+[Caricato workspace precedentemente salvato]
+
+> library(lbdatasets)
+
+Caricamento pacchetto: ‘lbdatasets’
+
+Il seguente oggetto è mascherato da ‘package:survival’:
+
+    ovarian
+
+> 
+> datasets <- ls("package:lbdatasets")
+> names(datasets) <- datasets
+> 
+> 
+> export_help <- function(x){
+    ## dataset <- sprintf("lbdatasets::%s", x)
+    ## csv_file <- sprintf("%s.csv", x)
+    ## txt_file <- sprintf("%s.txt", x)
+    # data
+    ## write.csv(eval(parse(text = dataset)), file = csv_file, row.names = FALSE)
+    ## # documentation l'help system non viene redirezionato allo stdout..
+    ## sink(txt_file, type = c("output", "message"))
+    help(x, package = "lbdatasets", help_type = "text")
+    ## sink()
+  }
+> 
+> 
+> 
+> lapply(datasets,  export_help)
+$aidssi
+aidssi               package:lbdatasets                R Documentation
+
+_D_a_t_a _f_r_o_m _t_h_e _A_m_s_t_e_r_d_a_m _C_o_h_o_r_t _S_t_u_d_i_e_s _o_n _H_I_V _i_n_f_e_c_t_i_o_n _a_n_d _A_I_D_S
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     These data sets give the times (in years) from HIV infection to
+     AIDS, SI switch and death in 329 men who have sex with men (MSM).
+     Data are from the period until combination anti-retroviral therapy
+     became available (1996). For more background information on the
+     cohort, ccr5 and SI, see Geskus _et al._ (2000, 2003)
+
+     ‘aidssi’ contains follow-up data until the first of AIDS and SI
+     switch. It was used as example for the competing risks analyses in
+     Putter, Fiocco, Geskus (2007) and in Geskus (2016).
+
+_U_s_a_g_e:
+
+     data(aidssi)
+     
+_F_o_r_m_a_t:
+
+     aidssi
+
+       patnr:   Patient identification number                                                  
+       time:    Time from HIV infection to first of SI appearance and AIDS, or                 
+                last follow-up                                                                 
+       status:  Event indicator; 0 = censored, 1 = AIDS, 2 = SI appearance                     
+       cause:   Failure cause; factor with levels "event-free", "AIDS", "SI"                   
+       ccr5:    CCR5 genotype; factor with levels "WW" (wild type allele on both chromosomes), 
+                "WM" (mutant allele on one chromosome)                                         
+      
+_S_o_u_r_c_e:
+
+     mstate package
+
+_R_e_f_e_r_e_n_c_e_s:
+
+     Geskus, Ronald B. (2016). _Data Analysis with Competing Risks and
+     Intermediate States._ CRC Press, Boca Raton.
+
+     Putter H, Fiocco M, Geskus RB (2007). Tutorial in biostatistics:
+     Competing risks and multi-state models. _Statistics in Medicine_
+     *26*, 2389-2430.
+
+
+
+$anorexia
+anorexia              package:lbdatasets               R Documentation
+
+_A_N_O_R_E_X_I_A _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     anorexia dataset.
+
+_U_s_a_g_e:
+
+     anorexia
+     
+_F_o_r_m_a_t:
+
+     A data.frame with 144 rows and variables:
+
+     id patient id
+
+     treatment treatment
+
+     weight weight
+
+     time time
+
+_S_o_u_r_c_e:
+
+     Agresti Statistical methods social sciences Table 12.21
+
+_E_x_a_m_p_l_e_s:
+
+     head(anorexia, n = 10)
+     summary(anorexia)
+     
+
+
+$arthritis
+arthritis              package:lbdatasets              R Documentation
+
+_A_R_T_H_R_I_T_I_S _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     Dataset di Agresti
+
+_U_s_a_g_e:
+
+     arthritis
+     
+_F_o_r_m_a_t:
+
+     vedere <https://users.stat.ufl.edu/~aa/ordinal/data.html>.
+
+_S_o_u_r_c_e:
+
+     Agresti, Analysis of ordinal categorical data, Arthritis clinical
+     trial pag 271
+
+_E_x_a_m_p_l_e_s:
+
+     head(arthritis, n = 10)
+     summary(arthritis)
+     
+
+
+$beetles1
+beetles1              package:lbdatasets               R Documentation
+
+_B_E_E_T_L_E_S_1 _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     beetles1 dataset.  beetles1 contains data with a "covariate
+     pattern" structure (one row for each unique covariate pattern)
+
+_U_s_a_g_e:
+
+     beetles1
+     
+_F_o_r_m_a_t:
+
+     A data.frame with 8 rows and 3 variables:
+
+     n number of beetles exposed to a given dose of poison
+
+     dead number of beetles dead among those exposed to a given dose of
+          poison
+
+     logdose logarithm of the dose of poison
+
+_S_o_u_r_c_e:
+
+     Galimberti, Logistic regression lessons
+
+_E_x_a_m_p_l_e_s:
+
+     head(beetles1, n = 10)
+     summary(beetles1)
+     
+
+
+$beetles2
+beetles2              package:lbdatasets               R Documentation
+
+_B_E_E_T_L_E_S_2 _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     beetles2 dataset.  beetles2 contains data with a "0/1 - sample
+     unit" structure (one row for each sample unit)
+
+_U_s_a_g_e:
+
+     beetles2
+     
+_F_o_r_m_a_t:
+
+     A data.frame with 481 rows and 2 variables:
+
+     x logarithm of the dose of poison the beetle was exposed to
+
+     y Is the beetle dead (0=no, 1=yes)
+
+_S_o_u_r_c_e:
+
+     Galimberti, Logistic regression lessons
+
+_E_x_a_m_p_l_e_s:
+
+     head(beetles2, n = 10)
+     summary(beetles2)
+     
+
+
+$camellia
+camellia              package:lbdatasets               R Documentation
+
+_d_a_t_a_s_e_t _C_A_M_E_L_L_I_A
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     I dati riguardano n.333 foglie di Camellia Japonica. Le foglie
+     sono state raccolte, pesate, essiccate e ripesate dopo 40 giorni
+     estivi in appartamento
+
+_U_s_a_g_e:
+
+     camellia
+     
+_F_o_r_m_a_t:
+
+     id numero identificativo della foglia
+
+     lunghezza lunghezza del diametro maggiore della foglia in mm
+
+     larghezza larghezza del diametro minore della foglia in mm
+
+     pesovivo peso della foglia misurato 1 ora dopo la raccolta in
+          deci-milligrammi
+
+     pesosecco peso della foglia misurato 40 giorni dopo la raccolta in
+          deci-milligrammi
+
+     codice codice della specie, caratterizzante la forma:
+          lanceolata=1; cordiforme=0
+
+_S_o_u_r_c_e:
+
+     Piccolo, D., Statistica per le decisioni, Il Mulino 2010
+
+_E_x_a_m_p_l_e_s:
+
+     head(camellia, n = 10)
+     summary(camellia)
+     
+
+
+$claims
+claims               package:lbdatasets                R Documentation
+
+_C_L_A_I_M_S _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     claims dataset: utilizzato per modelli, regressione di poisson
+
+_U_s_a_g_e:
+
+     claims
+     
+_F_o_r_m_a_t:
+
+     A data.frame with 64 rows and 5 variables:
+
+     n number of policyholders for each covariate pattern (that is,
+          each data entry of the cross-table built on
+          [age,dist,rural,car])
+
+     c number of claims for each covariate pattern
+
+     age arranged in classes (<25, 25-29, 30-35, >35)
+
+     dist type of area where the policyholders live rural, small town,
+          large towns, major cities
+
+     car engine capacity (<1 liter, 1-1.5 liter, 1.5-2 liter, >2 liter)
+
+_S_o_u_r_c_e:
+
+     Galimberti, Poisson regression lessons
+
+_E_x_a_m_p_l_e_s:
+
+     head(claims, n = 10)
+     summary(claims)
+     
+
+
+$compact
+compact               package:lbdatasets               R Documentation
+
+_d_a_t_a_s_e_t _C_O_M_P_A_C_T
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     I dati riguardano n.1192 brani incisi su compact disc di una
+     collezione privata. Per ciascun brano e` nota sia la durata che
+     l'anno di edizione
+
+_U_s_a_g_e:
+
+     compact
+     
+_F_o_r_m_a_t:
+
+     durata durata del singolo brano in secondi
+
+     anno anno di edizione del brano
+
+_S_o_u_r_c_e:
+
+     Piccolo, D., Statistica per le decisioni, Il Mulino 2010
+
+_E_x_a_m_p_l_e_s:
+
+     head(compact, n = 10)
+     summary(compact)
+     
+
+
+$crimeFL
+crimeFL               package:lbdatasets               R Documentation
+
+_C_R_I_M_E_F_L _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     crimeFL dataset.
+
+_U_s_a_g_e:
+
+     crimeFL
+     
+_F_o_r_m_a_t:
+
+     A data.frame with 67 contee and YY variables:
+
+     u percentuale di urbanizzazion
+
+     hs percentuale di adulti con diploma superiore
+
+     c crime rate
+
+_S_o_u_r_c_e:
+
+     Dataset Agresti fornito da Micciolo
+
+_E_x_a_m_p_l_e_s:
+
+     head(crimeFL, n = 10)
+     summary(crimeFL)
+     
+
+
+$dae_ologit
+dae_ologit             package:lbdatasets              R Documentation
+
+_D_A_E__O_L_O_G_I_T _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     dae_ologit dataset.
+
+_U_s_a_g_e:
+
+     dae_ologit
+     
+_F_o_r_m_a_t:
+
+     vedere
+     <https://stats.oarc.ucla.edu/stata/dae/ordered-logistic-regression/>.
+
+_S_o_u_r_c_e:
+
+     https://stats.idre.ucla.edu/stat/data/ologit.dta
+
+_E_x_a_m_p_l_e_s:
+
+     head(dae_ologit, n = 10)
+     summary(dae_ologit)
+     
+
+
+$ebmt3
+ebmt3                package:lbdatasets                R Documentation
+
+_D_a_t_a _f_r_o_m _t_h_e _E_u_r_o_p_e_a_n _S_o_c_i_e_t_y _f_o_r _B_l_o_o_d _a_n_d _M_a_r_r_o_w _T_r_a_n_s_p_l_a_n_t_a_t_i_o_n
+(_E_B_M_T)
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     A data frame of 2204 patients transplanted at the EBMT between
+     1995 and 1998. These data were used in Section 4 of the tutorial
+     on competing risks and multi-state models (Putter, Fiocco &
+     Geskus, 2007). The included variables are
+
+     id Patient identification number
+
+     prtime Time in days from transplantation to platelet recovery or
+          last follow-up
+
+     prstat Platelet recovery status; 1 = platelet recovery, 0 =
+          censored
+
+     rfstime Time in days from transplantation to relapse or death or
+          last follow-up (relapse-free survival time)
+
+     rfsstat Relapse-free survival status; 1 = relapsed or dead, 0 =
+          censored
+
+     dissub Disease subclassification; factor with levels "AML", "ALL",
+          "CML"
+
+     age Patient age at transplant; factor with levels "<=20", "20-40",
+          ">40"
+
+     drmatch Donor-recipient gender match; factor with levels "No
+          gender mismatch", "Gender mismatch"
+
+     tcd T-cell depletion; factor with levels "No TCD", "TCD"
+
+_U_s_a_g_e:
+
+     data(ebmt3)
+     
+_F_o_r_m_a_t:
+
+     A data frame, see ‘data.frame’.
+
+_S_o_u_r_c_e:
+
+     mstate package
+
+_R_e_f_e_r_e_n_c_e_s:
+
+     Putter H, Fiocco M, Geskus RB (2007). Tutorial in biostatistics:
+     Competing risks and multi-state models. _Statistics in Medicine_
+     *26*, 2389-2430.
+
+
+
+$film
+film                package:lbdatasets                 R Documentation
+
+_d_a_t_a_s_e_t _F_I_L_M
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     dataset film
+
+_U_s_a_g_e:
+
+     film
+     
+_F_o_r_m_a_t:
+
+     giudizio giudizio
+
+     genere genere
+
+     naziona nazione
+
+     anno anno
+
+     durata durata
+
+     visibilita visibilità
+
+_S_o_u_r_c_e:
+
+     Piccolo, D., Statistica, Il Mulino 2000
+
+_E_x_a_m_p_l_e_s:
+
+     head(film, n = 10)
+     summary(film)
+     
+
+
+$fitness
+fitness               package:lbdatasets               R Documentation
+
+_F_I_T_N_E_S_S _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     fitness dataset.
+
+_U_s_a_g_e:
+
+     fitness
+     
+_F_o_r_m_a_t:
+
+     A data.frame with XXX rows and YY variables.
+
+     Il contesto dell'esercizio: si vuole valutare quanto rapidamente
+     il corpo può assorbire e usare l'ossigeno (cosa difficile da fare
+     normalmente). Si conduce un esperimento in cui si desidera
+     sviluppare una equazione di previsione per il consumo di ossigeno
+     basato sulla misura di certi parametri (di facile
+     quantificazione/ottenimento) raccolti durante esercizi fisici
+     effettuati dai soggetti in studio:
+
+     oxy consumo di ossigeno (ml per kg di peso al minuto)
+
+     age età in anni
+
+     weight peso in kg
+
+     runtime minuti necessari per correre 1.5 miglia
+
+     rstpulse battito cardiaco a riposo
+
+     runpulse battito cardiaco terminata la corsa
+
+     maxpulse battito cardiaco massimo (durante la corsa)
+
+     Abbiamo dunque 6 variabili esplicative, ed una da spiegare (oxy),
+     e sono tutte continue.
+
+_S_o_u_r_c_e:
+
+     Ambrogi, Turati - Esercitazione regressione multipla
+
+_E_x_a_m_p_l_e_s:
+
+     head(fitness, n = 10)
+     summary(fitness)
+     
+
+
+$frei
+frei                package:lbdatasets                 R Documentation
+
+_A_c_u_t_e _L_e_u_k_e_m_i_a _d_a_t_a _f_r_o_m _F_r_e_i_r_e_i_c_h _e_t _a_l (_1_9_6_3).
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     In this study there were 21 pairs of subjects, and within each
+     pair one subject received 6-mercaptopurine (6-MP) and one got
+     placebo. The data are right censored.
+
+_U_s_a_g_e:
+
+     frei
+     
+_F_o_r_m_a_t:
+
+     A data frame with 42 observations on the following variables.
+
+     ‘time’ time in remission (in weeks)
+
+     ‘status’ event status, 1 is relapse, 0 is censored
+
+     ‘treatment’ treatment group: either 'placebo' or '6-MP'
+
+     ‘pair’ pair id number
+
+_D_e_t_a_i_l_s:
+
+     See also Gehan (1965) who used the data ignoring the pairing so
+     that he could illustrate his famous two-sample (non-paired) rank
+     test.
+
+_S_o_u_r_c_e:
+
+     bpcp package
+
+_R_e_f_e_r_e_n_c_e_s:
+
+     Gehan (1965) Biometrika 52:203-223. Freireich et al (1963) Blood
+     21(6):699-716.
+
+_E_x_a_m_p_l_e_s:
+
+     head(frei)
+     
+
+
+$influences
+influences             package:lbdatasets              R Documentation
+
+_I_N_F_L_U_E_N_C_E_S _d_a_t_a_s_e_t
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     influences on kids dataset.
+
+_U_s_a_g_e:
+
+     influences
+     
+_F_o_r_m_a_t:
+
+     A data.frame with 36 rows and 3 variables:
+
+     subject id
+
+     opinion score
+
+     influence source of influence
+
+_S_o_u_r_c_e:
+
+     Agresti Statistical methods social sciences Table 12.17
+
+_E_x_a_m_p_l_e_s:
+
+     head(influences, n = 10)
+     summary(influences)
+     
+
+
+$laureati
+laureati              package:lbdatasets               R Documentation
+
+_L_A_U_R_E_A_T_I _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     laureati dataset.
+
+_U_s_a_g_e:
+
+     laureati
+     
+_F_o_r_m_a_t:
+
+     A data.frame with XXX rows and YY variables:
+
+     corso EC = economia e commercio, EP = economia politica
+
+     anno anno laurea
+
+     media media esami
+
+     voto voto di laurea
+     #'
+
+_S_o_u_r_c_e:
+
+     Rocco Micciolo
+
+_E_x_a_m_p_l_e_s:
+
+     head(laureati, n = 10)
+     summary(laureati)
+     
+
+
+$libri
+libri                package:lbdatasets                R Documentation
+
+_d_a_t_a_s_e_t _P_R_E_Z_Z_O_L_I_B_R_I
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     I dati riguardano una rilevazione svoltasi nel 2001 sul prezzo in
+     Euro dei libri presenti nel catalogo di un importante editore
+     italiano (n.420 osservazioni)
+
+_U_s_a_g_e:
+
+     libri
+     
+_F_o_r_m_a_t:
+
+     prezzo prezzo in lire del libro
+
+_S_o_u_r_c_e:
+
+     Piccolo, D., Statistica per le decisioni, Il Mulino 2010
+
+_E_x_a_m_p_l_e_s:
+
+     head(libri, n = 10)
+     summary(libri)
+     
+
+
+$mental
+Nessuna documentazione per ‘mental’ nei pacchetti e librerie specificati:
+potresti provare ‘??mental’
+
+$metabcg
+metabcg               package:lbdatasets               R Documentation
+
+_M_E_T_A_B_C_G _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     metabcg dataset.
+
+_U_s_a_g_e:
+
+     metabcg
+     
+_F_o_r_m_a_t:
+
+     A data.frame for meta-regression (Book, table 20.1 pag 190)
+
+     study_name Study name
+
+_S_o_u_r_c_e:
+
+     Borenstein et al. 2009 - Introduction to Meta-Analysis - Wiley,
+     retrieved
+     https://www.meta-analysis.com/pages/book_introduction_to_meta-analysis.php
+
+_E_x_a_m_p_l_e_s:
+
+     head(metabcg)
+     summary(metabcg)
+     
+
+
+$metabin
+metabin               package:lbdatasets               R Documentation
+
+_M_E_T_A_B_I_N _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     metabin dataset.
+
+_U_s_a_g_e:
+
+     metabin
+     
+_F_o_r_m_a_t:
+
+     A data.frame for metaanalysis of binary data (Book, table 14.4 pag
+     93)
+
+     study Study name
+
+     te treated: events
+
+     tne treated: non events
+
+     tn treated: total number of patients
+
+     ce controls: events
+
+     cne controls: non events
+
+     cn controls: total number of patients
+
+_S_o_u_r_c_e:
+
+     Borenstein et al. 2009 - Introduction to Meta-Analysis - Wiley,
+     retrieved
+     https://www.meta-analysis.com/pages/book_introduction_to_meta-analysis.php
+
+_E_x_a_m_p_l_e_s:
+
+     head(metabin)
+     summary(metabin)
+     
+
+
+$metacon
+metacon               package:lbdatasets               R Documentation
+
+_M_E_T_A_C_O_N _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     metacon dataset.
+
+_U_s_a_g_e:
+
+     metacon
+     
+_F_o_r_m_a_t:
+
+     A data.frame for metaanalysis of continuous data (Book, table 14.1
+     pag 93):
+
+     study Study name
+
+     tm treated: mean
+
+     tsd treated: standard deviation
+
+     tn treated: total number of patients
+
+     cm controls: mean
+
+     csd controls: standard deviation
+
+     cn controls: total number of patients
+
+_S_o_u_r_c_e:
+
+     Borenstein et al. 2009 - Introduction to Meta-Analysis - Wiley,
+     retrieved
+     https://www.meta-analysis.com/pages/book_introduction_to_meta-analysis.php
+
+_E_x_a_m_p_l_e_s:
+
+     head(metacon)
+     summary(metacon)
+     
+
+
+$metacor
+metacor               package:lbdatasets               R Documentation
+
+_M_E_T_A_C_O_R _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     metacor dataset.
+
+_U_s_a_g_e:
+
+     metacor
+     
+_F_o_r_m_a_t:
+
+     A data.frame for metaanalysis of correlation data (Book, table
+     14.7 pag 98)
+
+     study Study name
+
+     cor correlation
+
+     n number of patients
+
+_S_o_u_r_c_e:
+
+     Borenstein et al. 2009 - Introduction to Meta-Analysis - Wiley,
+     retrieved
+     https://www.meta-analysis.com/pages/book_introduction_to_meta-analysis.php
+
+_E_x_a_m_p_l_e_s:
+
+     head(metacor)
+     summary(metacor)
+     
+
+
+$mros
+mros                package:lbdatasets                 R Documentation
+
+_M_r_o_s (_s_a_m_p_l_e) _d_a_t_a_s_e_t
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     Mros (sample) dataset
+
+_U_s_a_g_e:
+
+     mros
+     
+_F_o_r_m_a_t:
+
+     A data frame with 42 observations on the following variables.
+
+     ‘id’ patient id
+
+     ‘bmd’ ??
+
+     ‘giage1’ ??
+
+     ‘cutbmd’ class of something
+
+     ‘time’ T
+
+     ‘status’ 1 if ... 0 if ...
+
+_E_x_a_m_p_l_e_s:
+
+     head(mros)
+     
+
+
+$msofa
+msofa                package:lbdatasets                R Documentation
+
+_M_S_O_F_A _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     msofa dataset.
+
+_U_s_a_g_e:
+
+     msofa
+     
+_F_o_r_m_a_t:
+
+     A data.frame with XXX rows and YY variables:
+
+     c1 Item C1
+
+     c2 Item C2
+
+     c3 Item C3
+
+     c4 Item C4
+
+     c5 Item C5
+
+     c6 Item C6
+
+     c7 Item C7
+
+     c8 Item C8
+
+     c9 Item C9
+
+     c10 Item C10
+
+     c11 Item C11
+
+     c12 Item C12
+
+     c13 Item C13
+
+     c14 Item C14
+
+     c15 Item C15
+
+     c16 Item C16
+
+     c17 Item c17
+
+     c18 Item C18
+
+     c19 Item C19
+
+     c20 Item C20
+
+     age Age in years
+
+     race Race
+
+     marital Marital status
+
+     educlevl Education level
+
+     insured Insured
+
+_S_o_u_r_c_e:
+
+     Pett, A.M, Lackey, N.R. and Sullivan J.J. (2003) Making sense of
+     factor analysis, Sage
+
+_E_x_a_m_p_l_e_s:
+
+     head(msofa, n = 10)
+     summary(msofa)
+     
+
+
+$ovarian
+ovarian               package:lbdatasets               R Documentation
+
+_D_a_t_a _f_r_o_m _a _R_C_T _o_n _a_d_v_a_n_c_e_d _o_v_a_r_i_a_n _c_a_n_c_e_r
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     Controlled clinical trial on N = 476 women with advanced ovarian
+     cancer. The objective is to compare three treatment regimens:
+     monochemotherapy P (cisplatin), polichemotherapies
+     cyclophosphamide (CP) and cyclophosphamide + adriamycin (CAP).
+
+_U_s_a_g_e:
+
+     ovarian
+     
+_F_o_r_m_a_t:
+
+     A data frame with 476 observations on the following variables.
+
+     ‘npaz’ patient id
+
+     ‘tures’ residual tumor size (1 = absent, 2 = micro, 3 = <= 1cm, 4
+          = 1-2cm, 5 = 2-5cm, 6 = 5-10cm, 7 = > 10 cm
+
+     ‘tures_cl’ residual tumor size classes
+
+     ‘kar’ Karnofsky Index
+
+     ‘kar_cl’ Karnofsky Index classes
+
+     ‘histo’ Histology
+
+     ‘histo_cl’ Histology classes
+
+     ‘figo’ Federation Internationale de Gynecologie et d'Obstetrique
+          with stages I, II, III
+
+     ‘treatment’ treatment group (1 = CAP, 2 = CP, 3 = P)
+
+     ‘surv’ event indicator (0 = censored, 1 = death)
+
+     ‘survtime’ time to event (days)
+
+     ‘status’ ??
+
+_D_e_t_a_i_l_s:
+
+     Endpoint is the overall survival. The prognostic factors available
+     are residual tumor size, Karnofsky Index, Histology and the
+     Federation Internationale de Gynecologie et d'Obstetrique
+     classification.
+
+_E_x_a_m_p_l_e_s:
+
+     head(ovarian)
+     
+
+
+$political
+political              package:lbdatasets              R Documentation
+
+_P_O_L_I_T_I_C_A_L _I_D_E_O_L_O_G_Y _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     political ideologu dataset.
+
+_U_s_a_g_e:
+
+     political
+     
+_F_o_r_m_a_t:
+
+     A data.frame with 276 rows and 2 variables:
+
+     party_id party
+
+     poid political ideology score
+
+_S_o_u_r_c_e:
+
+     Agresti Statistical methods social sciences Table 12.1
+
+_E_x_a_m_p_l_e_s:
+
+     head(political, n = 10)
+     summary(political)
+     
+
+
+$political2
+political2             package:lbdatasets              R Documentation
+
+_P_O_L_I_T_I_C_A_L _I_D_E_O_L_O_G_Y _2 _d_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     political ideology dataset.
+
+_U_s_a_g_e:
+
+     political2
+     
+_F_o_r_m_a_t:
+
+     A data.frame with 943 rows and 3 variables:
+
+     party_id party
+
+     sex sex
+
+     poid political ideology score
+
+_S_o_u_r_c_e:
+
+     Agresti Statistical methods social sciences Table 12.10
+
+_E_x_a_m_p_l_e_s:
+
+     head(political2, n = 10)
+     summary(political2)
+     
+
+
+$produzione
+produzione             package:lbdatasets              R Documentation
+
+_d_a_t_a_s_e_t _P_R_O_D_U_Z_I_O_N_E
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     Indice mensile della Produzione industriale (corretto per i giorni
+     lavorativi) (Gennaio 1990 - Dicembre 2003)
+
+_U_s_a_g_e:
+
+     produzione
+     
+_F_o_r_m_a_t:
+
+     produzione indice mensile produzione
+
+_S_o_u_r_c_e:
+
+     Piccolo, D., Statistica per le decisioni, Il Mulino 2010
+
+_E_x_a_m_p_l_e_s:
+
+     head(produzione, n = 10)
+     summary(produzione)
+     
+
+
+$prostate
+prostate              package:lbdatasets               R Documentation
+
+_P_r_o_s_t_a_t_e _C_a_n_c_e_r _D_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     Data to examine the correlation between the level of
+     prostate-specific antigen and a number of clinical measures in men
+     who were about to receive a radical prostatectomy.
+
+_U_s_a_g_e:
+
+     data(prostate)
+     
+_F_o_r_m_a_t:
+
+     A data frame with 97 observations on the following 10 variables.
+
+     lcavol log cancer volume
+
+     lweight log prostate weight
+
+     age in years
+
+     lbph log of the amount of benign prostatic hyperplasia
+
+     svi seminal vesicle invasion
+
+     lcp log of capsular penetration
+
+     gleason a numeric vector
+
+     pgg45 percent of Gleason score 4 or 5
+
+     lpsa response
+
+     train a logical vector
+
+_D_e_t_a_i_l_s:
+
+     The last column indicates which 67 observations were used as the
+     "training set" and which 30 as the test set, as described on page
+     48 in the book.
+
+_N_o_t_e:
+
+     There was an error in this dataset in earlier versions of the
+     package, as indicated in a footnote on page 3 of the second
+     edition of the book. As of version 2012.04-0 this was corrected.
+
+_S_o_u_r_c_e:
+
+     Stamey, T., Kabalin, J., McNeal, J., Johnstone, I., Freiha, F.,
+     Redwine, E. and Yang, N (1989) Prostate specific antigen in the
+     diagnosis and treatment of adenocarcinoma of the prostate II.
+     Radical prostatectomy treted patients, Journall of Urology 16:
+     1076-1083.
+
+_E_x_a_m_p_l_e_s:
+
+     if(interactive())par(ask=TRUE)
+     str( prostate )
+     cor( prostate[,1:8] )
+     pairs( prostate[,1:9], col="violet" )
+     train <- subset( prostate, train==TRUE )[,1:9]
+     test  <- subset( prostate, train=FALSE )[,1:9]
+     #
+     if( require(leaps)) {
+     # The book (page 56) uses only train subset, so we the same:
+     prostate.leaps <- regsubsets( lpsa ~ . , data=train, nbest=70, #all!
+                          really.big=TRUE )
+     prostate.leaps.sum <- summary( prostate.leaps )
+     prostate.models <- prostate.leaps.sum$which
+     prostate.models.size <- as.numeric(attr(prostate.models, "dimnames")[[1]])
+     hist( prostate.models.size )
+     prostate.models.rss <- prostate.leaps.sum$rss
+     prostate.models.best.rss <- 
+          tapply( prostate.models.rss, prostate.models.size, min )
+     prostate.models.best.rss
+     # Let us add results for the only intercept model
+     prostate.dummy <- lm( lpsa ~ 1, data=train )
+     prostate.models.best.rss <- c(
+              sum(resid(prostate.dummy)^2), 
+               prostate.models.best.rss)
+     # Making a plot:
+     plot( 0:8, prostate.models.best.rss, ylim=c(0, 100), 
+           type="b", xlab="subset size", ylab="Residual Sum Square", 
+           col="red2" )
+     points( prostate.models.size, prostate.models.rss, pch=17, col="brown",cex=0.7 )
+     }
+     # For a better plot, should remove the best for each size from last call!
+     # Now with ridge regression: 
+     # Ridge regression in R is multiply implemented, at least:
+     # MASS: lm.ridge
+     # mda : gen.ridge
+     #( survival: ridge)
+     # Design: pentrace
+     # mgcv: pcls (very general)
+     # simple.ridge (in this package)
+     #
+     library(mda)
+     #
+     prostate.ridge.list <- lapply(list(lambda=seq(0,8,by=0.4)), function(lambda) 
+         gen.ridge(train[,1:8], y=train[,9,drop=FALSE],   lambda=lambda))
+     # Problems with this usage.
+     # simpler usage:
+     #
+     prostate.ridge <- gen.ridge(train[,1:8], y=train[,9,drop=FALSE], lambda=1)
+     #
+     # Since there is some problems with the mda functions, we use our own:
+     #
+     prostate.ridge <- simple.ridge( train[,1:8], train[,9], df=1:8 )
+     #
+     # coefficient traces:
+     #
+     matplot( prostate.ridge$df, t(prostate.ridge$beta), type="b", 
+             col="blue", pch=17, ylab="coefficients" )
+     # Calculations for the lasso:
+     #
+     if(require(lasso2))  {
+     prostate.lasso <- l1ce( lpsa ~ ., data=train, trace=TRUE, sweep.out=~1,  
+                          bound=seq(0,1,by=0.1) )
+     prostate.lasso.coef <- sapply(prostate.lasso, function(x) x$coef)
+     colnames(prostate.lasso.coef) <- seq( 0,1,by=0.1 )
+     matplot( seq(0,1,by=0.1), t(prostate.lasso.coef[-1,]), type="b", 
+             xlab="shrinkage factor", ylab="coefficients", 
+             xlim=c(0, 1.2), col="blue", pch=17 )
+     }
+     #
+     # lasso with lars:
+     if (require(lars)) {
+     #
+     prostate.lasso.lars <- lars( as.matrix(train[,1:8]), train[,9], 
+              type="lasso", trace=TRUE )
+     cv.lars( as.matrix(train[,1:8]), train[,9], 
+              type="lasso", trace=TRUE, K=10 )
+     }
+     #
+     # CV (cross-validation) using package boot:
+     #
+     library(boot)
+     prostate.glm <- glm( lpsa ~ ., data=train )
+     # repeat this some times to make clear that cross-validation is
+     # a random procedure
+     #
+     cv.glm( train, prostate.glm, K=10 )$delta                              
+     #
+     # This is a two-component vector, raw cross-validated estimate and
+     #   adjusted cross-validated estimate.
+     summary( prostate.glm )
+     #
+     
+
+
+$prostate_orig
+Nessuna documentazione per ‘prostate_orig’ nei pacchetti e librerie specificati:
+potresti provare ‘??prostate_orig’
+
+$SAheart
+SAheart               package:lbdatasets               R Documentation
+
+_S_o_u_t_h _A_f_r_i_c_a_n _H_e_a_r_t_h _D_i_s_e_a_s_e _D_a_t_a
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     A retrospective sample of males in a heart-disease high-risk
+     region of the Western Cape, South Africa.
+
+_U_s_a_g_e:
+
+     data(SAheart)
+     
+_F_o_r_m_a_t:
+
+     A data frame with 462 observations on the following 10 variables.
+
+     sbp systolic blood pressure
+
+     tobacco cumulative tobacco (kg)
+
+     ldl low density lipoprotein cholesterol
+
+     adiposity a numeric vector
+
+     famhist family history of heart disease, a factor with levels
+          ‘Absent’ ‘Present’
+
+     typea type-A behavior
+
+     obesity a numeric vector
+
+     alcohol current alcohol consumption
+
+     age age at onset
+
+     chd response, coronary heart disease
+
+_D_e_t_a_i_l_s:
+
+     A retrospective sample of males in a heart-disease high-risk
+     region of the Western Cape, South Africa. There are roughly two
+     controls per case of CHD. Many of the CHD positive men have
+     undergone blood pressure reduction treatment and other programs to
+     reduce their risk factors after their CHD event. In some cases the
+     measurements were made after these treatments. These data are
+     taken from a larger dataset, described in Rousseauw et al, 1983,
+     South African Medical Journal.
+
+_S_o_u_r_c_e:
+
+     Rousseauw, J., du Plessis, J., Benade, A., Jordaan, P., Kotze, J.
+     and Ferreira, J. (1983). Coronary risk factor screening in three
+     rural communities, South African Medical Journal 64: 430-436.
+
+_E_x_a_m_p_l_e_s:
+
+     str(SAheart) 
+     summary(SAheart)
+     
+
+
+$studenti
+studenti              package:lbdatasets               R Documentation
+
+_d_a_t_a_s_e_t _S_T_U_D_E_N_T_I
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     I dati riguardano n.2759 studenti presenti in aula durante la
+     lezione di Statistica, svolta al I anno dei CdL in Scienze
+     Politiche, Universita` di Napoli Federico II, e raccolti durante
+     gli anni 1988-1995
+
+_U_s_a_g_e:
+
+     studenti
+     
+_F_o_r_m_a_t:
+
+     anno anno di rilevazione
+
+     genere genere dell'intervistato: studenti (M)=0; studentesse (F)=1
+
+     eta eta` in frazioni di anno (calcolato sulla base del mese/anno
+          di nascita dichiarato)
+
+     peso peso (dichiarato) in kg
+
+     altezza altezza (dichiarata) in cm
+
+     dipsci possesso del diploma di maturita` scientifica: SI=1; No=0
+
+     dipcla possesso del diploma di maturita` classica: SI=1; No=0
+
+     diptec possesso del diploma di maturita` tecnica: SI=1; No=0
+
+     dipalt possesso di altri diploma di maturita`: SI=1; No=0
+
+     componenti numeri dei componenti della famiglia (compreso
+          l'intervistato)
+
+     occhiali possesso di occhiali da vista: SI=1, NO=0
+
+     fumo abitudine al fumo: SI=1, NO=0
+
+     diploma diploma secondario dello studente
+
+_S_o_u_r_c_e:
+
+     Piccolo, D., Statistica per le decisioni, Il Mulino 2010
+
+_E_x_a_m_p_l_e_s:
+
+     head(studenti, n = 10)
+     summary(studenti)
+     
+
+
+> 
+> system("rm -rf .RData")
+> 
+> proc.time()
+   utente   sistema trascorso 
+    0.565     0.084     0.643 

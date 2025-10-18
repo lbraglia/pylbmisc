@@ -10,6 +10,7 @@ import inspect as _inspect
 import re as _re
 import readline as _readline
 import sys as _sys
+import time as _time
 import types as _types
 
 from pprint import pp as _pp
@@ -275,6 +276,48 @@ def sysinfo():
         "paths": _sys.path,
         "now": _dt.datetime.now().isoformat(),
     })
+
+
+def timeit(n=1):
+    """A timer decorator with parameter for number of execution
+
+    Parameters
+    ----------
+    n: integer
+       number of function execution (default=1)
+
+    Examples
+    --------
+    >>> import pylbmisc as lb
+    >>> import time
+    >>> @timeit
+    >>> def test():
+    ...      time.sleep(2)
+    >>>
+    >>> test()
+    >>>
+    >>> @timeit(n=3)
+    >>> def test2():
+    ...      time.sleep(2)
+    >>>
+    >>> test2()
+    """
+    def inner(f):
+        def wrapper(*args, **kwargs):
+            start_time = _time.perf_counter()
+            for i in range(n):
+                rval = f(*args, **kwargs)
+            stop_time = _time.perf_counter()
+            elapsed = stop_time - start_time
+            function_name = f.__name__
+            msg_start = f"{n} calls of" if n > 1 else "Function"
+            msg_end = f" (mean: {elapsed/n:.4f} secs)" if n > 1 else "."
+            msg = f"{msg_start} {function_name} [{args=} {kwargs=}] " \
+                f"took {elapsed:.2f} secs{msg_end}"
+            print(msg)
+            return rval
+        return wrapper
+    return inner
 
 
 if __name__ == "__main__":

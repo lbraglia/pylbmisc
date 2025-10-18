@@ -38,8 +38,8 @@ def load(dname: str = "beetles1", **kwargs) -> _pd.DataFrame:
     >>> lb.datasets.ls()
     >>> df = lb.datasets.load("laureati.csv")
     """
-    data_file = _dataset_dir / (dname + ".csv") 
-    doc_file = _dataset_dir / (dname + ".txt") 
+    data_file = _dataset_dir / (dname + ".csv")
+    doc_file = _dataset_dir / (dname + ".txt")
     data = _pd.read_csv(data_file,
                         engine="python",
                         dtype_backend=_default_dtype_backend,

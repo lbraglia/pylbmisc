@@ -1,9 +1,8 @@
-"""Statistical utilities/routines"""
+"""P-values related utilities"""
 
 import pandas as _pd
 import numpy as _np
 from pylbmisc.r import match_arg as _match_arg
-from scipy import stats as _stats
 
 
 def _pstar_worker(p):
@@ -54,19 +53,22 @@ def p_adjust(p, method="holm"):
 
     Examples
     --------
+    >>> import pylbmisc as lb
+    >>> import numpy as np
+    >>>
     >>> # without missing
     >>> # > wikipedia = c(0.01, 0.04, 0.03, 0.005)
     >>> # > p.adjust(wikipedia)
     >>> # [1] 0.03 0.06 0.06 0.02
     >>> wikipedia = [0.01, 0.04, 0.03, 0.005]
-    >>> p_adjust(wikipedia)
+    >>> lb.stats.p_adjust(wikipedia)
     >>>
     >>> # with missing
     >>> # > wikipedia_miss = c(0.01, NA, 0.04, 0.03, 0.005, NA)
     >>> # > p.adjust(wikipedia_miss)
     >>> # [1] 0.03   NA 0.06 0.06 0.02   NA
     >>> wikipedia_miss = [0.01, np.nan, 0.04, 0.03, 0.005, np.nan]
-    >>> p_adjust(wikipedia_miss)
+    >>> lb.stats.p_adjust(wikipedia_miss)
     """
     if isinstance(p, list):
         x = _np.array(p)
@@ -123,79 +125,3 @@ def p_adjust(p, method="holm"):
 
     # exiting
     return p_adj
-
-
-def ci_prop(x, n=None, nas=0, confidence_level=0.95, method="exact"):
-    """Exact Clopper-Pearson confidence interval
-
-    Parameters
-    ----------
-    x: int or pd.Categorical with two categories
-        variable or count of successes
-    n: int
-        if x is integer, number of trials
-    nas: int
-        if x is integer, number of missing values out of n
-
-    Examples
-    --------
-    >>> # single variable
-    >>> ci_prop(df.adesione_intervento_proposto)
-    >>> ci_prop(27, 27+21, 34)
-
-    >>> # several variables stratified by time
-    >>> main_vars = ['adesione_intervento_posto_di_lavoro', 'proposta_posto_di_lavoro',
-    ...              'adesione_intervento_proposto', 'follow_up', 'soddisfazione',
-    ...              'rtw_continuazione_del_lavoro_alla_fine_del_follow_up']
-    >>>
-    >>> res = {}
-    >>> for var in main_vars:
-    ...     res[var] = (
-    ...           df.loc[:, var].groupby(df.time).apply(lambda x: ci_prop(x=x))
-    ...                         .reset_index().drop(columns = ["level_1"])
-    ... )
-    """
-    if n is None:
-        # caso in cui passo una serie: guarda le labels (la seconda,
-        # tipicamente "Yes" sarà usata per il numeratore)
-        groups = x.cat.categories
-        first_group = groups[0]
-        second_group = groups[1]
-        na = x.isna().sum()
-        first_group_n = x.isin([first_group]).sum()
-        second_group_n = x.isin([second_group]).sum()
-    else:
-        # caso in cui passo delle conte già fatte
-        first_group = "unsuccesses"
-        second_group = "successes"
-        na = nas
-        first_group_n = n - x - na
-        second_group_n = x
-
-    try:
-        binom_test = _stats.binomtest(
-            k=second_group_n,
-            n=first_group_n + second_group_n
-        )
-        ci = binom_test.proportion_ci(
-            confidence_level=confidence_level,
-            method=method
-        )
-    except Exception:
-        est = _pd.NA
-        lower = _pd.NA
-        upper = _pd.NA
-    else:
-        est = binom_test.statistic
-        lower = ci.low
-        upper = ci.high
-
-    return _pd.DataFrame({
-        "n": [na + first_group_n + second_group_n],
-        "NA": [na],
-        first_group: [first_group_n],
-        second_group: [second_group_n],
-        "perc": [est * 100],
-        "ci_lower": [lower * 100],
-        "ci_upper": [upper * 100]
-    })

@@ -7,7 +7,7 @@ from matplotlib.figure import Figure as _Figure
 from matplotlib.axes import Axes as _Axes
 from typing import Optional as _Optional
 from typing import Tuple as _Tuple
-from pylbmisc.stats import p_format
+from pylbmisc.stats import p_format as _p_format
 
 
 def fun2d(f: _Callable = lambda x: x**2,
@@ -244,7 +244,7 @@ def forestplot(
             rval = f"{est:.{ci_digits}f} ({ll:.{ci_digits}f}-{hl:.{ci_digits}f})"
         return rval
     ci_texts = df.apply(ci_format, axis=1)
-    pval_texts = p_format(df[pval_col])
+    pval_texts = _p_format(df[pval_col])
     n_texts = df[n_col].astype(int).astype(str)
 
     # figure setup

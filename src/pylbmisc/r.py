@@ -8,6 +8,7 @@ import types as _types
 import subprocess as _subprocess
 import tempfile as _tempfile
 from pprint import pformat as _pformat
+import re as _re
 
 
 def match_arg(arg, choices):
@@ -185,6 +186,37 @@ def view(df: _pd.DataFrame | _pd.Series) -> None:
     fname = tempfile[1]
     df.to_excel(fname)
     _subprocess.Popen(["libreoffice", fname])
+
+
+_comment_re = _re.compile("(#.+)")
+_prompt_re = _re.compile("^(>{3} ?|\\.{3} ?)")
+
+
+def example(f):
+    """Extract example code to be executed
+
+    Parameters
+    ----------
+    f: function
+       function for doc's example
+
+    Examples
+    --------
+    >>> import pylbmisc as lb
+    >>> exec(lb.r.example(lb.stats.p_adjust))
+    """
+    doc = _inspect.getdoc(f)
+    # select lines with >>> or ...
+    code = [line for line in doc.split("\n")
+            if line.startswith(">>>")
+            or line.startswith("...")]
+    print("\n".join(code))
+    # rm from comments onward
+    uncommented = [_comment_re.sub("", line) for line in code]
+    # rm starting lines
+    clean_code = [_prompt_re.sub("", line) for line in uncommented]
+    to_be_run = [line for line in clean_code if line != ""]
+    return "\n".join(to_be_run)
 
 
 if __name__ == "__main__":

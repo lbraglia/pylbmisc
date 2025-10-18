@@ -1,35 +1,31 @@
-anorexia              package:lbdatasets               R Documentation
+compact               package:lbdatasets               R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_d_a_t_a_s_e_t _C_O_M_P_A_C_T
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     I dati riguardano n.1192 brani incisi su compact disc di una
+     collezione privata. Per ciascun brano e` nota sia la durata che
+     l'anno di edizione
 
 _U_s_a_g_e:
 
-     anorexia
+     compact
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     durata durata del singolo brano in secondi
 
-     id patient id
-
-     treatment treatment
-
-     weight weight
-
-     time time
+     anno anno di edizione del brano
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Piccolo, D., Statistica per le decisioni, Il Mulino 2010
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(compact, n = 10)
+     summary(compact)
      
 
 

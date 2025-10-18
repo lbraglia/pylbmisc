@@ -13,7 +13,7 @@ def main():
 
     for man in doc_splitted:
         fname = name_re.match(man).group(0).replace("\n","")  + ".txt"
-        actual_doc = name_re.sub(r"", doc_splitted[1])
+        actual_doc = name_re.sub(r"", man)
         with open(fname, "w") as f:
             print(actual_doc, file=f)
 

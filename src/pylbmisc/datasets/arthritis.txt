@@ -1,35 +1,28 @@
-anorexia              package:lbdatasets               R Documentation
+arthritis              package:lbdatasets              R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_A_R_T_H_R_I_T_I_S _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     Dataset di Agresti
 
 _U_s_a_g_e:
 
-     anorexia
+     arthritis
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
-
-     id patient id
-
-     treatment treatment
-
-     weight weight
-
-     time time
+     vedere <https://users.stat.ufl.edu/~aa/ordinal/data.html>.
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Agresti, Analysis of ordinal categorical data, Arthritis clinical
+     trial pag 271
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(arthritis, n = 10)
+     summary(arthritis)
      
 
 

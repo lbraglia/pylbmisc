@@ -1,35 +1,47 @@
-anorexia              package:lbdatasets               R Documentation
+aidssi               package:lbdatasets                R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_D_a_t_a _f_r_o_m _t_h_e _A_m_s_t_e_r_d_a_m _C_o_h_o_r_t _S_t_u_d_i_e_s _o_n _H_I_V _i_n_f_e_c_t_i_o_n _a_n_d _A_I_D_S
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     These data sets give the times (in years) from HIV infection to
+     AIDS, SI switch and death in 329 men who have sex with men (MSM).
+     Data are from the period until combination anti-retroviral therapy
+     became available (1996). For more background information on the
+     cohort, ccr5 and SI, see Geskus _et al._ (2000, 2003)
+
+     ‘aidssi’ contains follow-up data until the first of AIDS and SI
+     switch. It was used as example for the competing risks analyses in
+     Putter, Fiocco, Geskus (2007) and in Geskus (2016).
 
 _U_s_a_g_e:
 
-     anorexia
+     data(aidssi)
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     aidssi
 
-     id patient id
-
-     treatment treatment
-
-     weight weight
-
-     time time
-
+       patnr:   Patient identification number                                                  
+       time:    Time from HIV infection to first of SI appearance and AIDS, or                 
+                last follow-up                                                                 
+       status:  Event indicator; 0 = censored, 1 = AIDS, 2 = SI appearance                     
+       cause:   Failure cause; factor with levels "event-free", "AIDS", "SI"                   
+       ccr5:    CCR5 genotype; factor with levels "WW" (wild type allele on both chromosomes), 
+                "WM" (mutant allele on one chromosome)                                         
+      
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     mstate package
 
-_E_x_a_m_p_l_e_s:
+_R_e_f_e_r_e_n_c_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
-     
+     Geskus, Ronald B. (2016). _Data Analysis with Competing Risks and
+     Intermediate States._ CRC Press, Boca Raton.
+
+     Putter H, Fiocco M, Geskus RB (2007). Tutorial in biostatistics:
+     Competing risks and multi-state models. _Statistics in Medicine_
+     *26*, 2389-2430.
+
 
 

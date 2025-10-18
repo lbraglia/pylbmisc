@@ -1,35 +1,35 @@
-anorexia              package:lbdatasets               R Documentation
+beetles1              package:lbdatasets               R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_B_E_E_T_L_E_S_1 _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     beetles1 dataset.  beetles1 contains data with a "covariate
+     pattern" structure (one row for each unique covariate pattern)
 
 _U_s_a_g_e:
 
-     anorexia
+     beetles1
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data.frame with 8 rows and 3 variables:
 
-     id patient id
+     n number of beetles exposed to a given dose of poison
 
-     treatment treatment
+     dead number of beetles dead among those exposed to a given dose of
+          poison
 
-     weight weight
-
-     time time
+     logdose logarithm of the dose of poison
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Galimberti, Logistic regression lessons
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(beetles1, n = 10)
+     summary(beetles1)
      
 
 

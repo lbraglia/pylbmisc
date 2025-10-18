@@ -1,35 +1,34 @@
-anorexia              package:lbdatasets               R Documentation
+mros                package:lbdatasets                 R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_M_r_o_s (_s_a_m_p_l_e) _d_a_t_a_s_e_t
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     Mros (sample) dataset
 
 _U_s_a_g_e:
 
-     anorexia
+     mros
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data frame with 42 observations on the following variables.
 
-     id patient id
+     ‘id’ patient id
 
-     treatment treatment
+     ‘bmd’ ??
 
-     weight weight
+     ‘giage1’ ??
 
-     time time
+     ‘cutbmd’ class of something
 
-_S_o_u_r_c_e:
+     ‘time’ T
 
-     Agresti Statistical methods social sciences Table 12.21
+     ‘status’ 1 if ... 0 if ...
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(mros)
      
 
 

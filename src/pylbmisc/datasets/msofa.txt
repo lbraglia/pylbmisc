@@ -1,35 +1,78 @@
-anorexia              package:lbdatasets               R Documentation
+msofa                package:lbdatasets                R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_M_S_O_F_A _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     msofa dataset.
 
 _U_s_a_g_e:
 
-     anorexia
+     msofa
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data.frame with XXX rows and YY variables:
 
-     id patient id
+     c1 Item C1
 
-     treatment treatment
+     c2 Item C2
 
-     weight weight
+     c3 Item C3
 
-     time time
+     c4 Item C4
+
+     c5 Item C5
+
+     c6 Item C6
+
+     c7 Item C7
+
+     c8 Item C8
+
+     c9 Item C9
+
+     c10 Item C10
+
+     c11 Item C11
+
+     c12 Item C12
+
+     c13 Item C13
+
+     c14 Item C14
+
+     c15 Item C15
+
+     c16 Item C16
+
+     c17 Item c17
+
+     c18 Item C18
+
+     c19 Item C19
+
+     c20 Item C20
+
+     age Age in years
+
+     race Race
+
+     marital Marital status
+
+     educlevl Education level
+
+     insured Insured
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Pett, A.M, Lackey, N.R. and Sullivan J.J. (2003) Making sense of
+     factor analysis, Sage
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(msofa, n = 10)
+     summary(msofa)
      
 
 

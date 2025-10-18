@@ -1,35 +1,33 @@
-anorexia              package:lbdatasets               R Documentation
+crimeFL               package:lbdatasets               R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_C_R_I_M_E_F_L _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     crimeFL dataset.
 
 _U_s_a_g_e:
 
-     anorexia
+     crimeFL
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data.frame with 67 contee and YY variables:
 
-     id patient id
+     u percentuale di urbanizzazion
 
-     treatment treatment
+     hs percentuale di adulti con diploma superiore
 
-     weight weight
-
-     time time
+     c crime rate
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Dataset Agresti fornito da Micciolo
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(crimeFL, n = 10)
+     summary(crimeFL)
      
 
 

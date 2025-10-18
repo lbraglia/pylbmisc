@@ -18,11 +18,11 @@ def ls() -> list[str]:
     >>> lb.datasets.ls()
     """
     files = sorted(_dataset_dir.rglob("*.csv"))
-    fnames = [str(f.name) for f in files]
+    fnames = [str(f.name).replace(".csv", "") for f in files]
     return fnames
 
 
-def load(fname: str = "beetles1.csv", **kwargs) -> _pd.DataFrame:
+def load(dname: str = "beetles1", **kwargs) -> _pd.DataFrame:
     """Load an available dataset.
 
     Parameters
@@ -38,6 +38,13 @@ def load(fname: str = "beetles1.csv", **kwargs) -> _pd.DataFrame:
     >>> lb.datasets.ls()
     >>> df = lb.datasets.load("laureati.csv")
     """
-    return _pd.read_csv(_dataset_dir / fname, engine="python",
+    data_file = _dataset_dir / (dname + ".csv") 
+    doc_file = _dataset_dir / (dname + ".txt") 
+    data = _pd.read_csv(data_file,
+                        engine="python",
                         dtype_backend=_default_dtype_backend,
                         **kwargs)
+    with open(doc_file, "r") as f:
+        doc = f.read()
+    data.__doc__ = doc
+    return data

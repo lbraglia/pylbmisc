@@ -1,35 +1,33 @@
-anorexia              package:lbdatasets               R Documentation
+political2             package:lbdatasets              R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_P_O_L_I_T_I_C_A_L _I_D_E_O_L_O_G_Y _2 _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     political ideology dataset.
 
 _U_s_a_g_e:
 
-     anorexia
+     political2
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data.frame with 943 rows and 3 variables:
 
-     id patient id
+     party_id party
 
-     treatment treatment
+     sex sex
 
-     weight weight
-
-     time time
+     poid political ideology score
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Agresti Statistical methods social sciences Table 12.10
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(political2, n = 10)
+     summary(political2)
      
 
 

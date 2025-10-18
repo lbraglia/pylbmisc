@@ -1,35 +1,47 @@
-anorexia              package:lbdatasets               R Documentation
+frei                package:lbdatasets                 R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_A_c_u_t_e _L_e_u_k_e_m_i_a _d_a_t_a _f_r_o_m _F_r_e_i_r_e_i_c_h _e_t _a_l (_1_9_6_3).
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     In this study there were 21 pairs of subjects, and within each
+     pair one subject received 6-mercaptopurine (6-MP) and one got
+     placebo. The data are right censored.
 
 _U_s_a_g_e:
 
-     anorexia
+     frei
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data frame with 42 observations on the following variables.
 
-     id patient id
+     ‘time’ time in remission (in weeks)
 
-     treatment treatment
+     ‘status’ event status, 1 is relapse, 0 is censored
 
-     weight weight
+     ‘treatment’ treatment group: either 'placebo' or '6-MP'
 
-     time time
+     ‘pair’ pair id number
+
+_D_e_t_a_i_l_s:
+
+     See also Gehan (1965) who used the data ignoring the pairing so
+     that he could illustrate his famous two-sample (non-paired) rank
+     test.
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     bpcp package
+
+_R_e_f_e_r_e_n_c_e_s:
+
+     Gehan (1965) Biometrika 52:203-223. Freireich et al (1963) Blood
+     21(6):699-716.
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(frei)
      
 
 

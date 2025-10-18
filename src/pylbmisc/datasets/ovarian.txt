@@ -1,35 +1,58 @@
-anorexia              package:lbdatasets               R Documentation
+ovarian               package:lbdatasets               R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_D_a_t_a _f_r_o_m _a _R_C_T _o_n _a_d_v_a_n_c_e_d _o_v_a_r_i_a_n _c_a_n_c_e_r
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     Controlled clinical trial on N = 476 women with advanced ovarian
+     cancer. The objective is to compare three treatment regimens:
+     monochemotherapy P (cisplatin), polichemotherapies
+     cyclophosphamide (CP) and cyclophosphamide + adriamycin (CAP).
 
 _U_s_a_g_e:
 
-     anorexia
+     ovarian
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data frame with 476 observations on the following variables.
 
-     id patient id
+     ‘npaz’ patient id
 
-     treatment treatment
+     ‘tures’ residual tumor size (1 = absent, 2 = micro, 3 = <= 1cm, 4
+          = 1-2cm, 5 = 2-5cm, 6 = 5-10cm, 7 = > 10 cm
 
-     weight weight
+     ‘tures_cl’ residual tumor size classes
 
-     time time
+     ‘kar’ Karnofsky Index
 
-_S_o_u_r_c_e:
+     ‘kar_cl’ Karnofsky Index classes
 
-     Agresti Statistical methods social sciences Table 12.21
+     ‘histo’ Histology
+
+     ‘histo_cl’ Histology classes
+
+     ‘figo’ Federation Internationale de Gynecologie et d'Obstetrique
+          with stages I, II, III
+
+     ‘treatment’ treatment group (1 = CAP, 2 = CP, 3 = P)
+
+     ‘surv’ event indicator (0 = censored, 1 = death)
+
+     ‘survtime’ time to event (days)
+
+     ‘status’ ??
+
+_D_e_t_a_i_l_s:
+
+     Endpoint is the overall survival. The prognostic factors available
+     are residual tumor size, Karnofsky Index, Histology and the
+     Federation Internationale de Gynecologie et d'Obstetrique
+     classification.
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(ovarian)
      
 
 

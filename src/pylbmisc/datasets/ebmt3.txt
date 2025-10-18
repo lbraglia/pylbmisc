@@ -1,35 +1,57 @@
-anorexia              package:lbdatasets               R Documentation
+ebmt3                package:lbdatasets                R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_D_a_t_a _f_r_o_m _t_h_e _E_u_r_o_p_e_a_n _S_o_c_i_e_t_y _f_o_r _B_l_o_o_d _a_n_d _M_a_r_r_o_w _T_r_a_n_s_p_l_a_n_t_a_t_i_o_n
+(_E_B_M_T)
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     A data frame of 2204 patients transplanted at the EBMT between
+     1995 and 1998. These data were used in Section 4 of the tutorial
+     on competing risks and multi-state models (Putter, Fiocco &
+     Geskus, 2007). The included variables are
+
+     id Patient identification number
+
+     prtime Time in days from transplantation to platelet recovery or
+          last follow-up
+
+     prstat Platelet recovery status; 1 = platelet recovery, 0 =
+          censored
+
+     rfstime Time in days from transplantation to relapse or death or
+          last follow-up (relapse-free survival time)
+
+     rfsstat Relapse-free survival status; 1 = relapsed or dead, 0 =
+          censored
+
+     dissub Disease subclassification; factor with levels "AML", "ALL",
+          "CML"
+
+     age Patient age at transplant; factor with levels "<=20", "20-40",
+          ">40"
+
+     drmatch Donor-recipient gender match; factor with levels "No
+          gender mismatch", "Gender mismatch"
+
+     tcd T-cell depletion; factor with levels "No TCD", "TCD"
 
 _U_s_a_g_e:
 
-     anorexia
+     data(ebmt3)
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
-
-     id patient id
-
-     treatment treatment
-
-     weight weight
-
-     time time
+     A data frame, see ‘data.frame’.
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     mstate package
 
-_E_x_a_m_p_l_e_s:
+_R_e_f_e_r_e_n_c_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
-     
+     Putter H, Fiocco M, Geskus RB (2007). Tutorial in biostatistics:
+     Competing risks and multi-state models. _Statistics in Medicine_
+     *26*, 2389-2430.
+
 
 

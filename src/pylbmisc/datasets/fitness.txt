@@ -1,35 +1,52 @@
-anorexia              package:lbdatasets               R Documentation
+fitness               package:lbdatasets               R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_F_I_T_N_E_S_S _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     fitness dataset.
 
 _U_s_a_g_e:
 
-     anorexia
+     fitness
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data.frame with XXX rows and YY variables.
 
-     id patient id
+     Il contesto dell'esercizio: si vuole valutare quanto rapidamente
+     il corpo può assorbire e usare l'ossigeno (cosa difficile da fare
+     normalmente). Si conduce un esperimento in cui si desidera
+     sviluppare una equazione di previsione per il consumo di ossigeno
+     basato sulla misura di certi parametri (di facile
+     quantificazione/ottenimento) raccolti durante esercizi fisici
+     effettuati dai soggetti in studio:
 
-     treatment treatment
+     oxy consumo di ossigeno (ml per kg di peso al minuto)
 
-     weight weight
+     age età in anni
 
-     time time
+     weight peso in kg
+
+     runtime minuti necessari per correre 1.5 miglia
+
+     rstpulse battito cardiaco a riposo
+
+     runpulse battito cardiaco terminata la corsa
+
+     maxpulse battito cardiaco massimo (durante la corsa)
+
+     Abbiamo dunque 6 variabili esplicative, ed una da spiegare (oxy),
+     e sono tutte continue.
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Ambrogi, Turati - Esercitazione regressione multipla
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(fitness, n = 10)
+     summary(fitness)
      
 
 

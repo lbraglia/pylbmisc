@@ -1,35 +1,42 @@
-anorexia              package:lbdatasets               R Documentation
+camellia              package:lbdatasets               R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_d_a_t_a_s_e_t _C_A_M_E_L_L_I_A
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     I dati riguardano n.333 foglie di Camellia Japonica. Le foglie
+     sono state raccolte, pesate, essiccate e ripesate dopo 40 giorni
+     estivi in appartamento
 
 _U_s_a_g_e:
 
-     anorexia
+     camellia
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     id numero identificativo della foglia
 
-     id patient id
+     lunghezza lunghezza del diametro maggiore della foglia in mm
 
-     treatment treatment
+     larghezza larghezza del diametro minore della foglia in mm
 
-     weight weight
+     pesovivo peso della foglia misurato 1 ora dopo la raccolta in
+          deci-milligrammi
 
-     time time
+     pesosecco peso della foglia misurato 40 giorni dopo la raccolta in
+          deci-milligrammi
+
+     codice codice della specie, caratterizzante la forma:
+          lanceolata=1; cordiforme=0
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Piccolo, D., Statistica per le decisioni, Il Mulino 2010
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(camellia, n = 10)
+     summary(camellia)
      
 
 

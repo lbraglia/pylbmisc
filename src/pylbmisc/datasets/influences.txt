@@ -1,35 +1,33 @@
-anorexia              package:lbdatasets               R Documentation
+influences             package:lbdatasets              R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_I_N_F_L_U_E_N_C_E_S _d_a_t_a_s_e_t
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     influences on kids dataset.
 
 _U_s_a_g_e:
 
-     anorexia
+     influences
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data.frame with 36 rows and 3 variables:
 
-     id patient id
+     subject id
 
-     treatment treatment
+     opinion score
 
-     weight weight
-
-     time time
+     influence source of influence
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Agresti Statistical methods social sciences Table 12.17
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(influences, n = 10)
+     summary(influences)
      
 
 

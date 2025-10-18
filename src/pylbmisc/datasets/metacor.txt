@@ -1,35 +1,36 @@
-anorexia              package:lbdatasets               R Documentation
+metacor               package:lbdatasets               R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_M_E_T_A_C_O_R _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     metacor dataset.
 
 _U_s_a_g_e:
 
-     anorexia
+     metacor
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data.frame for metaanalysis of correlation data (Book, table
+     14.7 pag 98)
 
-     id patient id
+     study Study name
 
-     treatment treatment
+     cor correlation
 
-     weight weight
-
-     time time
+     n number of patients
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Borenstein et al. 2009 - Introduction to Meta-Analysis - Wiley,
+     retrieved
+     https://www.meta-analysis.com/pages/book_introduction_to_meta-analysis.php
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(metacor)
+     summary(metacor)
      
 
 

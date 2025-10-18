@@ -1,35 +1,32 @@
-anorexia              package:lbdatasets               R Documentation
+beetles2              package:lbdatasets               R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_B_E_E_T_L_E_S_2 _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     beetles2 dataset.  beetles2 contains data with a "0/1 - sample
+     unit" structure (one row for each sample unit)
 
 _U_s_a_g_e:
 
-     anorexia
+     beetles2
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data.frame with 481 rows and 2 variables:
 
-     id patient id
+     x logarithm of the dose of poison the beetle was exposed to
 
-     treatment treatment
-
-     weight weight
-
-     time time
+     y Is the beetle dead (0=no, 1=yes)
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Galimberti, Logistic regression lessons
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(beetles2, n = 10)
+     summary(beetles2)
      
 
 

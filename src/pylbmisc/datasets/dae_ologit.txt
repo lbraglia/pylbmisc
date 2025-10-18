@@ -1,35 +1,28 @@
-anorexia              package:lbdatasets               R Documentation
+dae_ologit             package:lbdatasets              R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_D_A_E__O_L_O_G_I_T _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     dae_ologit dataset.
 
 _U_s_a_g_e:
 
-     anorexia
+     dae_ologit
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
-
-     id patient id
-
-     treatment treatment
-
-     weight weight
-
-     time time
+     vedere
+     <https://stats.oarc.ucla.edu/stata/dae/ordered-logistic-regression/>.
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     https://stats.idre.ucla.edu/stat/data/ologit.dta
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(dae_ologit, n = 10)
+     summary(dae_ologit)
      
 
 

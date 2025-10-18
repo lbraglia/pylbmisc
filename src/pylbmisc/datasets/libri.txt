@@ -1,35 +1,29 @@
-anorexia              package:lbdatasets               R Documentation
+libri                package:lbdatasets                R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_d_a_t_a_s_e_t _P_R_E_Z_Z_O_L_I_B_R_I
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     I dati riguardano una rilevazione svoltasi nel 2001 sul prezzo in
+     Euro dei libri presenti nel catalogo di un importante editore
+     italiano (n.420 osservazioni)
 
 _U_s_a_g_e:
 
-     anorexia
+     libri
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
-
-     id patient id
-
-     treatment treatment
-
-     weight weight
-
-     time time
+     prezzo prezzo in lire del libro
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Piccolo, D., Statistica per le decisioni, Il Mulino 2010
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(libri, n = 10)
+     summary(libri)
      
 
 

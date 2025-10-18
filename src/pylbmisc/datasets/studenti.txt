@@ -1,35 +1,63 @@
-anorexia              package:lbdatasets               R Documentation
+studenti              package:lbdatasets               R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_d_a_t_a_s_e_t _S_T_U_D_E_N_T_I
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     I dati riguardano n.2759 studenti presenti in aula durante la
+     lezione di Statistica, svolta al I anno dei CdL in Scienze
+     Politiche, Universita` di Napoli Federico II, e raccolti durante
+     gli anni 1988-1995
 
 _U_s_a_g_e:
 
-     anorexia
+     studenti
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     anno anno di rilevazione
 
-     id patient id
+     genere genere dell'intervistato: studenti (M)=0; studentesse (F)=1
 
-     treatment treatment
+     eta eta` in frazioni di anno (calcolato sulla base del mese/anno
+          di nascita dichiarato)
 
-     weight weight
+     peso peso (dichiarato) in kg
 
-     time time
+     altezza altezza (dichiarata) in cm
+
+     dipsci possesso del diploma di maturita` scientifica: SI=1; No=0
+
+     dipcla possesso del diploma di maturita` classica: SI=1; No=0
+
+     diptec possesso del diploma di maturita` tecnica: SI=1; No=0
+
+     dipalt possesso di altri diploma di maturita`: SI=1; No=0
+
+     componenti numeri dei componenti della famiglia (compreso
+          l'intervistato)
+
+     occhiali possesso di occhiali da vista: SI=1, NO=0
+
+     fumo abitudine al fumo: SI=1, NO=0
+
+     diploma diploma secondario dello studente
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Piccolo, D., Statistica per le decisioni, Il Mulino 2010
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(studenti, n = 10)
+     summary(studenti)
      
 
+
+> 
+> system("rm -rf .RData")
+> 
+> proc.time()
+   utente   sistema trascorso 
+    0.536     0.112     0.641 
 

@@ -1,35 +1,40 @@
-anorexia              package:lbdatasets               R Documentation
+claims               package:lbdatasets                R Documentation
 
-_A_N_O_R_E_X_I_A _d_a_t_a
+_C_L_A_I_M_S _d_a_t_a
 
 _D_e_s_c_r_i_p_t_i_o_n:
 
-     anorexia dataset.
+     claims dataset: utilizzato per modelli, regressione di poisson
 
 _U_s_a_g_e:
 
-     anorexia
+     claims
      
 _F_o_r_m_a_t:
 
-     A data.frame with 144 rows and variables:
+     A data.frame with 64 rows and 5 variables:
 
-     id patient id
+     n number of policyholders for each covariate pattern (that is,
+          each data entry of the cross-table built on
+          [age,dist,rural,car])
 
-     treatment treatment
+     c number of claims for each covariate pattern
 
-     weight weight
+     age arranged in classes (<25, 25-29, 30-35, >35)
 
-     time time
+     dist type of area where the policyholders live rural, small town,
+          large towns, major cities
+
+     car engine capacity (<1 liter, 1-1.5 liter, 1.5-2 liter, >2 liter)
 
 _S_o_u_r_c_e:
 
-     Agresti Statistical methods social sciences Table 12.21
+     Galimberti, Poisson regression lessons
 
 _E_x_a_m_p_l_e_s:
 
-     head(anorexia, n = 10)
-     summary(anorexia)
+     head(claims, n = 10)
+     summary(claims)
      
 
 

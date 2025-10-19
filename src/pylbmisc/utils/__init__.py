@@ -12,6 +12,7 @@ import readline as _readline
 import sys as _sys
 import time as _time
 import types as _types
+import importlib as _importlib
 
 from pprint import pp as _pp
 from pylbmisc.iter import unique as _unique
@@ -318,6 +319,35 @@ def timeit(n=1):
             return rval
         return wrapper
     return inner
+
+
+
+def namespace(pkgname="pylbmisc"):
+    """This should print a tree of module, submodule and contents
+
+    Parameters
+    ----------
+    pkgname: str
+        name of the package to be printed
+
+    Examples
+    --------
+    >>> # namespace("pylbmisc")
+    >>> # namespace("scipy") # TODO evolve the function to handle this
+    """
+    # da riscrivere come funzione ricorsiva, qui fa solo il primo livello, che
+    # per pylbmisc è abbastanza per avere una idea della roba esportata
+    mod = _importlib.import_module(pkgname)
+    modules = [m for m in dir(mod) if not m.startswith("__")]
+    for module_name in modules:
+        pre = post = "-" * 30
+        print(f"\n{pre} {module_name} {post}\n")
+        mod = _importlib.import_module("." + module_name, package=pkgname)
+        objects = [(name, getattr(mod, name))
+                   for name in getattr(mod, "__all__", dir(mod))
+                   if not name.startswith("_")]
+        for x in objects:
+            _pp(x)
 
 
 if __name__ == "__main__":

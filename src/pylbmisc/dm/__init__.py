@@ -7,8 +7,13 @@ import pandas as _pd
 import pyarrow as _pa
 import re as _re
 import string as _string
-from pprint import pprint as _pprint
+
+from collections import Counter
+from functools import singledispatch
 from pathlib import Path as _Path
+from pprint import pprint as _pprint
+from pylbmisc.dm import to_integer as _to_integer
+
 
 _default_dtype_backend = "pyarrow"
 
@@ -1371,6 +1376,56 @@ class Coercer:
             return df[kept_in_order]
         else:
             return df[varorder]
+
+
+@singledispatch
+def group_prog_id(x):
+    """Count the number of times each id was already seen
+
+    Parameters
+    ----------
+    x: list or np.array or pd.Dataframe
+        group indicator
+
+    Examples
+    --------
+    >>> # no missings
+    >>> group_prog_id(3)
+    >>> group_prog_id([0, 1, 1, 1, 2, 0, 2, 0])
+    >>> group_prog_id(np.array([0, 1, 1, 1, 2, 0, 2, 0]))
+    >>> group_prog_id(pd.Series([0, 1, 1, 1, 2, 0, 2, 0]))
+    >>> # with missing
+    >>> group_prog_id(np.array([1, 1, 0, np.nan, np.nan]))
+    >>> group_prog_id(pd.Series([1, 1, 0, pd.NA, pd.NA]))
+    """
+    raise NotImplementedError(f"{type(x)} is not handled.")
+
+
+def _group_prog_id_worker(x):
+    seen = Counter()
+    rval = []
+    for elem in x:
+        seen[elem] += 1
+        rval.append(seen[elem])
+    return rval
+
+
+@group_prog_id.register
+def _(x: list):
+    return _group_prog_id_worker(x)
+
+
+@group_prog_id.register
+def _(x: _np.ndarray):
+    res = _np.array(_group_prog_id_worker(x))
+    return _np.where(_np.isnan(x), _np.nan, res)
+
+
+@group_prog_id.register
+def _(x: _pd.Series):
+    rval = _pd.Series(_group_prog_id_worker(x))
+    rval[_pd.isna(x)] = _pd.NA
+    return _to_integer(rval)
 
 
 if __name__ == "__main__":

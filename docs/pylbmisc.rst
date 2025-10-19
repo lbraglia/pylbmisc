@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    pylbmisc.datasets
+   pylbmisc.stats
 
 Submodules
 ----------
@@ -56,14 +57,6 @@ pylbmisc.rand module
 --------------------
 
 .. automodule:: pylbmisc.rand
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pylbmisc.stats module
----------------------
-
-.. automodule:: pylbmisc.stats
    :members:
    :undoc-members:
    :show-inheritance:

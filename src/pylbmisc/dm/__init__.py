@@ -12,7 +12,6 @@ from collections import Counter
 from functools import singledispatch
 from pathlib import Path as _Path
 from pprint import pprint as _pprint
-from pylbmisc.dm import to_integer as _to_integer
 
 
 _default_dtype_backend = "pyarrow"
@@ -1425,7 +1424,7 @@ def _(x: _np.ndarray):
 def _(x: _pd.Series):
     rval = _pd.Series(_group_prog_id_worker(x))
     rval[_pd.isna(x)] = _pd.NA
-    return _to_integer(rval)
+    return to_integer(rval)
 
 
 if __name__ == "__main__":

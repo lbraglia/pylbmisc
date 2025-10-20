@@ -263,6 +263,8 @@ def _imports(globs):
 def sysinfo():
     """Display several system informations.
 
+    The aim should be to emulate R's sessionInfo + additional uv/venv info.
+    
     Examples
     --------
     >>> import pylbmisc as lb

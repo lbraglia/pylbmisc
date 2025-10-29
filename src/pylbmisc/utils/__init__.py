@@ -8,7 +8,7 @@ import argparse as _argparse
 import datetime as _dt
 import inspect as _inspect
 import re as _re
-import readline as _readline
+# import readline as _readline # be more portable
 import sys as _sys
 import time as _time
 import types as _types
@@ -19,7 +19,7 @@ from pylbmisc.iter import unique as _unique
 from typing import Sequence as _Sequence
 
 
-_readline.parse_and_bind("set editing-mode emacs")
+# _readline.parse_and_bind("set editing-mode emacs") # hopefully
 
 
 def is_interactive():

@@ -15,6 +15,7 @@ from lifelines.statistics import multivariate_logrank_test \
     as _multivariate_logrank_test
 from lifelines.utils import qth_survival_times as _qth_survival_times
 from pylbmisc.dm import to_integer as _to_integer
+from pylbmisc.dm import is_datetime as _is_datetime
 from pylbmisc.stats import p_format as _p_format
 from warnings import warn as _warn
 
@@ -247,9 +248,8 @@ def _date_check(x: _pd.Series, name: str = "date", can_be_none: bool = False):
     if (x is None) and (not can_be_none):
         msg = f"{name} can't be None"
         raise Exception(msg)
-    allowed = _pd.api.types.is_datetime64_dtype(x)
-    if not allowed:
-        msg = f"{name} must be an allowed type (numeric or datetime)"
+    if not _is_datetime(x):
+        msg = f"{name} must be an allowed type (datetime)"
         raise Exception(msg)
 
 

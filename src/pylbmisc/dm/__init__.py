@@ -8,8 +8,8 @@ import pyarrow as _pa
 import re as _re
 import string as _string
 
-from collections import Counter
-from functools import singledispatch
+from collections import Counter as _Counter
+from functools import singledispatch as _singledispatch
 from pathlib import Path as _Path
 from pprint import pprint as _pprint
 
@@ -29,6 +29,16 @@ _fc_re = _re.compile(
 )
 _tel_re = _re.compile(r"(.+)?0[0-9]{1,3}[\. /\-]?[0-9]{6,7}")
 _mobile_re = _re.compile(r"(.+)?3[0-9]{2}[\. /\-]?[0-9]{6,7}")
+
+
+_is_mobile_number = _np.vectorize(lambda x: bool(_mobile_re.match(x)))
+_is_telephone_number = _np.vectorize(lambda x: bool(_tel_re.match(x)))
+_is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
+_is_fiscal_code = _np.vectorize(lambda x: bool(_fc_re.match(x)))
+
+# cleaning string that have to contain dates
+_dates_polish = _re.compile(r"[^/\d-]") # keep only numbers, - and /, and just hope for the best
+
 
 
 # -------------------------------------------------------------------------
@@ -103,7 +113,7 @@ def dump_unique_values(dfs: _pd.DataFrame | dict[str, _pd.DataFrame],
                       file=f)
                 # Dati: non sortati perché ci sono problemi se i dati sono metà
                 # numerici e meta stringa? bah ci riprovo
-                if _is_string(df[col]):
+                if is_string(df[col]):
                     _pprint(df[col].value_counts().index.to_list(),
                             stream=f,
                             compact=True)
@@ -158,22 +168,10 @@ def qcut(x, q, **kwargs) -> _pd.Categorical:
 
 
 # -------------------------------------------------------------------------
-# pii_erase
+# Tests
 # ------------------------------------------------------------------------
-# Searching by column name
-def _columns_match(df_columns, searched):
-    """Search in columns names, both exact match and contains match"""
-    # coerce single string to list of one string
-    if isinstance(searched, str):
-        searched = [searched]
-    perfect_match = [c in set(searched) for c in df_columns]
-    return perfect_match
 
-
-is_email = _np.vectorize(lambda x: bool(_mail_re.match(x)))
-
-
-def _is_string(x: _pd.Series) -> bool:
+def is_string(x: _pd.Series) -> bool:
     """Check the type of a Series to be composed of string.
 
     It checks Series (including data with np.nan) differently from
@@ -190,10 +188,82 @@ def _is_string(x: _pd.Series) -> bool:
     >>> x = pd.Series(["a", pd.NA])
     >>> pd.api.types.is_string_dtype(x)
     False
-    >>> _is_string(x)
+    >>> is_string(x)
     True
     """
     return x.dtype in ["O", "string[pyarrow]"]
+
+
+def is_bool(x: _pd.Series) -> bool:
+    """Check the type of a Series to be composed of boolean.
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+    """
+    return _pd.api.types.is_bool_dtype(x)
+
+
+def is_integer(x: _pd.Series) -> bool:
+    """Check the type of a Series to be composed of integers.
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+    """
+    return _pd.api.types.is_integer_dtype(x)
+
+
+def is_numeric(x: _pd.Series) -> bool:
+    """Check the type of a Series to be composed of numerics.
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+    """
+    return _pd.api.types.is_numeric_dtype(x)
+
+
+def is_categorical(x: _pd.Series) -> bool:
+    """Check the type of a Series to be composed of string.
+
+    It checks Series (including data with np.nan) differently from
+    pandas.api.types.is_string_dtype
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+    """
+    return _pd.api.types.is_categorical_dtype(x)
+
+
+def is_datetime(x: _pd.Series) -> bool:
+    """Check the type of a Series to be composed of datetimes.
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+    """
+    return _pd.api.types.is_datetime64_any_dtype(x)
+
+
+# -------------------------------------------------------------------------
+# pii_erase
+# ------------------------------------------------------------------------
+# Searching by column name
+def _columns_match(df_columns, searched):
+    """Search in columns names, both exact match and contains match"""
+    # coerce single string to list of one string
+    if isinstance(searched, str):
+        searched = [searched]
+    perfect_match = [c in set(searched) for c in df_columns]
+    return perfect_match
+
 
 
 def _has_emails(x: _pd.Series) -> bool:
@@ -205,15 +275,12 @@ def _has_emails(x: _pd.Series) -> bool:
         the Series to be checked
 
     """
-    if _is_string(x):
-        check = is_email(x)
+    if is_string(x):
+        check = _is_email(x)
         return bool(_np.any(check))
     else:
         return False
 
-
-# Fiscal code
-is_fiscal_code = _np.vectorize(lambda x: bool(_fc_re.match(x)))
 
 
 def _has_fiscal_codes(x: _pd.Series) -> bool:
@@ -224,15 +291,12 @@ def _has_fiscal_codes(x: _pd.Series) -> bool:
     x:
         the Series to be checked
     """
-    if _is_string(x):
-        check = is_fiscal_code(x)
+    if is_string(x):
+        check = _is_fiscal_code(x)
         return bool(_np.any(check))
     else:
         return False
 
-
-# Telephone number:
-is_telephone_number = _np.vectorize(lambda x: bool(_tel_re.match(x)))
 
 
 def _has_telephone_numbers(x: _pd.Series) -> bool:
@@ -244,15 +308,12 @@ def _has_telephone_numbers(x: _pd.Series) -> bool:
         the Series to be checked
 
     """
-    if _is_string(x):
-        check = is_telephone_number(x)
+    if is_string(x):
+        check = _is_telephone_number(x)
         return bool(_np.any(check))
     else:
         return False
 
-
-# Mobile number
-is_mobile_number = _np.vectorize(lambda x: bool(_mobile_re.match(x)))
 
 
 def _has_mobile_numbers(x: _pd.Series) -> bool:
@@ -263,8 +324,8 @@ def _has_mobile_numbers(x: _pd.Series) -> bool:
     x:
         the Series to be checked
     """
-    if _is_string(x):
-        check = is_mobile_number(x)
+    if is_string(x):
+        check = _is_mobile_number(x)
         return bool(_np.any(check))
     else:
         return False
@@ -534,111 +595,6 @@ def fix_varnames(x: str | list[str] | _pd.Series | _pd.DataFrame | dict[str, _pd
         raise ValueError(msg)
 
 
-    
-# def _old_fix_varnames(x: str | list[str]):
-#     """The good-old R preprocess_varnames, returns just the fixed strings. See
-#     sanitize_varnames for DataFrame or dict of DataFrames.
-
-#     Parameters
-#     ----------
-#     x:
-#         string or list of strig to be fixed
-
-#     Examples
-#     --------
-#     >>> fix_varnames("  asd 98n2 3")
-#     'asd_98n2_3'
-#     >>> fix_varnames([" 98n2 3", " L< KIAFJ8 0_________"])
-#     ['x98n2_3', 'l_kiafj8_0']
-#     >>> fix_varnames(["àsd", "foo0", "asd"])
-#     ['asd', 'foo0', 'asd_1']
-#     """
-#     if isinstance(x, str):
-#         original = [x]
-#     elif isinstance(x, list):
-#         original = x
-#     else:
-#         msg = "Only str and list are allowed, see sanitize_varnames for DataFrame or dict of DataFrames."
-#         raise ValueError(msg)
-#     # let's go functional: s is (should be) a str, the following are to be applied
-#     # in order
-#     funcs = [
-#         lambda s: str(s),
-#         lambda s: s.lower().strip(),
-#         lambda s: _replace_accents(s),
-#         lambda s: _replace_unwanted_chars(s),
-#         lambda s: _remove_duplicated_underscore(s),
-#         lambda s: _remove_external_underscore(s),
-#         lambda s: _add_x_if_first_is_digit(s),
-#     ]
-#     # sotto serve dato che compose applica prima la funzione a destra
-#     # e poi quella a sx (come in math) mentre vogliamo tenere l'ordine
-#     # di sopra
-#     funcs.reverse()
-#     worker = _functools.reduce(_compose, funcs)
-#     mod = [worker(s) for s in original]
-#     # handle duplicated names by adding numeric postfix
-#     has_duplicates = len(mod) != len(set(mod))
-#     if has_duplicates:
-#         seen = {}
-#         uniq = []
-#         for v in mod:
-#             if v not in seen:
-#                 seen[v] = 0
-#                 uniq.append(v)
-#             else:
-#                 seen[v] += 1
-#                 uniq.append(f"{v}_{seen[v]}")
-#     else:
-#         uniq = mod
-#     # se ci sono doppi nei nomi di partenza meglio evitare i dict se no i
-#     # doppi vengono considerati solo una volta
-#     # rename_dict = {}
-#     # for o, m in zip(original, uniq_mod):
-#     #     rename_dict.update({o: m})
-#     # if it was a string that was passed, return a string, not a list
-#     return uniq if not isinstance(x, str) else uniq[0]
-
-
-# def _old_sanitize_varnames(x: _pd.DataFrame | dict[str, _pd.DataFrame],
-#                            return_tfd: bool = True):
-#     """Fix a DataFrame or a dict of DataFrames names using fix_varnames to
-#     obtain the cleaned ones.
-
-#     Parameters
-#     ----------
-#     x:
-#        the data to be fixed
-#     return_tfd:
-#        wheter to return or not (default return) the original and processed
-#        strings as dict
-
-#     """
-#     if isinstance(x, _pd.DataFrame):
-#         from_name = list(x.columns.values)
-#         to_name = fix_varnames(from_name)
-#         df = x.copy()
-#         df.columns = to_name
-#         tf = {t : f for t, f in zip(to_name, from_name)}
-#         if return_tfd:
-#             return df, tf
-#         else:
-#             return df
-#     elif isinstance(x, dict):
-#         dfs = {}
-#         tfs = {}
-#         for k, v in x.items():
-#             from_name = list(v.columns.values)
-#             to_name = fix_varnames(from_name)
-#             df = v.copy()
-#             df.columns = to_name
-#             tf = {t: f for t, f in zip(to_name, from_name)}
-#             dfs[k] = df
-#             tfs[k] = tf
-#         if return_tfd:
-#             return dfs, tfs
-#         else:
-#             return dfs
 
 
 # -------------------------------------------------------------------------
@@ -717,7 +673,7 @@ def to_bool(x=None) -> _pd.Series:
 
 
 def _replace_comma(x: _pd.Series):
-    if _is_string(x):
+    if is_string(x):
         # nas = x.isin(["", _pd.NA, _np.nan])
         nas = (x.isna()) | (x == "")
         rval = x.astype("str").str.replace(",", ".")
@@ -872,12 +828,9 @@ def to_date(x=None) -> _pd.Series:
     return to_datetime(x).dt.floor("D")
 
 
-_dates_re = _re.compile(r"[^/\d-]") # keep only numbers, - and /, and just hope for the best
-
-
 def _extract_dates_worker(x):
     if isinstance(x, str): # handle missing values (sono float)
-        polished = _dates_re.sub("", x)
+        polished = _dates_polish.sub("", x)
         return _pd.to_datetime(polished)
     else:
         # return _np.nan
@@ -952,7 +905,7 @@ def extract_dates(x=None) -> _pd.Series:
 #         raise ValueError(msg)
 #     if not isinstance(x, _pd.Series):
 #         x = _pd.Series(x)
-#     if _is_string(x):
+#     if is_string(x):
 #         # string preprocessing
 #         # rm spaces and uniform NAs
 #         x = x.str.strip()
@@ -1085,7 +1038,7 @@ def to_noyes(x=None) -> _pd.Categorical:
         raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
-    if _is_string(x):
+    if is_string(x):
         # take only the first character and map to n/y
         tmp = x.str.strip().str.lower().str[0]
         tmp[tmp == "s"] = "y"
@@ -1118,7 +1071,7 @@ def to_sex(x=None) -> _pd.Categorical:
         raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
-    if not _is_string(x):
+    if not is_string(x):
         msg = "to_sex only for strings vectors"
         raise Exception(msg)
 
@@ -1148,7 +1101,7 @@ def to_recist(x=None) -> _pd.Categorical:
         raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
-    if not _is_string(x):
+    if not is_string(x):
         msg = "to_recist only for strings vectors"
         raise Exception(msg)
 
@@ -1377,7 +1330,7 @@ class Coercer:
             return df[varorder]
 
 
-@singledispatch
+@_singledispatch
 def group_prog_id(x):
     """Count the number of times each id was already seen
 
@@ -1401,7 +1354,7 @@ def group_prog_id(x):
 
 
 def _group_prog_id_worker(x):
-    seen = Counter()
+    seen = _Counter()
     rval = []
     for elem in x:
         seen[elem] += 1

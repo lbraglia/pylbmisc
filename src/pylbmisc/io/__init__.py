@@ -7,13 +7,19 @@ import pandas as _pd
 import tempfile as _tempfile
 import zipfile as _zipfile
 
-from pylbmisc.dm import fix_varnames as _fix_varnames
-
+from collections import OrderedDict as _OrderedDict
 from pathlib import Path as _Path
-from typing import Sequence as _Sequence
-
 from pylbmisc.dm import _default_dtype_backend
-from pylbmisc.dm import _is_string
+from pylbmisc.dm import fix_varnames as _fix_varnames
+from pylbmisc.dm import is_bool as _is_bool
+from pylbmisc.dm import is_categorical as _is_categorical
+from pylbmisc.dm import is_datetime as _is_datetime
+from pylbmisc.dm import is_integer as _is_integer
+from pylbmisc.dm import is_numeric as _is_numeric
+from pylbmisc.dm import is_string as _is_string
+from pylbmisc.dm import to_categorical as _to_categorical
+from pylbmisc.dm import to_date as _to_date
+from typing import Sequence as _Sequence
 
 
 # ------------------------------------
@@ -105,6 +111,94 @@ def export_figure(fig,
 # ------------------------------------
 # Dataset Import/export routines
 # ------------------------------------
+# import pandas as _pd
+# from pathlib import Path as _Path
+# from pylbmisc.dm import _default_dtype_backend
+# # import pylbmisc as lb
+# from pylbmisc.dm import is_integer as _is_integer
+# from pylbmisc.dm import is_numeric as _is_string
+# from pylbmisc.dm import is_numeric as _is_numeric
+
+
+def _make_rec_dict(f, t):
+    rec_df = (
+        _pd.DataFrame({"from": f, "to": t})
+        .drop_duplicates()
+        .dropna()
+        .sort_values(by="from")
+    )
+    ft = _OrderedDict()
+    for row in rec_df.itertuples():
+        ft[row[1]] = row[2]
+    return ft
+
+
+def import_redcap(
+        data_fpath: str | _Path = "data/DATA.csv",
+        labels_fpath: str | _Path = "data/LABELS.csv",
+        csv_kwargs: dict = {"dtype_backend": _default_dtype_backend},
+        verbose=False
+) -> _pd.DataFrame:
+    """
+    Import dataset exported from redcap adding labels
+
+    The idea is adding names as data['var'].name = labels['var'].column
+
+    Parameters
+    ----------
+    data_path: str | Path
+        csv of raw data export
+    labels_path: str | Path
+        csv of labelled data export
+
+    Examples
+    --------
+    >>> df = import_redcap("data/DATA.csv", "data/LABELS.csv")
+    """
+    data = _pd.read_csv(data_fpath, **csv_kwargs)
+    labels = _pd.read_csv(labels_fpath, **csv_kwargs)
+
+    varnames = data.columns.to_list()
+    comments = labels.columns.to_list()
+
+    if (data.shape[1] != labels.shape[1]):
+        msg = "I dataframe passati debbono avere lo stesso numero di colonne"
+        raise Exception(msg)
+
+    final = data.copy()
+
+    # process column by column
+    for ncol in range(data.shape[1]):
+        varname = varnames[ncol]
+        if verbose:
+            print(f"Doing {varname}")
+        # add labels
+        final[varname].name = comments[ncol]
+
+        # do recoding if needed
+        raw = data.iloc[:, ncol]    # raw variable (before recoding)
+        rec = labels.iloc[:, ncol]  # recoded variable (after recoding)
+
+        # factor: raw stringa/intero/numerico e ricodificato a stringa
+        probable_factor = ((_is_integer(raw) or _is_numeric(raw))
+                           and
+                           _is_string(rec))
+        probable_date = (_is_string(raw) and
+                         raw.str.fullmatch(r"\d{4}-\d{2}-\d{2}").all())
+
+        if probable_date:
+            final[varname] = _to_date(raw)
+        elif probable_factor:
+            rec_dict = _make_rec_dict(raw, rec)
+            final[varname] = _to_categorical(
+                raw,
+                levels=list(rec_dict.keys()),
+                labels=list(rec_dict.values()))
+
+    return final
+
+
+
 def import_data(fpaths: str | _Path | _Sequence[str | _Path],
                 csv_kwargs: dict = {"dtype_backend": _default_dtype_backend},
                 excel_kwargs: dict = {"dtype_backend": _default_dtype_backend},
@@ -282,15 +376,15 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
     r_code.append(f"{dfname} <- data.frame(")
     for var in df.columns:
         x = df[var]
-        if _pd.api.types.is_bool_dtype(x):
+        if _is_bool(x):
             r_code.append(_rdf_bool(x, var))
-        elif _pd.api.types.is_integer_dtype(x):
+        elif _is_integer(x):
             r_code.append(_rdf_integer(x, var))
-        elif _pd.api.types.is_numeric_dtype(x):
+        elif _is_numeric(x):
             r_code.append(_rdf_numeric(x, var))
-        elif _pd.api.types.is_categorical_dtype(x):
+        elif _is_categorical(x):
             r_code.append(_rdf_factor(x, var))
-        elif _pd.api.types.is_datetime64_any_dtype(x):
+        elif _is_datetime(x):
             r_code.append(_rdf_datetime(x, var))
         elif _is_string(x):
             r_code.append(_rdf_object(x, var))

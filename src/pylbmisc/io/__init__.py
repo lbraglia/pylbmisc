@@ -130,9 +130,6 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
     A dict of DataFrame
 
     '''
-    # import ipdb
-    # ipdb.set_trace()
-
     # uniform 1 to many and clean input
     if isinstance(fpaths, str) or isinstance(fpaths, _Path):
         fpaths = [fpaths]

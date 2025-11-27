@@ -7,7 +7,7 @@ import pandas as _pd
 import tempfile as _tempfile
 import zipfile as _zipfile
 
-from collections import OrderedDict as _OrderedDict
+# from collections import OrderedDict as _OrderedDict
 from pathlib import Path as _Path
 from pylbmisc.dm import _default_dtype_backend
 from pylbmisc.dm import fix_varnames as _fix_varnames
@@ -127,7 +127,7 @@ def _make_rec_dict(f, t):
         .dropna()
         .sort_values(by="from")
     )
-    ft = _OrderedDict()
+    ft = dict()
     for row in rec_df.itertuples():
         ft[row[1]] = row[2]
     return ft
@@ -165,15 +165,16 @@ def import_redcap(
         msg = "I dataframe passati debbono avere lo stesso numero di colonne"
         raise Exception(msg)
 
-    final = data.copy()
+    final_df = data.copy()
+    description_dict = dict()
 
     # process column by column
     for ncol in range(data.shape[1]):
         varname = varnames[ncol]
+        comment = comments[ncol]
+        description_dict[varname] = comment
         if verbose:
             print(f"Doing {varname}")
-        # add labels
-        final[varname].name = comments[ncol]
 
         # do recoding if needed
         raw = data.iloc[:, ncol]    # raw variable (before recoding)
@@ -187,16 +188,17 @@ def import_redcap(
                          raw.str.fullmatch(r"\d{4}-\d{2}-\d{2}").all())
 
         if probable_date:
-            final[varname] = _to_date(raw)
+            final_df[varname] = _to_date(raw)
         elif probable_factor:
             rec_dict = _make_rec_dict(raw, rec)
-            final[varname] = _to_categorical(
+            final_df[varname] = _to_categorical(
                 raw,
                 levels=list(rec_dict.keys()),
                 labels=list(rec_dict.values()))
+        else:
+            pass  # do nothing but in the previous cases
 
-    return final
-
+    return final_df, description_dict
 
 
 def import_data(fpaths: str | _Path | _Sequence[str | _Path],

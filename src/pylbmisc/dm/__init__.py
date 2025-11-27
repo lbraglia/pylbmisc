@@ -864,62 +864,6 @@ def extract_dates(x=None) -> _pd.Series:
     return x.apply(_extract_dates_worker)
 
 
-# def to_categorical(x=None,
-#                    categories: list[str] | None = None,
-#                    ordered: bool = False,
-#                    lowcase: bool = False) -> _pd.Categorical:
-#     """Coerce to categorical a pd.Series, with blank values as missing
-
-#     Parameters
-#     ----------
-#     x: Series or something coercible to
-#         data to be coerced
-#     categories: list of str
-#         labels to be considered as valid groups
-#     ordered: bool
-#         make an ordered categorical?
-#     lowcase: bool
-#         lowcase the data (str) before transforming to categories?
-
-#     Examples
-#     --------
-#     >>> import numpy as np
-#     >>> to_categorical([1, 2, 1, 2, 3])
-#     [1, 2, 1, 2, 3]
-#     Categories (3, int64): [1, 2, 3]
-#     >>> to_categorical([1, 2., 1., 2, 3, np.nan])
-#     [1.0, 2.0, 1.0, 2.0, 3.0, NaN]
-#     Categories (3, float64): [1.0, 2.0, 3.0]
-#     >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan])
-#     ['AA', 'sd', 'asd', 'aa', NaN, NaN]
-#     Categories (4, object): ['AA', 'aa', 'asd', 'sd']
-#     >>> to_categorical(["AA", "sd", "asd", "aa", "", np.nan], categories=["aa", "AA"] )
-#     ['AA', NaN, NaN, 'aa', NaN, NaN]
-#     Categories (2, object): ['aa', 'AA']
-#     >>> to_categorical(["AA", "sd", "asd", "aa", ""], lowcase = True)
-#     ['aa', 'sd', 'asd', 'aa', NaN]
-#     Categories (3, object): ['aa', 'asd', 'sd']
-#     """
-#     if x is None:
-#         msg = "x must be a Series or something coercible to, not None."
-#         raise ValueError(msg)
-#     if not isinstance(x, _pd.Series):
-#         x = _pd.Series(x)
-#     if is_string(x):
-#         # string preprocessing
-#         # rm spaces and uniform NAs
-#         x = x.str.strip()
-#         nas = (x.isna()) | (x == "")
-#         x[nas] = _pd.NA
-#         if lowcase:
-#             x = x.str.lower()
-#             if categories is not None:
-#                 categories = [c.lower() for c in categories]
-
-#     # categorical making
-#     return _pd.Categorical(x, categories=categories, ordered=ordered)
-
-
 def to_categorical(x=None,
                    levels=None,
                    labels=None,

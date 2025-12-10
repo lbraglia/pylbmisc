@@ -363,13 +363,30 @@ def _rdf_bool(x: _pd.Series, xn: str):
     return rval
 
 
+# def _rdf_datetime(x: _pd.Series, xn: str):
+#     val = ", ".join(x.dt.strftime("'%Y-%m-%d %H:%M:%S'"))
+#     rval = f"{xn} = c({val})"
+#     return rval
+
+
+def _datemap(x):
+    if _pd.isna(x):
+        return "NA"
+    else:
+        return x.strftime("'%Y-%m-%d %H:%M:%S'")
+
+    
 def _rdf_datetime(x: _pd.Series, xn: str):
-    val = ", ".join(x.dt.strftime("'%Y-%m-%d %H:%M:%S'"))
+    recoded = x.map(_datemap)
+    val = ", ".join(recoded)
     rval = f"{xn} = c({val})"
     return rval
 
 
-def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
+def _rdf(df: _pd.DataFrame,
+         path: str | _Path,
+         dfname: str = "df",
+         verbose: bool = False):
     """
     pd.DataFrame to R data.frame 'converter'
     """
@@ -378,6 +395,9 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
     r_code = []
     r_code.append(f"{dfname} <- data.frame(")
     for var in df.columns:
+        if verbose:
+            msg = f"Processing {var}."
+            print(msg)
         x = df[var]
         if _is_bool(x):
             r_code.append(_rdf_bool(x, var))
@@ -413,7 +433,8 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
                 path: str | _Path,
                 ext: str | list[str] = ["xlsx", "csv", "pkl", "R", "feather"],
                 index=False,
-                dfname="df"
+                dfname="df",
+                verbose=False
                 ) -> None:
     """Export a DataFrame or a dict of DataFrames as csv/xlsx
 
@@ -430,6 +451,8 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
         str or list of string with file extensions
     index:
         bool add index in exporting (typically True for results, False for data)
+    verbose: bool
+        for single variables exporting (R) say the varname which is processed
     """
 
     if not (isinstance(x, _pd.DataFrame) or isinstance(x, dict)):
@@ -480,8 +503,8 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
         if isinstance(x, _pd.DataFrame):
             _rdf(x,
                  path if path_has_suffix else path.with_suffix(".R"),
-                 dfname
-                 )
+                 dfname,
+                 verbose=verbose)
         elif isinstance(x, dict):
             # use dict key as postfix
             for k, v in x.items():

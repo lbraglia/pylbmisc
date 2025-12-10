@@ -171,6 +171,19 @@ def qcut(x, q, **kwargs) -> _pd.Categorical:
 # Tests
 # ------------------------------------------------------------------------
 
+def is_all_missing(x: _pd.Series) -> bool:
+    """Check if all the Series is composed of missing values
+
+    Check if all the Series is composed of missing values
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+    """
+    return x.isna().all()
+
+
 def is_string(x: _pd.Series) -> bool:
     """Check the type of a Series to be composed of string.
 

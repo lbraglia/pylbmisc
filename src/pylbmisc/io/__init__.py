@@ -17,6 +17,7 @@ from pylbmisc.dm import is_datetime as _is_datetime
 from pylbmisc.dm import is_integer as _is_integer
 from pylbmisc.dm import is_numeric as _is_numeric
 from pylbmisc.dm import is_string as _is_string
+from pylbmisc.dm import is_all_missing as _is_all_missing
 from pylbmisc.dm import to_categorical as _to_categorical
 from pylbmisc.dm import to_date as _to_date
 from typing import Sequence as _Sequence
@@ -390,6 +391,9 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
             r_code.append(_rdf_datetime(x, var))
         elif _is_string(x):
             r_code.append(_rdf_object(x, var))
+        elif _is_all_missing(x):
+            msg = f"{var} tutto missing, non esportato."
+            print(msg)
         else:
             msg = f"{var}: il tipo {x.dtype!r} non è ancora gestito."
             raise ValueError(msg)
@@ -407,7 +411,7 @@ def _rdf(df: _pd.DataFrame, path: str | _Path, dfname: str = "df"):
 
 def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
                 path: str | _Path,
-                ext: str | list[str] = ["xlsx", "csv", "pkl", "R"],
+                ext: str | list[str] = ["xlsx", "csv", "pkl", "R", "feather"],
                 index=False,
                 dfname="df"
                 ) -> None:
@@ -483,6 +487,16 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
             for k, v in x.items():
                 r_path = path.parent / (str(path.stem) + f"_{k}.R")
                 _rdf(v, r_path, dfname = k)
+
+    if "feather" in used_formats:
+        if isinstance(x, _pd.DataFrame):
+            x.to_feather(path if path_has_suffix else path.with_suffix(".feather"))
+        elif isinstance(x, dict):
+            # use dict key as postfix
+            for k, v in x.items():
+                feather_path = path.parent / (str(path.stem) + f"_{k}.feather")
+                v.to_feather(feather_path)
+
 
 
 # ------------------------------------

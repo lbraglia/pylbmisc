@@ -418,10 +418,12 @@ def _rdf(df: _pd.DataFrame,
             msg = f"{var}: il tipo {x.dtype!r} non è ancora gestito."
             raise ValueError(msg)
         is_last = var == df.columns[-1]
-        if not is_last:
-            r_code.append(",\n")
-        else:
+        if is_last:
             r_code.append(")\n")
+        elif _is_all_missing(x):
+            r_code.append("\n")
+        else:
+            r_code.append(",\n")
 
     # fix some NA
     r_code = [line.replace("<NA>", "NA") for line in r_code]

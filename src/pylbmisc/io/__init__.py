@@ -294,6 +294,11 @@ def import_data(fpaths: str | _Path | _Sequence[str | _Path],
 
 # _rdf: pd.DataFrame to R data.frame converter (a-la dput)
 # --------------------------------------------------------
+def _rdf_missing(x: _pd.Series, xn: str):
+    rval = f"{xn} = c(NA)"
+    return rval
+
+
 def _rdf_integer(x: _pd.Series, xn: str):
     data_str = x.to_string(
         na_rep="NA",
@@ -385,8 +390,7 @@ def _rdf_datetime(x: _pd.Series, xn: str):
 
 def _rdf(df: _pd.DataFrame,
          path: str | _Path,
-         dfname: str = "df",
-         verbose: bool = False):
+         dfname: str = "df"):
     """
     pd.DataFrame to R data.frame 'converter'
     """
@@ -395,9 +399,6 @@ def _rdf(df: _pd.DataFrame,
     r_code = []
     r_code.append(f"{dfname} <- data.frame(")
     for var in df.columns:
-        if verbose:
-            msg = f"Processing {var}."
-            print(msg)
         x = df[var]
         if _is_bool(x):
             r_code.append(_rdf_bool(x, var))
@@ -412,16 +413,13 @@ def _rdf(df: _pd.DataFrame,
         elif _is_string(x):
             r_code.append(_rdf_object(x, var))
         elif _is_all_missing(x):
-            msg = f"{var} tutto missing, non esportato."
-            print(msg)
+            r_code.append(_rdf_missing(x, var))
         else:
             msg = f"{var}: il tipo {x.dtype!r} non è ancora gestito."
             raise ValueError(msg)
         is_last = var == df.columns[-1]
         if is_last:
             r_code.append(")\n")
-        elif _is_all_missing(x):
-            r_code.append("\n")
         else:
             r_code.append(",\n")
 
@@ -435,8 +433,7 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
                 path: str | _Path,
                 ext: str | list[str] = ["xlsx", "csv", "pkl", "R", "feather"],
                 index=False,
-                dfname="df",
-                verbose=False
+                dfname="df"
                 ) -> None:
     """Export a DataFrame or a dict of DataFrames as csv/xlsx
 
@@ -461,7 +458,7 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
         msg = "x deve essere un pd.DataFrame o un dict di pd.DataFrame"
         raise ValueError(msg)
 
-    if isinstance(ext, str): #uniforma
+    if isinstance(ext, str):  # uniforma
         ext = [ext]
 
     path = _Path(path)
@@ -505,13 +502,12 @@ def export_data(x: _pd.DataFrame | dict[str, _pd.DataFrame],
         if isinstance(x, _pd.DataFrame):
             _rdf(x,
                  path if path_has_suffix else path.with_suffix(".R"),
-                 dfname,
-                 verbose=verbose)
+                 dfname)
         elif isinstance(x, dict):
             # use dict key as postfix
             for k, v in x.items():
                 r_path = path.parent / (str(path.stem) + f"_{k}.R")
-                _rdf(v, r_path, dfname = k)
+                _rdf(v, r_path, dfname=k)
 
     if "feather" in used_formats:
         if isinstance(x, _pd.DataFrame):

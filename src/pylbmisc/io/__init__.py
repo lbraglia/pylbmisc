@@ -13,6 +13,7 @@ from pylbmisc.dm import _default_dtype_backend
 from pylbmisc.dm import fix_varnames as _fix_varnames
 from pylbmisc.dm import is_bool as _is_bool
 from pylbmisc.dm import is_categorical as _is_categorical
+from pylbmisc.dm import is_date as _is_date
 from pylbmisc.dm import is_datetime as _is_datetime
 from pylbmisc.dm import is_integer as _is_integer
 from pylbmisc.dm import is_numeric as _is_numeric
@@ -332,7 +333,7 @@ def _rdf_factor(x: _pd.Series, xn: str):
     labels = []
     for lev, lab in enumerate(categs):
         levels.append(str(lev))
-        labels.append(f"'{lab}'")
+        labels.append(f'"{lab}"')
 
     levs = ", ".join(levels)
     labs = ", ".join(labels)
@@ -368,13 +369,7 @@ def _rdf_bool(x: _pd.Series, xn: str):
     return rval
 
 
-# def _rdf_datetime(x: _pd.Series, xn: str):
-#     val = ", ".join(x.dt.strftime("'%Y-%m-%d %H:%M:%S'"))
-#     rval = f"{xn} = c({val})"
-#     return rval
-
-
-def _datemap(x):
+def _datetimemap(x):
     if _pd.isna(x):
         return "NA"
     else:
@@ -382,10 +377,25 @@ def _datemap(x):
 
     
 def _rdf_datetime(x: _pd.Series, xn: str):
+    recoded = x.map(_datetimemap)
+    val = ", ".join(recoded)
+    rval = f"{xn} = c({val})"
+    return rval
+
+
+def _datemap(x):
+    if _pd.isna(x):
+        return "NA"
+    else:
+        return x.strftime("'%Y-%m-%d'")
+    
+
+def _rdf_date(x: _pd.Series, xn: str):
     recoded = x.map(_datemap)
     val = ", ".join(recoded)
     rval = f"{xn} = c({val})"
     return rval
+
 
 
 def _rdf(df: _pd.DataFrame,
@@ -408,6 +418,8 @@ def _rdf(df: _pd.DataFrame,
             r_code.append(_rdf_numeric(x, var))
         elif _is_categorical(x):
             r_code.append(_rdf_factor(x, var))
+        elif _is_date(x):
+            r_code.append(_rdf_date(x, var))
         elif _is_datetime(x):
             r_code.append(_rdf_datetime(x, var))
         elif _is_string(x):

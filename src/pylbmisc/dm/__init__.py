@@ -7,6 +7,7 @@ import pandas as _pd
 import pyarrow as _pa
 import re as _re
 import string as _string
+import datetime as _dt
 
 from collections import Counter as _Counter
 from functools import singledispatch as _singledispatch
@@ -263,6 +264,28 @@ def is_datetime(x: _pd.Series) -> bool:
         the Series to be checked
     """
     return _pd.api.types.is_datetime64_any_dtype(x)
+
+
+def is_date(x: _pd.Series) -> bool:
+    """Check the type of a Series to be composed of dates.
+
+    Parameters
+    ----------
+    x:
+        the Series to be checked
+    """
+    # If it's not a datetime it can't be a date
+    if not is_datetime(x):
+        return False
+
+    # otherwise check if all the times are zero; fix na for the sake of god:
+    # don't put in all the comparison based on NA
+    zero_time = (x.dt.time == _dt.time(0, 0))
+    zero_time = zero_time[~ x.isna()]
+    return zero_time.all()
+
+
+
 
 
 # -------------------------------------------------------------------------

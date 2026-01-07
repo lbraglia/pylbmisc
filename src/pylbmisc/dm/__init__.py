@@ -791,14 +791,18 @@ def to_numeric(x=None) -> _pd.Series:
                           dtype_backend=_default_dtype_backend)
 
 
-def to_datetime(x=None) -> _pd.Series:
+def to_datetime(x=None, *args, **kwargs) -> _pd.Series:
     """Coerce to a datetime a pd.Series
 
     Parameters
     ----------
     x: Series or something coercible to
         data to be coerced
-
+    args:
+        other arguments passed to pd.to_datetime
+    kwargs:
+        other arguments passed to pd.to_datetime
+    
     Examples
     --------
     >>> to_datetime(['2025-03-01 10:02:22.756611'] * 2)
@@ -811,16 +815,20 @@ def to_datetime(x=None) -> _pd.Series:
         raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
-    return _pd.to_datetime(x, errors="coerce")
+    return _pd.to_datetime(x, errors="coerce", *args, **kwargs)
 
 
-def to_date(x=None) -> _pd.Series:
+def to_date(x=None, *args, **kwargs) -> _pd.Series:
     """Coerce to a date a pd.Series
 
     Parameters
     ----------
     x: Series or something coercible to
         data to be coerced
+    args:
+        other arguments passed to pd.to_datetime
+    kwargs:
+        other arguments passed to pd.to_datetime
 
     Examples
     --------
@@ -838,7 +846,7 @@ def to_date(x=None) -> _pd.Series:
         raise ValueError(msg)
     if not isinstance(x, _pd.Series):
         x = _pd.Series(x)
-    return to_datetime(x).dt.floor("D")
+    return to_datetime(x, *args, **kwargs).dt.floor("D")
 
 
 def _extract_dates_worker(x):

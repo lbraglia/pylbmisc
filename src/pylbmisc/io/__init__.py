@@ -397,6 +397,23 @@ def _rdf_date(x: _pd.Series, xn: str):
     return rval
 
 
+def _rdf_datetime_coercion_code(varlist, are_dates=True):
+    v2 = [f"'{v}'" for v in varlist]
+    v2 = ", ".join(v2)
+    if are_dates:
+        # dates code
+        varlist = f"datevars <- c({v2});"
+        importcmd = "df[, datevars] <- lapply(df[, datevars], as.Date);"
+        cleaning = "rm(datevars);"
+        return [varlist, importcmd, cleaning]
+    else:
+        # datetimes code
+        varlist = f"dt_vars <- c({v2});"
+        importfun = "imp_dt <- function(x) as.POSIXct(x, format='%Y-%m-%d %H:%M:%S');"
+        importcmd = "df[, dt_vars] <- lapply(df[, dt_vars], imp_dt);"
+        cleaning = "rm(dt_vars, imp_dt);"
+        return [varlist, importfun, importcmd, cleaning, ""]
+
 
 def _rdf(df: _pd.DataFrame,
          path: str | _Path,
@@ -407,6 +424,8 @@ def _rdf(df: _pd.DataFrame,
     path = _Path(path)
 
     r_code = []
+    date_vars = []
+    datetime_vars = []
     r_code.append(f"{dfname} <- data.frame(")
     for var in df.columns:
         x = df[var]
@@ -420,8 +439,10 @@ def _rdf(df: _pd.DataFrame,
             r_code.append(_rdf_factor(x, var))
         elif _is_date(x):
             r_code.append(_rdf_date(x, var))
+            date_vars.append(var)
         elif _is_datetime(x):
             r_code.append(_rdf_datetime(x, var))
+            datetime_vars.append(var)
         elif _is_string(x):
             r_code.append(_rdf_object(x, var))
         elif _is_all_missing(x):
@@ -437,6 +458,12 @@ def _rdf(df: _pd.DataFrame,
 
     # fix some NA
     r_code = [line.replace("<NA>", "NA") for line in r_code]
+    # add code for date/datetime import
+    if date_vars:
+        r_code += _rdf_datetime_coercion_code(date_vars, are_dates=True)
+    if datetime_vars:
+        r_code += _rdf_datetime_coercion_code(datetime_vars, are_dates=False)
+    # finally export the surce code
     with path.open(mode="w") as f:
         f.writelines(r_code)
 
